@@ -469,7 +469,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             borderBottom: '1px solid var(--table-border-color)',
             textWrap: 'nowrap',
             verticalAlign: 'top',
-            padding: '16px 12px',
+            padding: 'var(--table-cell-padding, 16px 12px)',
             textAlign: 'left',
             lineHeight: '24px',
             fontSize: '1em',
@@ -485,7 +485,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           },
           'td:not(.config-td)': {
             verticalAlign: 'top',
-            padding: '16px 12px',
+            padding: 'var(--table-cell-padding, 16px 12px)',
             textAlign: 'left',
             position: 'relative',
             lineHeight: '24px',
