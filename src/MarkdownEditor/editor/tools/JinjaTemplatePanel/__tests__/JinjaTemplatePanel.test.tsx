@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { I18nProvide } from '../../../../I18n';
 import { useEditorStore } from '../../../store';
 import { JinjaTemplatePanel } from '../index';
 
@@ -56,7 +57,11 @@ describe('JinjaTemplatePanel', () => {
   });
 
   it('renders nothing when openJinjaTemplate is false', () => {
-    const { container } = render(<JinjaTemplatePanel />);
+    const { container } = render(
+      <I18nProvide>
+        <JinjaTemplatePanel />
+      </I18nProvide>,
+    );
     expect(container.firstChild).toBeNull();
   });
 
@@ -67,7 +72,11 @@ describe('JinjaTemplatePanel', () => {
       jinjaAnchorPath: [0],
     } as any);
 
-    render(<JinjaTemplatePanel />);
+    render(
+      <I18nProvide>
+        <JinjaTemplatePanel />
+      </I18nProvide>,
+    );
 
     expect(
       screen.getByRole('listbox', { name: 'Jinja template list' }),
@@ -94,7 +103,11 @@ describe('JinjaTemplatePanel', () => {
       },
     } as any);
 
-    render(<JinjaTemplatePanel />);
+    render(
+      <I18nProvide>
+        <JinjaTemplatePanel />
+      </I18nProvide>,
+    );
 
     expect(screen.getByText('自定义无数据提示')).toBeInTheDocument();
   });

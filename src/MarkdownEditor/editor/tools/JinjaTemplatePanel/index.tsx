@@ -1,16 +1,18 @@
-import { ConfigProvider, Typography } from 'antd';
+import { Info } from '@sofa-design/icons';
+import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import isHotkey from 'is-hotkey';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { Editor, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
+import { useLocale } from '../../../../I18n';
 import type { JinjaTemplateItem } from '../../../types';
 import { useEditorStore } from '../../store';
 import { getOffsetLeft } from '../../utils/dom';
 import { EditorUtils } from '../../utils/editorUtils';
 import { JINJA_PANEL_PREFIX_CLS, useJinjaTemplatePanelStyle } from './style';
-import { JINJA_DOC_LINK, JINJA_TEMPLATE_DATA } from './templates';
+import { getJinjaTemplateData, JINJA_DOC_LINK } from './templates';
 
 const PANEL_MAX_HEIGHT = 320;
 
@@ -51,7 +53,12 @@ export const JinjaTemplatePanel: React.FC = () => {
   const notFoundContent = templatePanelConfig?.notFoundContent ?? null;
   const itemsConfig = templatePanelConfig?.items;
 
-  const [items, setItems] = useState<JinjaTemplateItem[]>(JINJA_TEMPLATE_DATA);
+  const locale = useLocale();
+  const defaultItems = useMemo(
+    () => getJinjaTemplateData(locale),
+    [locale],
+  );
+  const [items, setItems] = useState<JinjaTemplateItem[]>(defaultItems);
   const [loading, setLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [position, setPosition] = useState<{
@@ -63,7 +70,8 @@ export const JinjaTemplatePanel: React.FC = () => {
 
   const context = React.useContext(ConfigProvider.ConfigContext);
   const prefixCls =
-    context?.getPrefixCls?.('agentic-md-editor-jinja-panel') ?? JINJA_PANEL_PREFIX_CLS;
+    context?.getPrefixCls?.('agentic-md-editor-jinja-panel') ??
+    JINJA_PANEL_PREFIX_CLS;
   const { wrapSSR, hashId } = useJinjaTemplatePanelStyle(prefixCls);
 
   const close = useCallback(() => {
@@ -89,10 +97,10 @@ export const JinjaTemplatePanel: React.FC = () => {
       const editor = markdownEditorRef?.current;
       itemsConfig({ editor })
         .then((list) => {
-          setItems(Array.isArray(list) ? list : JINJA_TEMPLATE_DATA);
+          setItems(Array.isArray(list) ? list : defaultItems);
         })
         .catch((err) => {
-          setItems(JINJA_TEMPLATE_DATA);
+          setItems(defaultItems);
           if (process.env.NODE_ENV !== 'production') {
             console.error(
               '[JinjaTemplatePanel] Failed to load template items:',
@@ -104,9 +112,9 @@ export const JinjaTemplatePanel: React.FC = () => {
     } else if (Array.isArray(itemsConfig)) {
       setItems(itemsConfig);
     } else {
-      setItems(JINJA_TEMPLATE_DATA);
+      setItems(defaultItems);
     }
-  }, [openJinjaTemplate, itemsConfig, markdownEditorRef]);
+  }, [openJinjaTemplate, itemsConfig, markdownEditorRef, defaultItems]);
 
   useEffect(() => {
     if (!openJinjaTemplate || !jinjaAnchorPath || !markdownEditorRef?.current)
@@ -220,30 +228,36 @@ export const JinjaTemplatePanel: React.FC = () => {
       }}
       onMouseDown={(e) => e.preventDefault()}
     >
-      <div className={`${prefixCls}__content`}>
-        {docLink ? (
-          <div className={`${prefixCls}__doc-link`}>
-            <Typography.Link
-              href={docLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="打开 Jinja 使用说明（新窗口）"
-            >
-              使用说明
-            </Typography.Link>
+      <div className={`${prefixCls}-content`}>
+        <div className={`${prefixCls}-header`}>
+          <div className={`${prefixCls}-title`}>
+            {locale['jinja.panel.title']}
           </div>
-        ) : null}
-        <div className={`${prefixCls}__list-box`}>
+          {docLink ? (
+            <div
+              className={`${prefixCls}-doc-link`}
+              onClick={(e) => {
+                e.preventDefault();
+                window.open(docLink, '_blank');
+              }}
+            >
+              <Info />
+              {locale['jinja.panel.docLink']}
+            </div>
+          ) : null}
+        </div>
+
+        <div className={`${prefixCls}-list-box`}>
           {loading ? (
             <div style={{ padding: 12, color: 'var(--color-text-secondary)' }}>
-              加载中...
+              {locale.loading}
             </div>
           ) : items.length === 0 ? (
             (notFoundContent ?? (
               <div
                 style={{ padding: 12, color: 'var(--color-text-secondary)' }}
               >
-                暂无模板
+                {locale['jinja.panel.noTemplates']}
               </div>
             ))
           ) : (
@@ -252,8 +266,8 @@ export const JinjaTemplatePanel: React.FC = () => {
                 key={i}
                 role="option"
                 aria-selected={i === activeIndex}
-                className={classNames(`${prefixCls}__item`, {
-                  [`${prefixCls}__item--active`]: i === activeIndex,
+                className={classNames(`${prefixCls}-item`, {
+                  [`${prefixCls}-item-active`]: i === activeIndex,
                 })}
                 onMouseDown={(e) => {
                   e.preventDefault();
@@ -261,9 +275,9 @@ export const JinjaTemplatePanel: React.FC = () => {
                 }}
                 onMouseEnter={() => setActiveIndex(i)}
               >
-                <span className={`${prefixCls}__item-title`}>{item.title}</span>
+                <span className={`${prefixCls}-item-title`}>{item.title}</span>
                 {item.description ? (
-                  <span className={`${prefixCls}__item-desc`}>
+                  <span className={`${prefixCls}-item-desc`}>
                     {item.description}
                   </span>
                 ) : null}

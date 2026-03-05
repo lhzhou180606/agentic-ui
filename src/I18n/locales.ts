@@ -405,6 +405,20 @@ export const cnLabels = {
   'refine.loading': '优化中',
   'refine.oneClickOptimize': '一键优化提示词',
   'refine.optimizePrompt': '优化提示词',
+  // Jinja 模板面板相关
+  'jinja.panel.title': 'Jinja 模板',
+  'jinja.panel.docLink': '使用说明',
+  'jinja.panel.noTemplates': '暂无模板',
+  'jinja.template.variableInterpolation.title': '变量插值',
+  'jinja.template.variableInterpolation.description': '{{ variable }}',
+  'jinja.template.condition.title': '条件语句',
+  'jinja.template.condition.description': '{% if condition %}...{% endif %}',
+  'jinja.template.loop.title': '循环遍历',
+  'jinja.template.loop.description': '{% for item in list %}...{% endfor %}',
+  'jinja.template.filter.title': '过滤器',
+  'jinja.template.filter.description': '{{ value | filter }}',
+  'jinja.template.setVariable.title': '设置变量',
+  'jinja.template.setVariable.description': '{% set name = value %}',
 };
 
 /**
@@ -822,4 +836,18 @@ export const enLabels: typeof cnLabels = {
   'refine.loading': 'Optimizing',
   'refine.oneClickOptimize': 'One-click optimize prompt',
   'refine.optimizePrompt': 'Optimize prompt',
+  // Jinja template panel related
+  'jinja.panel.title': 'Jinja Templates',
+  'jinja.panel.docLink': 'Documentation',
+  'jinja.panel.noTemplates': 'No templates',
+  'jinja.template.variableInterpolation.title': 'Variable interpolation',
+  'jinja.template.variableInterpolation.description': '{{ variable }}',
+  'jinja.template.condition.title': 'Conditional',
+  'jinja.template.condition.description': '{% if condition %}...{% endif %}',
+  'jinja.template.loop.title': 'Loop',
+  'jinja.template.loop.description': '{% for item in list %}...{% endfor %}',
+  'jinja.template.filter.title': 'Filter',
+  'jinja.template.filter.description': '{{ value | filter }}',
+  'jinja.template.setVariable.title': 'Set variable',
+  'jinja.template.setVariable.description': '{% set name = value %}',
 };

@@ -13,61 +13,74 @@ const genJinjaPanelStyle: GenerateStyle<ChatTokenType> = (token) => {
       boxSizing: 'border-box',
       display: 'flex',
       flexDirection: 'column',
+      width: 360,
+      height: 200,
       maxHeight: 320,
       minWidth: 240,
       overflow: 'hidden',
-      borderRadius: token.borderRadius,
-      backgroundColor: token.colorBgContainer,
-      boxShadow: token.boxShadowSecondary,
-      border: `1px solid ${token.colorBorder}`,
-      '&__content': {
+      borderRadius: 'var(--radius-control-sm, var(--ant-border-radius-sm))',
+      backgroundColor:
+        'var(--color-gray-bg-page-light, var(--ant-color-bg-container))',
+      boxShadow: 'var(--shadow-control-lg, var(--ant-box-shadow))',
+      '&-content': {
         display: 'flex',
         flexDirection: 'column',
         flex: 1,
         overflow: 'hidden',
+        padding: 4,
       },
-      '&__doc-link': {
-        padding: '8px 12px',
-        fontSize: token.fontSizeSM,
-        color: token.colorLink,
-        borderBottom: `1px solid ${token.colorBorder}`,
-        a: {
-          color: 'inherit',
-          textDecoration: 'none',
-          '&:hover': { textDecoration: 'underline' },
-          '&:focus-visible': {
-            outline: `2px solid ${token.colorPrimary}`,
-            outlineOffset: 2,
-            borderRadius: token.borderRadiusSM,
-          },
-        },
+      '&-header': {
+        padding: '6px 12px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
       },
-      '&__list-box': {
+      '&-title': {
+        font: 'var(--font-text-body-emphasized-sm)',
+        letterSpacing: 'var(--letter-spacing-body-emphasized-sm, normal)',
+        color: 'var(--color-gray-text-light, var(--ant-color-text-secondary))',
+      },
+      '&-doc-link': {
+        display: 'flex',
+        cursor: 'pointer',
+        alignItems: 'center',
+        gap: 4,
+        font: 'var(--font-text-body-emphasized-sm)',
+        letterSpacing: 'var(--letter-spacing-body-emphasized-sm, normal)',
+        color: 'var(--color-primary-text-default, var(--ant-color-link))',
+      },
+      '&-list-box': {
         flex: 1,
         overflowY: 'auto',
         padding: '4px 0',
       },
-      '&__item': {
+      '&-item': {
         display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
+        borderRadius: token.borderRadiusSM,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
         padding: '8px 12px',
         cursor: 'pointer',
         '&:hover': {
           backgroundColor: token.colorFillTertiary,
         },
-        '&--active': {
-          backgroundColor: token.controlItemBgHover,
-        },
       },
-      '&__item-title': {
-        fontSize: token.fontSize,
-        fontWeight: token.fontWeightStrong,
-        color: token.colorText,
+      '&-item-active': {
+        backgroundColor: token.controlItemBgHover,
       },
-      '&__item-desc': {
-        fontSize: token.fontSizeSM,
-        color: token.colorTextSecondary,
+      '&-item-title': {
+        flexShrink: 0,
+        font: 'var(--font-text-body-base)',
+        letterSpacing: 'var(--letter-spacing-body-base, normal)',
+        color: 'var(--color-gray-text-default, var(--ant-color-text))',
+      },
+      '&-item-desc': {
+        flex: 1,
+        minWidth: 0,
+        font: 'var(--font-text-body-sm)',
+        letterSpacing: 'var(--letter-spacing-body-sm, normal)',
+        color: 'var(--color-gray-text-light, var(--ant-color-text-secondary))',
       },
     },
   };
