@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cnLabels } from '../../../../I18n';
+import { cnLabels } from '../../../../../I18n';
 import {
   getJinjaTemplateData,
   JINJA_DOC_LINK,
