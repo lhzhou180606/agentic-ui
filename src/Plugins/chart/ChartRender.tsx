@@ -136,6 +136,7 @@ const ChartRuntimeRendererImpl: React.FC<{
   getFieldValue,
   loading = false,
 }) => {
+  const i18n = useContext(I18nContext);
   const {
     DonutChart,
     FunnelChart,
@@ -331,7 +332,10 @@ const ChartRuntimeRendererImpl: React.FC<{
         height={config?.height || 400}
         title={title || ''}
         dataTime={dataTime}
-        typeNames={{ rate: '转化率', name: colorLegend || '转化' }}
+        typeNames={{
+          rate: i18n?.locale?.['common.conversionRate'] || '转化率',
+          name: colorLegend || i18n?.locale?.['common.conversion'] || '转化',
+        }}
         toolbarExtra={toolBar}
         loading={loading}
       />

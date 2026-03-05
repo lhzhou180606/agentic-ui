@@ -1,9 +1,7 @@
 /**
  * 中文标签映射对象
  *
- * 包含所有界面文本的中文翻译，用于国际化  dataTime: '数据时间',
-  columns: '列',
-  all: '全部',
+ * 包含所有界面文本的中文翻译，用于国际化
  * 提供完整的用户界面文本本地化。
  */
 export const cnLabels = {
@@ -397,6 +395,16 @@ export const cnLabels = {
   // 图表错误相关
   'chart.renderFailed': '图表渲染失败',
   'chart.renderFailedSubTitle': '图表组件遇到了一个错误，请稍后重试',
+  // DonutChart 图例相关
+  'chart.legend.show': '显示',
+  'chart.legend.hide': '隐藏',
+  'chart.legend.prevPage': '上一页',
+  'chart.legend.nextPage': '下一页',
+  'chart.legend.remaining': '剩余',
+  // RefinePromptButton 相关
+  'refine.loading': '优化中',
+  'refine.oneClickOptimize': '一键优化提示词',
+  'refine.optimizePrompt': '优化提示词',
 };
 
 /**
@@ -804,4 +812,14 @@ export const enLabels: typeof cnLabels = {
   'chart.renderFailed': 'Chart Rendering Failed',
   'chart.renderFailedSubTitle':
     'The chart component encountered an error, please try again later',
+  // DonutChart legend related
+  'chart.legend.show': 'Show',
+  'chart.legend.hide': 'Hide',
+  'chart.legend.prevPage': 'Previous page',
+  'chart.legend.nextPage': 'Next page',
+  'chart.legend.remaining': 'Remaining',
+  // RefinePromptButton related
+  'refine.loading': 'Optimizing',
+  'refine.oneClickOptimize': 'One-click optimize prompt',
+  'refine.optimizePrompt': 'Optimize prompt',
 };

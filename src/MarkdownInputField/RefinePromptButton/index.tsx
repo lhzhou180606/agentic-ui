@@ -2,6 +2,8 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { TextOptimize } from '@sofa-design/icons';
 import { ConfigProvider, Tooltip } from 'antd';
 import React, { useContext } from 'react';
+
+import { useLocale } from '../../I18n';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { isBrowserEnv } from './env';
@@ -20,6 +22,7 @@ export const RefinePromptButton: React.FC<RefinePromptButtonProps> = (
 ) => {
   const { disabled, status, onRefine } = props;
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
+  const locale = useLocale();
   const baseCls = getPrefixCls('agentic-md-input-field-refine-button');
   const { wrapSSR } = useStyle(baseCls);
 
@@ -39,9 +42,15 @@ export const RefinePromptButton: React.FC<RefinePromptButtonProps> = (
   }
 
   return wrapSSR(
-    <Tooltip title={status === 'loading' ? '优化中' : '一键优化提示词'}>
+    <Tooltip
+      title={
+        status === 'loading'
+          ? locale['refine.loading']
+          : locale['refine.oneClickOptimize']
+      }
+    >
       <ActionIconBox
-        title={'优化提示词'}
+        title={locale['refine.optimizePrompt']}
         onClick={handleClick}
         data-testid="refine-prompt-button"
       >

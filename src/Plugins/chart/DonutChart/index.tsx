@@ -9,6 +9,8 @@ import {
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 import classNames from 'clsx';
 import React, { useContext, useMemo, useRef, useState } from 'react';
+
+import { useLocale } from '../../../../I18n';
 import { Doughnut } from 'react-chartjs-2';
 import {
   ChartContainer,
@@ -123,6 +125,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
   }, []);
 
   const { isMobile, windowWidth } = useMobile();
+  const locale = useLocale();
 
   // 默认配置：当 configs 不传时，使用默认配置，showLegend 默认为 true
   const defaultConfigs: DonutChartConfig[] = [{ showLegend: true }];
@@ -403,7 +406,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
             chartData = [
               currentDataItem,
               {
-                label: '剩余',
+                label: locale['chart.legend.remaining'],
                 value: remainingValue,
                 category: currentDataItem.category,
               },

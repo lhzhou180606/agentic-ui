@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+
+import { useLocale } from '../../../../I18n';
 import { DonutChartData } from './types';
 
 /** 图例每页显示条数，超过则显示分页 */
@@ -29,6 +31,7 @@ const Legend: React.FC<LegendProps> = ({
   hashId,
   isMobile,
 }) => {
+  const locale = useLocale();
   const hiddenDataIndices = React.useMemo(() => {
     return hiddenDataIndicesByChart[chartIndex] || new Set<number>();
   }, [hiddenDataIndicesByChart, chartIndex]);
@@ -105,7 +108,7 @@ const Legend: React.FC<LegendProps> = ({
             }}
             tabIndex={0}
             role="button"
-            aria-label={`${isHidden ? '显示' : '隐藏'} ${d.label}`}
+            aria-label={`${isHidden ? locale['chart.legend.show'] : locale['chart.legend.hide']} ${d.label}`}
           >
             <span
               className={[`${baseClassName}-legend-color`, hashId]
@@ -179,7 +182,7 @@ const Legend: React.FC<LegendProps> = ({
         >
           <button
             type="button"
-            aria-label="上一页"
+            aria-label={locale['chart.legend.prevPage']}
             disabled={currentPage <= 0}
             onClick={handlePrevPage}
             style={{
@@ -199,7 +202,7 @@ const Legend: React.FC<LegendProps> = ({
           </span>
           <button
             type="button"
-            aria-label="下一页"
+            aria-label={locale['chart.legend.nextPage']}
             disabled={currentPage >= totalPages - 1}
             onClick={handleNextPage}
             style={{
