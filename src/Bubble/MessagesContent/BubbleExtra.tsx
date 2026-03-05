@@ -346,7 +346,6 @@ export const BubbleExtra = ({
   );
 
   const reSend = useMemo(() => {
-    console.log('originalData?.isAborted', originalData, typing);
     if (originalData?.isAborted && !originalData.isFinished) {
       return (
         <span>{locale?.['chat.message.aborted'] || '回答已停止生成'}</span>
