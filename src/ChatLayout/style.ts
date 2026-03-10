@@ -188,6 +188,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         height: 146,
         pointerEvents: 'none',
         overflow: 'hidden',
+        borderRadius: 'inherit',
       },
       [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
         '&-header': {
