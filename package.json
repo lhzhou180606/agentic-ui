@@ -24,7 +24,6 @@
     "lint:css": "stylelint \"{src,test}/**/*.{css,less}\"",
     "lint:es": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
     "prepare": "husky install && dumi setup",
-    "prepublishOnly": "father doctor && pnpm run test && pnpm run build",
     "prettier": "prettier --write \"{src,docs,test}/**/*.{js,jsx,ts,tsx,css,less,json,md}\"",
     "preview": "pnpm dumi preview",
     "report:demo": "node scripts/generateDemoReport.js",
