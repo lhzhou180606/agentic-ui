@@ -102,7 +102,9 @@ describe('ReadonlyTableComponent', () => {
     it('应该应用正确的类名', () => {
       renderComponent();
       const table = document.querySelector('table');
-      expect(table).toHaveClass('ant-agentic-md-editor-content-table-editor-table');
+      expect(table).toHaveClass(
+        'ant-agentic-md-editor-content-table-editor-table',
+      );
       expect(table).toHaveClass('readonly');
     });
 
@@ -129,7 +131,9 @@ describe('ReadonlyTableComponent', () => {
 
       renderComponent();
       const table = document.querySelector('table');
-      expect(table).toHaveClass('ant-agentic-md-editor-content-table-readonly-pure');
+      expect(table).toHaveClass(
+        'ant-agentic-md-editor-content-table-readonly-pure',
+      );
     });
   });
 
@@ -140,9 +144,18 @@ describe('ReadonlyTableComponent', () => {
         {
           type: 'table-row',
           children: [
-            { type: 'table-cell', children: [{ type: 'paragraph', children: [{ text: 'A' }] }] },
-            { type: 'table-cell', children: [{ type: 'paragraph', children: [{ text: 'B' }] }] },
-            { type: 'table-cell', children: [{ type: 'paragraph', children: [{ text: 'C' }] }] },
+            {
+              type: 'table-cell',
+              children: [{ type: 'paragraph', children: [{ text: 'A' }] }],
+            },
+            {
+              type: 'table-cell',
+              children: [{ type: 'paragraph', children: [{ text: 'B' }] }],
+            },
+            {
+              type: 'table-cell',
+              children: [{ type: 'paragraph', children: [{ text: 'C' }] }],
+            },
           ],
         },
       ],
@@ -352,8 +365,12 @@ describe('ReadonlyTableComponent', () => {
       expect(fiberKey).toBeDefined();
       const divFiber = (modalBody as any)[fiberKey!];
       const configProviderFiber = divFiber?.child;
-      expect(configProviderFiber?.memoizedProps?.getPopupContainer).toBeDefined();
-      expect(configProviderFiber?.memoizedProps?.getTargetContainer).toBeDefined();
+      expect(
+        configProviderFiber?.memoizedProps?.getPopupContainer,
+      ).toBeDefined();
+      expect(
+        configProviderFiber?.memoizedProps?.getTargetContainer,
+      ).toBeDefined();
       const container = configProviderFiber.memoizedProps.getPopupContainer();
       const target = configProviderFiber.memoizedProps.getTargetContainer();
       expect(container === modalBody || container === document.body).toBe(true);
@@ -436,7 +453,9 @@ describe('ReadonlyTableComponent', () => {
         fireEvent.click(fullscreenButton);
 
         await waitFor(() => {
-          const modalContent = document.querySelector('.ant-agentic-md-editor-content');
+          const modalContent = document.querySelector(
+            '.ant-agentic-md-editor-content',
+          );
           if (modalContent) {
             const mouseDownEvent = new MouseEvent('mousedown', {
               bubbles: true,
@@ -463,9 +482,10 @@ describe('ReadonlyTableComponent', () => {
 
       const modalBody = document.querySelector('.ant-modal-body');
       expect(modalBody).toBeInTheDocument();
-      const contentDiv = modalBody?.querySelector(
-        '.ant-agentic-md-editor-content-table.ant-agentic-md-editor-content',
-      ) || modalBody?.firstElementChild;
+      const contentDiv =
+        modalBody?.querySelector(
+          '.ant-agentic-md-editor-content-table.ant-agentic-md-editor-content',
+        ) || modalBody?.firstElementChild;
       expect(contentDiv).toBeInTheDocument();
 
       const preventDefaultSpy = vi.fn();
@@ -491,7 +511,9 @@ describe('ReadonlyTableComponent', () => {
   describe('样式和容器测试', () => {
     it('应该应用 baseCls', () => {
       renderComponent();
-      const wrapper = document.querySelector('.ant-agentic-md-editor-content-table');
+      const wrapper = document.querySelector(
+        '.ant-agentic-md-editor-content-table',
+      );
       expect(wrapper).toBeInTheDocument();
     });
   });
@@ -618,7 +640,7 @@ describe('ReadonlyTableComponent', () => {
       expect(cols.length).toBe(10);
     });
 
-    it('5 列及以上时应用默认 120px，最后一列弹性', () => {
+    it('5 列及以上时按内容比例分配列宽（百分比），最后一列弹性', () => {
       const elementWith5Cols = {
         type: 'table',
         children: [
@@ -647,9 +669,10 @@ describe('ReadonlyTableComponent', () => {
         const htmlCol = col as HTMLElement;
         const isLastCol = i === cols.length - 1;
         if (isLastCol) {
-          expect(htmlCol.style.minWidth).toBe('80px');
+          expect(htmlCol.style.minWidth).toBe('120px');
         } else {
-          expect(htmlCol.style.width).toBe('120px');
+          // 无 containerWidth 时走内容比例，5 列等分即为 20%
+          expect(htmlCol.style.width).toBe('20%');
         }
       });
     });

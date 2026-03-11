@@ -1201,19 +1201,19 @@
                     >
                       <colgroup>
                         <col
-                          style="width: 120px; min-width: 120px; max-width: 120px;"
+                          style="width: 23.08%; min-width: 120px; max-width: 23.08%;"
                         />
                         <col
-                          style="width: 120px; min-width: 120px; max-width: 120px;"
+                          style="width: 19.23%; min-width: 120px; max-width: 19.23%;"
                         />
                         <col
-                          style="width: 120px; min-width: 120px; max-width: 120px;"
+                          style="width: 19.23%; min-width: 120px; max-width: 19.23%;"
                         />
                         <col
-                          style="width: 120px; min-width: 120px; max-width: 120px;"
+                          style="width: 19.23%; min-width: 120px; max-width: 19.23%;"
                         />
                         <col
-                          style="min-width: 80px;"
+                          style="width: 19.23%; min-width: 120px; max-width: 19.23%;"
                         />
                       </colgroup>
                       <tbody>
