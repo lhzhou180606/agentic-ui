@@ -11,11 +11,9 @@ export class MarkdownInputFieldPage {
 
   constructor(page: Page) {
     this.page = page;
-    // 使用 data-testid 作为后备，优先使用语义化选择器
-    this.inputField = page
-      .getByTestId('markdown-input-field')
-      .or(page.locator('[contenteditable="true"]').first().locator('..'));
-    this.editableInput = page.locator('[contenteditable="true"]').first();
+    // 仅用 testid 并取第一个，避免多 demo 页面下 strict mode 匹配到多个元素
+    this.inputField = page.getByTestId('markdown-input-field').first();
+    this.editableInput = this.inputField.locator('[contenteditable="true"]');
   }
 
   get sendButton(): Locator {
