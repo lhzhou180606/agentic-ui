@@ -213,35 +213,36 @@ test.describe('MarkdownInputField 布局样式兼容性', () => {
     // 等待输入框加载
     await markdownInputFieldPage.waitForReady();
 
-    // 查找输入框
-    const inputField = page.locator(
-      '.ant-agentic-md-input-field:not(.ant-agentic-md-input-field-enlarged)',
-    ).first();
-
-    await expect(inputField).toBeVisible({ timeout: 5000 });
-
-    // 检查是否有放大和优化按钮
+    // 检查是否有放大和优化按钮（必须在同一输入框内）
     const enlargeButton = markdownInputFieldPage.enlargeButton;
     const hasEnlarge = await enlargeButton.isVisible().catch(() => false);
-
-    // 查找优化按钮（如果有的话）
     const refineButton = page.getByRole('button', { name: /优化|refine/i });
     const hasRefine = await refineButton.isVisible().catch(() => false);
 
-    if (hasEnlarge && hasRefine) {
-      // 获取计算后的样式
-      const styles = await inputField.evaluate((el) => {
-        const computed = window.getComputedStyle(el);
-        return {
-          minHeight: computed.minHeight,
-        };
-      });
-
-      // 验证同时有放大和优化按钮时，最小高度应该是 140px（根据修复代码）
-      const minHeightValue = parseFloat(styles.minHeight);
-      // 允许一些误差，因为可能是 140px 或接近的值
-      expect(minHeightValue).toBeGreaterThanOrEqual(130);
+    if (!hasEnlarge || !hasRefine) {
+      // 当前 demo 无同时具备两个按钮的输入框，跳过断言
+      test.skip();
+      return;
     }
+
+    // 使用包含放大按钮的输入框（确保断言的是「同时有放大和优化」的那个实例）
+    const inputField = page
+      .locator(
+        '.ant-agentic-md-input-field:not(.ant-agentic-md-input-field-enlarged)',
+      )
+      .filter({ has: enlargeButton })
+      .first();
+
+    await expect(inputField).toBeVisible({ timeout: 5000 });
+
+    const styles = await inputField.evaluate((el) => {
+      const computed = window.getComputedStyle(el);
+      return { minHeight: computed.minHeight };
+    });
+
+    // 验证同时有放大和优化按钮时，最小高度应为 140px（useMarkdownInputFieldStyles）
+    const minHeightValue = parseFloat(styles.minHeight);
+    expect(minHeightValue).toBeGreaterThanOrEqual(130);
   });
 
   test('应该在移动端尺寸下应用正确的布局样式', async ({
