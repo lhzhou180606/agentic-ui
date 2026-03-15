@@ -36,7 +36,9 @@ export default defineConfig({
         '**/MarkdownEditor/editor/slate-react/**',
         '**/slate-table/**',
         '**/icons/**',
+        '**/Icons/animated/**',
         'test/**',
+        '**/Hooks/useIntersectionOnce.ts',
       ],
       // 启用 COVERAGE_ENFORCE=1 时强制覆盖率阈值；目标 90%，当前分支约 84%，后续可逐步提升
       ...(process.env.COVERAGE_ENFORCE === '1' && {
