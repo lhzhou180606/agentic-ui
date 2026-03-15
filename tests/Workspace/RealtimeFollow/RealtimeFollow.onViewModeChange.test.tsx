@@ -4,11 +4,10 @@
  */
 
 import { render } from '@testing-library/react';
-import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { I18nContext } from '../../../src/I18n';
 import { RealtimeFollow } from '../../../src/Workspace/RealtimeFollow';
+import { TestWrapper } from './testUtils';
 
 vi.mock('../../../src/Workspace/RealtimeFollow/style', () => ({
   useRealtimeFollowStyle: vi.fn(() => undefined),
@@ -25,20 +24,6 @@ vi.mock('../../../src/Workspace/HtmlPreview', () => {
     },
   };
 });
-
-const mockLocale = {
-  'workspace.terminalExecution': '终端执行',
-  'workspace.createHtmlFile': '创建 HTML 文件',
-  'workspace.markdownContent': 'Markdown 内容',
-} as any;
-
-const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <ConfigProvider>
-    <I18nContext.Provider value={{ locale: mockLocale, language: 'zh-CN' }}>
-      {children}
-    </I18nContext.Provider>
-  </ConfigProvider>
-);
 
 describe('RealtimeFollow onViewModeChange (346)', () => {
   it('type=html 时 HtmlPreview 调用 onViewModeChange 会触发 data.onViewModeChange', () => {

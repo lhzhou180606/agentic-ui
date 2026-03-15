@@ -9,31 +9,13 @@ import {
   RealtimeFollowList,
   shouldUpdateEditor,
 } from '../../src/Workspace/RealtimeFollow';
+import { TestWrapper } from './RealtimeFollow/testUtils';
 
 vi.mock('../../src/Workspace/RealtimeFollow/style', () => ({
   useRealtimeFollowStyle: vi.fn(() => undefined),
 }));
 
 describe('RealtimeFollow Component', () => {
-  const mockLocale = {
-    'workspace.terminalExecution': '终端执行',
-    'workspace.createHtmlFile': '创建 HTML 文件',
-    'workspace.markdownContent': 'Markdown 内容',
-    'htmlPreview.preview': '预览',
-    'htmlPreview.code': '代码',
-    'htmlPreview.renderFailed': '页面渲染失败',
-  } as any;
-
-  const TestWrapper: React.FC<{ children: React.ReactNode }> = ({
-    children,
-  }) => (
-    <ConfigProvider>
-      <I18nContext.Provider value={{ locale: mockLocale, language: 'zh-CN' }}>
-        {children}
-      </I18nContext.Provider>
-    </ConfigProvider>
-  );
-
   describe('RealtimeFollow - Shell Type', () => {
     it('应该渲染 shell 类型内容', () => {
       render(
