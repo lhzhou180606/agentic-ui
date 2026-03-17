@@ -60,7 +60,7 @@ export function Blockquote(props: ElementProps<BlockQuoteNode>) {
           className={clsx(
             'markdown-container',
             containerType,
-            props.attributes?.className,
+            (props.attributes as React.HTMLAttributes<HTMLElement>)?.className,
           )}
         >
           {containerTitle ? (
