@@ -38,10 +38,12 @@
         />
         <div
           class="ant-agentic-md-input-field-editor"
+          data-testid="markdown-input-field-editor"
           style="display: flex; flex-direction: column; border-radius: inherit; border-top-left-radius: inherit; border-top-right-radius: inherit; height: auto; flex: 1 1 0%; min-height: 0;"
         >
           <div
             class="ant-agentic-md-input-field-editor-content"
+            data-testid="markdown-input-field-editor-content"
           >
             <div
               class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-edit"
@@ -103,6 +105,7 @@
           <div
             class="ant-agentic-md-input-field-send-actions"
             contenteditable="false"
+            data-testid="markdown-input-field-send-actions"
           >
             <div
               aria-describedby="test-id"
