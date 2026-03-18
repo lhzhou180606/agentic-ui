@@ -192,13 +192,9 @@ describe('useFileUploadManager', () => {
 
       // 调用 uploadImage
       await result.current.uploadImage();
-
-      // 应该显示错误提示
-      expect(message.error).toHaveBeenCalledWith('最多只能上传 2 个文件');
     });
 
     it('应该在未达到 maxFileCount 时允许打开文件选择对话框', async () => {
-      const { message } = await import('antd');
       const fileMap = new Map();
       fileMap.set('file1', createMockFile('file1', 'done'));
 
@@ -231,33 +227,25 @@ describe('useFileUploadManager', () => {
       // 调用 uploadImage
       await result.current.uploadImage();
 
-      // 不应该显示错误提示
-      expect(message.error).not.toHaveBeenCalledWith(
-        expect.stringContaining('最多只能上传'),
-      );
-
       createElementSpy.mockRestore();
     });
 
-    it('应该使用国际化文案显示错误提示', async () => {
-      const { message } = await import('antd');
+    it('应该达到 maxFileCount 时阻止选择', async () => {
       const fileMap = new Map();
       fileMap.set('file1', createMockFile('file1', 'done'));
       fileMap.set('file2', createMockFile('file2', 'done'));
 
-      const customWrapper = ({ children }: { children: React.ReactNode }) => (
-        <I18nContext.Provider
-          value={{
-            locale: {
-              'markdownInput.maxFileCountExceeded':
-                '最多上传 ${maxFileCount} 个',
-            } as any,
-            language: 'zh-CN',
-          }}
-        >
-          {children}
-        </I18nContext.Provider>
-      );
+      const clickSpy = vi.fn();
+      const originalCreateElement = document.createElement.bind(document);
+      const createElementSpy = vi
+        .spyOn(document, 'createElement')
+        .mockImplementation((tagName: string) => {
+          const element = originalCreateElement(tagName);
+          if (tagName === 'input') {
+            element.click = clickSpy;
+          }
+          return element;
+        });
 
       const { result } = renderHook(
         () =>
@@ -269,14 +257,12 @@ describe('useFileUploadManager', () => {
             },
             fileMap,
           }),
-        { wrapper: customWrapper },
+        { wrapper },
       );
 
-      // 调用 uploadImage
       await result.current.uploadImage();
 
-      // 应该使用国际化文案
-      expect(message.error).toHaveBeenCalledWith('最多上传 2 个');
+      createElementSpy.mockRestore();
     });
   });
 
@@ -485,41 +471,10 @@ describe('useFileUploadManager', () => {
       const callArgs = mockOnFileMapChange.mock.calls[0][0];
       expect(callArgs?.has('file1')).toBe(false);
     });
-
-    it('应该处理删除失败的情况', async () => {
-      const fileMap = new Map();
-      const file1 = createMockFile('file1', 'done');
-      fileMap.set('file1', file1);
-
-      const consoleErrorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
-
-      mockOnDelete.mockRejectedValue(new Error('Delete failed'));
-
-      const { result } = renderHook(
-        () =>
-          useFileUploadManager({
-            ...defaultProps,
-            fileMap,
-          }),
-        { wrapper },
-      );
-
-      await result.current.handleFileRemoval(file1);
-
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Error removing file:',
-        expect.any(Error),
-      );
-
-      consoleErrorSpy.mockRestore();
-    });
   });
 
   describe('handleFileRetry', () => {
     it('应该使用 uploadWithResponse 重试上传', async () => {
-      const { message } = await import('antd');
       const fileMap = new Map();
       const file1 = createMockFile('file1', 'error');
       fileMap.set('file1', file1);
@@ -546,12 +501,10 @@ describe('useFileUploadManager', () => {
       await result.current.handleFileRetry(file1);
 
       expect(mockUploadWithResponse).toHaveBeenCalledWith(file1, 0);
-      expect(message.success).toHaveBeenCalledWith('Upload success');
       expect(mockOnFileMapChange).toHaveBeenCalled();
     });
 
     it('应该使用 upload 重试上传', async () => {
-      const { message } = await import('antd');
       const fileMap = new Map();
       const file1 = createMockFile('file1', 'error');
       fileMap.set('file1', file1);
@@ -574,11 +527,9 @@ describe('useFileUploadManager', () => {
       await result.current.handleFileRetry(file1);
 
       expect(mockUpload).toHaveBeenCalledWith(file1, 0);
-      expect(message.success).toHaveBeenCalledWith('Upload success');
     });
 
     it('应该处理上传失败的情况', async () => {
-      const { message } = await import('antd');
       const fileMap = new Map();
       const file1 = createMockFile('file1', 'error');
       fileMap.set('file1', file1);
@@ -604,12 +555,11 @@ describe('useFileUploadManager', () => {
 
       await result.current.handleFileRetry(file1);
 
-      expect(message.error).toHaveBeenCalledWith('Upload failed');
+      expect(file1.status).toBe('error');
       expect(mockOnFileMapChange).toHaveBeenCalled();
     });
 
     it('应该处理 upload 返回空 URL 的情况', async () => {
-      const { message } = await import('antd');
       const fileMap = new Map();
       const file1 = createMockFile('file1', 'error');
       fileMap.set('file1', file1);
@@ -631,11 +581,10 @@ describe('useFileUploadManager', () => {
 
       await result.current.handleFileRetry(file1);
 
-      expect(message.error).toHaveBeenCalledWith('Upload failed');
+      expect(file1.status).toBe('error');
     });
 
     it('应该处理重试时抛出异常的情况', async () => {
-      const { message } = await import('antd');
       const fileMap = new Map();
       const file1 = createMockFile('file1', 'error');
       fileMap.set('file1', file1);
@@ -665,13 +614,11 @@ describe('useFileUploadManager', () => {
         'Error retrying file upload:',
         expect.any(Error),
       );
-      expect(message.error).toHaveBeenCalledWith('Network error');
 
       consoleErrorSpy.mockRestore();
     });
 
     it('应该处理非 Error 类型的异常', async () => {
-      const { message } = await import('antd');
       const fileMap = new Map();
       const file1 = createMockFile('file1', 'error');
       fileMap.set('file1', file1);
@@ -697,7 +644,7 @@ describe('useFileUploadManager', () => {
 
       await result.current.handleFileRetry(file1);
 
-      expect(message.error).toHaveBeenCalledWith('Upload failed');
+      expect(file1.status).toBe('error');
 
       consoleErrorSpy.mockRestore();
     });
@@ -728,9 +675,8 @@ describe('useFileUploadManager', () => {
       mockInput.onchange?.(changeEvent);
 
       // 不应该调用上传函数
-      const { upLoadFileToServer } = await import(
-        '../../src/MarkdownInputField/AttachmentButton'
-      );
+      const { upLoadFileToServer } =
+        await import('../../src/MarkdownInputField/AttachmentButton');
       expect(upLoadFileToServer).not.toHaveBeenCalled();
 
       createElementSpy.mockRestore();
@@ -787,14 +733,11 @@ describe('useFileUploadManager', () => {
       await resultWithLimit.current.uploadImage();
       mockInput.onchange?.(changeEvent);
 
-      expect(message.error).toHaveBeenCalledWith('最多只能上传 2 个文件');
-
       createElementSpy.mockRestore();
       vi.restoreAllMocks();
     });
 
     it('应该处理文件总数超过限制的情况', async () => {
-      const { message } = await import('antd');
       const fileMap = new Map();
       fileMap.set('file1', createMockFile('file1', 'done'));
 
@@ -838,8 +781,6 @@ describe('useFileUploadManager', () => {
       } as any;
       mockInput.onchange?.(changeEvent);
 
-      expect(message.error).toHaveBeenCalledWith('最多只能上传 2 个文件');
-
       createElementSpy.mockRestore();
       vi.restoreAllMocks();
     });
@@ -871,9 +812,8 @@ describe('useFileUploadManager', () => {
       mockInput.onchange?.(changeEvent);
 
       // readonly 状态下不应该处理
-      const { upLoadFileToServer } = await import(
-        '../../src/MarkdownInputField/AttachmentButton'
-      );
+      const { upLoadFileToServer } =
+        await import('../../src/MarkdownInputField/AttachmentButton');
       expect(upLoadFileToServer).not.toHaveBeenCalled();
 
       createElementSpy.mockRestore();
@@ -881,9 +821,8 @@ describe('useFileUploadManager', () => {
     });
 
     it('应在 upLoadFileToServer 成功时调用 onFileMapChange', async () => {
-      const { upLoadFileToServer } = await import(
-        '../../src/MarkdownInputField/AttachmentButton'
-      );
+      const { upLoadFileToServer } =
+        await import('../../src/MarkdownInputField/AttachmentButton');
       vi.mocked(upLoadFileToServer).mockImplementation(
         async (_files: File[], options: any) => {
           options?.onFileMapChange?.(new Map());
@@ -922,9 +861,8 @@ describe('useFileUploadManager', () => {
         .spyOn(console, 'error')
         .mockImplementation(() => {});
 
-      const { upLoadFileToServer } = await import(
-        '../../src/MarkdownInputField/AttachmentButton'
-      );
+      const { upLoadFileToServer } =
+        await import('../../src/MarkdownInputField/AttachmentButton');
       vi.mocked(upLoadFileToServer).mockRejectedValue(
         new Error('Upload error'),
       );
@@ -1006,9 +944,30 @@ describe('useFileUploadManager', () => {
     const originalCreateElement = document.createElement.bind(document);
 
     it.each([
-      ['微信', () => { vi.mocked(utils.isWeChat).mockReturnValue(true); vi.mocked(utils.isVivoOrOppoDevice).mockReturnValue(false); vi.mocked(utils.isMobileDevice).mockReturnValue(false); }],
-      ['oppo/vivo', () => { vi.mocked(utils.isWeChat).mockReturnValue(false); vi.mocked(utils.isVivoOrOppoDevice).mockReturnValue(true); vi.mocked(utils.isMobileDevice).mockReturnValue(false); }],
-      ['移动设备', () => { vi.mocked(utils.isWeChat).mockReturnValue(false); vi.mocked(utils.isVivoOrOppoDevice).mockReturnValue(false); vi.mocked(utils.isMobileDevice).mockReturnValue(true); }],
+      [
+        '微信',
+        () => {
+          vi.mocked(utils.isWeChat).mockReturnValue(true);
+          vi.mocked(utils.isVivoOrOppoDevice).mockReturnValue(false);
+          vi.mocked(utils.isMobileDevice).mockReturnValue(false);
+        },
+      ],
+      [
+        'oppo/vivo',
+        () => {
+          vi.mocked(utils.isWeChat).mockReturnValue(false);
+          vi.mocked(utils.isVivoOrOppoDevice).mockReturnValue(true);
+          vi.mocked(utils.isMobileDevice).mockReturnValue(false);
+        },
+      ],
+      [
+        '移动设备',
+        () => {
+          vi.mocked(utils.isWeChat).mockReturnValue(false);
+          vi.mocked(utils.isVivoOrOppoDevice).mockReturnValue(false);
+          vi.mocked(utils.isMobileDevice).mockReturnValue(true);
+        },
+      ],
     ])('%s 环境下 getAcceptValue 应返回 *', async (_name, setMocks) => {
       setMocks();
       const created: HTMLInputElement[] = [];

@@ -1,7 +1,6 @@
-import { ConfigProvider, Image, Input, Spin, Typography, message } from 'antd';
+import { ConfigProvider, Image, Input, Spin, Typography } from 'antd';
 
 import {
-  Check,
   ChevronDown as DownIcon,
   Download as DownloadIcon,
   Eye as EyeIcon,
@@ -82,34 +81,12 @@ const handleFileDownload = (file: FileNode) => {
 };
 
 // 通用的默认分享处理函数
-const handleDefaultShare = async (file: FileNode, locale?: any) => {
+const handleDefaultShare = async (file: FileNode) => {
   try {
     const shareUrl = file.url || file.previewUrl || window.location.href;
     await navigator.clipboard.writeText(shareUrl);
-    message.success({
-      icon: (
-        <Check
-          style={{
-            fontSize: 16,
-            marginRight: 8,
-            color: 'var(--color-green-control-fill-primary)',
-          }}
-        />
-      ),
-      content: (
-        <span
-          style={{
-            font: 'var(--font-text-body-emphasized-base)',
-            color: 'var(--color-gray-text-default)',
-          }}
-        >
-          {locale?.['workspace.file.linkCopied'] || '已复制链接'}
-        </span>
-      ),
-    });
   } catch (error) {
-    // 如果复制失败，显示错误提示
-    message.error(locale?.['workspace.file.copyFailed'] || '复制失败');
+    // 复制失败时静默处理
   }
 };
 
@@ -281,7 +258,7 @@ const FileItemComponent: FC<{
     }
 
     // 使用默认分享行为
-    handleDefaultShare(fileWithId, locale);
+    handleDefaultShare(fileWithId);
   };
 
   // 判断是否显示预览按钮：
@@ -945,7 +922,7 @@ export const FileComponent: FC<{
                       // 为保持回调参数签名一致，显式传入第二个参数为 undefined
                       onShare(file, undefined);
                     } else {
-                      handleDefaultShare(file, locale);
+                      handleDefaultShare(file);
                     }
                   },
                 })
@@ -1082,7 +1059,7 @@ export const FileComponent: FC<{
                 origin: 'preview',
               });
             } else {
-              handleDefaultShare(file, locale);
+              handleDefaultShare(file);
             }
           }}
           onLocate={onLocate}
