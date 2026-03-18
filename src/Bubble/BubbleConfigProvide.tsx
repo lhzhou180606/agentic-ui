@@ -32,6 +32,11 @@ export type ChatConfigType = {
     uuid: number;
   }>;
   compact?: boolean;
+  /**
+   * extra（点赞、踩、复制等）是否仅在 hover 时展示
+   * @default false 默认常驻展示
+   */
+  extraShowOnHover?: boolean;
 };
 
 export const BubbleConfigContext = React.createContext<

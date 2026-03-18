@@ -87,7 +87,7 @@ export const AIBubble: React.FC<
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const context = useContext(BubbleConfigContext);
-  const { compact, standalone } = context || {};
+  const { compact, standalone, extraShowOnHover } = context || {};
 
   const prefixClass = getPrefixCls('agentic');
   const { wrapSSR, hashId } = useStyle(prefixClass);
@@ -219,6 +219,7 @@ export const AIBubble: React.FC<
       value={{
         compact,
         standalone: !!standalone,
+        extraShowOnHover,
         bubble: props as any,
       }}
     >

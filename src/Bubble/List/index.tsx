@@ -62,6 +62,12 @@ export type BubbleListProps = {
   style?: React.CSSProperties;
 
   /**
+   * extra（点赞、踩、复制等）是否仅在 hover 时展示
+   * @default false 默认常驻展示
+   */
+  extraShowOnHover?: boolean;
+
+  /**
    * 用户元数据
    */
   userMeta?: BubbleMetaData;
@@ -375,7 +381,22 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
   const loading = isLoading ?? legacyLoading;
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
 
-  const { compact } = useContext(BubbleConfigContext) || {};
+  const parentContext = useContext(BubbleConfigContext);
+  const { compact } = parentContext || {};
+  const mergedContext = useMemo(
+    () =>
+      parentContext
+        ? {
+            ...parentContext,
+            extraShowOnHover:
+              props.extraShowOnHover ?? parentContext.extraShowOnHover,
+          }
+        : {
+            standalone: false,
+            extraShowOnHover: props.extraShowOnHover,
+          },
+    [parentContext, props.extraShowOnHover],
+  );
 
   const prefixClass = getPrefixCls('agentic-bubble-list');
   const { wrapSSR, hashId } = useStyle(prefixClass);
@@ -508,37 +529,41 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
 
   if (loading)
     return wrapSSR(
-      <div
-        className={clsx(
-          prefixClass,
-          `${prefixClass}-loading`,
-          className,
-          hashId,
-        )}
-        ref={bubbleListRef}
-        style={{
-          padding: 24,
-        }}
-      >
-        <SkeletonList />
-      </div>,
+      <BubbleConfigContext.Provider value={mergedContext}>
+        <div
+          className={clsx(
+            prefixClass,
+            `${prefixClass}-loading`,
+            className,
+            hashId,
+          )}
+          ref={bubbleListRef}
+          style={{
+            padding: 24,
+          }}
+        >
+          <SkeletonList />
+        </div>
+      </BubbleConfigContext.Provider>,
     );
 
   return wrapSSR(
-    <div
-      className={clsx(`${prefixClass}`, className, hashId, {
-        [`${prefixClass}-readonly`]: props.readonly,
-        [`${prefixClass}-compact`]: compact,
-      })}
-      data-chat-list={bubbleList.length}
-      style={style}
-      ref={bubbleListRef}
-      onScroll={onScroll}
-      onWheel={(e) => onWheel?.(e, bubbleListRef?.current || null)}
-      onTouchMove={(e) => onTouchMove?.(e, bubbleListRef?.current || null)}
-    >
-      {bubbleListDom}
-    </div>,
+    <BubbleConfigContext.Provider value={mergedContext}>
+      <div
+        className={clsx(`${prefixClass}`, className, hashId, {
+          [`${prefixClass}-readonly`]: props.readonly,
+          [`${prefixClass}-compact`]: compact,
+        })}
+        data-chat-list={bubbleList.length}
+        style={style}
+        ref={bubbleListRef}
+        onScroll={onScroll}
+        onWheel={(e) => onWheel?.(e, bubbleListRef?.current || null)}
+        onTouchMove={(e) => onTouchMove?.(e, bubbleListRef?.current || null)}
+      >
+        {bubbleListDom}
+      </div>
+    </BubbleConfigContext.Provider>,
   );
 };
 
