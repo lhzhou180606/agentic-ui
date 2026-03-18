@@ -105,7 +105,7 @@ describe('MarkdownPreview', () => {
   });
 
   describe('placement left', () => {
-    it('当 placement 为 left 时，extra 直接作为兄弟节点渲染，不使用 Popover', () => {
+    it('当 placement 为 left 且 extra 有内容时，使用 Popover 在 hover 时展示', () => {
       render(
         <MarkdownPreview
           {...defaultProps}
@@ -115,8 +115,8 @@ describe('MarkdownPreview', () => {
       );
 
       expect(
-        screen.queryByTestId('markdown-preview-popover-wrapper'),
-      ).not.toBeInTheDocument();
+        screen.getByTestId('markdown-preview-popover-wrapper'),
+      ).toBeInTheDocument();
       expect(screen.getByTestId('extra-left')).toHaveTextContent('Extra Left');
     });
 

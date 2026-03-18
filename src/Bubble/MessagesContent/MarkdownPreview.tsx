@@ -178,7 +178,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     </div>
   );
 
-  const contentWrapper = (
+  const innerContent = (
     <div
       style={{
         display: 'flex',
@@ -193,25 +193,25 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
         {docListNode}
         {afterContent}
       </ErrorBoundary>
-      {props.placement === 'right' ? null : extra}
     </div>
   );
 
-  if (props.placement !== 'right') {
-    return contentWrapper;
+  // 无 extra 时直接返回内容，避免 hover 出现空浮层
+  if (!extra) {
+    return innerContent;
   }
 
-  // 仅当 extra 有内容时才用 Popover，避免 shouldShowCopy={false} 时 hover 出现空浮层小点
-  if (!extra) {
-    return contentWrapper;
-  }
+  // 左右两侧均通过 Popover 在 hover 时展示 extra
+  const isLeft = props.placement === 'left';
+  const popoverAlign = isLeft
+    ? { points: ['tl', 'bl'] as const, offset: [0, -12] as [number, number] }
+    : { points: ['tr', 'br'] as const, offset: [0, -12] as [number, number] };
+  const popoverPlacement = isLeft ? 'bottomLeft' : 'bottomRight';
 
   return (
     <Popover
-      align={{
-        points: ['tr', 'br'],
-        offset: [0, -12],
-      }}
+      trigger="hover"
+      align={popoverAlign}
       content={extra}
       styles={{
         root: {
@@ -228,23 +228,9 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
         },
       }}
       arrow={false}
-      placement="bottomRight"
+      placement={popoverPlacement}
     >
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          minWidth: 0,
-          maxWidth: '100%',
-        }}
-      >
-        <ErrorBoundary fallback={errorDom}>
-          {beforeContent}
-          {markdown}
-          {docListNode}
-          {afterContent}
-        </ErrorBoundary>
-      </div>
+      {innerContent}
     </Popover>
   );
 };
