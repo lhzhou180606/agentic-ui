@@ -1,4 +1,4 @@
-import { Result } from 'antd';
+import { Button, Result } from 'antd';
 import React, { ErrorInfo, ReactNode } from 'react';
 import { I18nContext } from '../../../../I18n';
 
@@ -13,6 +13,8 @@ export interface ChartErrorBoundaryProps {
 
 export interface ChartErrorBoundaryState {
   hasError: boolean;
+  /** 用于重试时销毁并重建 children */
+  retryKey: number;
 }
 
 /**
@@ -50,12 +52,25 @@ class ChartErrorBoundary extends React.Component<
   static contextType = I18nContext;
   declare context: React.ContextType<typeof I18nContext>;
 
+  /** 本轮错误是否已自动重试过，用于“自动重试一次” */
+  private _hasAutoRetried = false;
+
   constructor(props: ChartErrorBoundaryProps) {
     super(props);
     this.state = {
       hasError: false,
+      retryKey: 0,
     };
   }
+
+  /** 重试：清除错误状态并递增 key，使 children 销毁后重建 */
+  handleRetry = (): void => {
+    this._hasAutoRetried = false;
+    this.setState((prev) => ({
+      hasError: false,
+      retryKey: prev.retryKey + 1,
+    }));
+  };
 
   static getDerivedStateFromError(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -75,7 +90,16 @@ class ChartErrorBoundary extends React.Component<
 
     // 在开发环境下打印错误信息
     if (process.env.NODE_ENV === 'development') {
-      console.error('ChartErrorBoundary caught an error:', error, errorInfo);
+      console.error('ChartErrorBoundary caught an error:', error);
+    }
+
+    // 自动重试一次：清除错误并递增 key，使 children 销毁后重建
+    if (!this._hasAutoRetried) {
+      this._hasAutoRetried = true;
+      this.setState((prev) => ({
+        hasError: false,
+        retryKey: prev.retryKey + 1,
+      }));
     }
   }
 
@@ -89,7 +113,7 @@ class ChartErrorBoundary extends React.Component<
         return fallback;
       }
 
-      // 使用 antd Result 组件的简洁错误UI
+      // 使用 antd Result 组件的简洁错误 UI，带重试按钮
       const locale = this.context?.locale;
       return (
         <Result
@@ -99,11 +123,19 @@ class ChartErrorBoundary extends React.Component<
             locale?.['chart.renderFailedSubTitle'] ||
             '图表组件遇到了一个错误，请稍后重试'
           }
+          extra={
+            <Button type="primary" onClick={this.handleRetry}>
+              {(locale as unknown as Record<string, string>)?.['chart.retry'] ||
+                '重新渲染'}
+            </Button>
+          }
         />
       );
     }
 
-    return children;
+    return (
+      <React.Fragment key={this.state.retryKey}>{children}</React.Fragment>
+    );
   }
 }
 
