@@ -811,7 +811,6 @@ describe('TableCellIndexSpacer 组件测试', () => {
       }
       
       // handleClick 会遍历所有单元格并调用 setAttribute
-      // 由于有 4 个单元格，setAttribute 应该被调用 4 次
       // 但需要确保 ReactEditor.toDOMNode 被正确调用
       // 注意：Editor.hasPath 和 Editor.node 是真实的 Slate API，它们应该能正常工作
       // 因为我们已经设置了正确的 editor.children 和 testEditorInstance

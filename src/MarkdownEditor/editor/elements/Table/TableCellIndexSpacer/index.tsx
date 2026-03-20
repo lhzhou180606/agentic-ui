@@ -6,12 +6,17 @@ import {
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { useContext, useRef } from 'react';
-import { Editor, Transforms } from 'slate';
-import { ReactEditor, useSlate } from 'slate-react';
+import { useSlate } from 'slate-react';
 import { useClickAway } from '../../../../../Hooks/useClickAway';
 import { useRefFunction } from '../../../../../Hooks/useRefFunction';
 import { I18nContext } from '../../../../../I18n';
-import { NativeTableEditor } from '../../../../utils/native-table';
+import {
+  clearTableSelection,
+  insertTableColumn,
+  removeTableColumn,
+  selectTableColumn,
+  selectWholeTable,
+} from '../commands/tableCommands';
 import { TablePropsContext } from '../TableContext';
 
 /**
@@ -80,37 +85,15 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
   const tableContext = useContext(TablePropsContext);
 
   const { deleteIconPosition, setDeleteIconPosition } = tableContext;
+  const isSelectWholeTable = columnIndex === -1;
+  const actionColumnIndex = isSelectWholeTable ? 0 : columnIndex;
 
   const clearSelect = useRefFunction((clearIcon = true) => {
     if (clearIcon) {
       setDeleteIconPosition?.(null);
     }
     if (!tablePath) return;
-    const tableElement = Editor.node(editor, tablePath)[0] as any;
-    if (!tableElement || tableElement.type !== 'table') return;
-    const rowCount = tableElement.children?.length || 0;
-    if (rowCount === 0) return;
-    for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-      const rowElement = tableElement.children[rowIndex];
-      if (rowElement && rowElement.children) {
-        for (
-          let colIndex = 0;
-          colIndex < rowElement.children.length;
-          colIndex++
-        ) {
-          const cellPath = [...tablePath, rowIndex, colIndex];
-          if (Editor.hasPath(editor, cellPath)) {
-            const [cellNode] = Editor.node(editor, cellPath);
-            if (cellNode && (cellNode as any).type === 'table-cell') {
-              const domNode = ReactEditor.toDOMNode(editor, cellNode);
-              if (domNode) {
-                domNode.removeAttribute('data-select');
-              }
-            }
-          }
-        }
-      }
-    }
+    clearTableSelection(editor, tablePath);
   });
 
   /**
@@ -121,69 +104,24 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
     e.stopPropagation();
 
     // 如果提供了列索引，显示删除图标
-    setDeleteIconPosition?.({
-      columnIndex: columnIndex,
-    });
+    if (columnIndex !== undefined) {
+      setDeleteIconPosition?.({
+        columnIndex,
+      });
+    }
 
     if (columnIndex === undefined || !tablePath) {
       return;
     }
 
     try {
-      // 获取表格元素
-      const tableElement = Editor.node(editor, tablePath)[0] as any;
-      if (!tableElement || tableElement.type !== 'table') {
-        return;
-      }
-
-      // 获取表格的行数
-      const rowCount = tableElement.children?.length || 0;
-      if (rowCount === 0) {
-        return;
-      }
-
-      // 根据 columnIndex 的值决定选中逻辑
-      if (columnIndex === -1) {
-        // 选中所有单元格 - 只使用 DOM 操作
-        for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-          const rowElement = tableElement.children[rowIndex];
-          if (rowElement && rowElement.children) {
-            for (
-              let colIndex = 0;
-              colIndex < rowElement.children.length;
-              colIndex++
-            ) {
-              const cellPath = [...tablePath, rowIndex, colIndex];
-              if (Editor.hasPath(editor, cellPath)) {
-                const [cellNode] = Editor.node(editor, cellPath);
-                if (cellNode && (cellNode as any).type === 'table-cell') {
-                  // 只使用 DOM 操作设置 data-select 属性
-                  const domNode = ReactEditor.toDOMNode(editor, cellNode);
-                  if (domNode) {
-                    domNode.setAttribute('data-select', 'true');
-                  }
-                }
-              }
-            }
-          }
-        }
-        return;
-      }
       clearSelect(false);
-      // 选中指定列的所有单元格 - 只使用 DOM 操作
-      for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-        const cellPath = [...tablePath, rowIndex, columnIndex];
-        if (Editor.hasPath(editor, cellPath)) {
-          const [cellNode] = Editor.node(editor, cellPath);
-          if (cellNode && (cellNode as any).type === 'table-cell') {
-            // 只使用 DOM 操作设置 data-select 属性
-            const domNode = ReactEditor.toDOMNode(editor, cellNode);
-            if (domNode) {
-              domNode.setAttribute('data-select', 'true');
-            }
-          }
-        }
+      if (isSelectWholeTable) {
+        selectWholeTable(editor, tablePath);
+        return;
       }
+
+      selectTableColumn(editor, tablePath, columnIndex);
     } catch (error) {
       console.warn('Failed to select table column:', error);
     }
@@ -197,35 +135,10 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
     e.stopPropagation();
 
     try {
-      if (!tablePath || columnIndex === undefined) {
+      if (!tablePath || actionColumnIndex === undefined) {
         return;
       }
-
-      // 获取表格元素
-      const tableElement = Editor.node(editor, tablePath)[0] as any;
-      if (!tableElement || tableElement.type !== 'table') {
-        return;
-      }
-
-      const rowCount = tableElement.children.length;
-      const firstRow = tableElement.children[0] as any;
-      const colCount = firstRow.children.length;
-
-      // 检查是否只有一列
-      if (colCount <= 1) {
-        // 如果只有一列，删除整个表格
-        NativeTableEditor.removeTable(editor, tablePath);
-        return;
-      }
-
-      // 删除每一行的指定列
-      for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-        const cellPath = [...tablePath, rowIndex, columnIndex];
-        if (Editor.hasPath(editor, cellPath)) {
-          Transforms.removeNodes(editor, { at: cellPath });
-        }
-      }
-
+      removeTableColumn(editor, tablePath, actionColumnIndex);
       clearSelect();
     } catch (error) {
       console.warn('Failed to delete table column:', error);
@@ -240,34 +153,10 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
     e.stopPropagation();
 
     try {
-      if (!tablePath || columnIndex === undefined) {
+      if (!tablePath || actionColumnIndex === undefined) {
         return;
       }
-
-      // 获取表格元素
-      const tableElement = Editor.node(editor, tablePath)[0] as any;
-      if (!tableElement || tableElement.type !== 'table') {
-        return;
-      }
-
-      const rowCount = tableElement.children.length;
-
-      // 为每一行在当前列之前插入新单元格
-      for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-        const cellPath = [...tablePath, rowIndex, columnIndex];
-        const newCell = {
-          type: 'table-cell',
-          children: [
-            {
-              type: 'paragraph',
-              children: [{ text: '' }],
-            },
-          ],
-        };
-
-        Transforms.insertNodes(editor, newCell, { at: cellPath });
-      }
-
+      insertTableColumn(editor, tablePath, actionColumnIndex, 'before');
       clearSelect();
     } catch (error) {
       console.warn('Failed to insert column before:', error);
@@ -282,34 +171,10 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
     e.stopPropagation();
 
     try {
-      if (!tablePath || columnIndex === undefined) {
+      if (!tablePath || actionColumnIndex === undefined) {
         return;
       }
-
-      // 获取表格元素
-      const tableElement = Editor.node(editor, tablePath)[0] as any;
-      if (!tableElement || tableElement.type !== 'table') {
-        return;
-      }
-
-      const rowCount = tableElement.children.length;
-
-      // 为每一行在当前列之后插入新单元格
-      for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-        const cellPath = [...tablePath, rowIndex, columnIndex + 1];
-        const newCell = {
-          type: 'table-cell',
-          children: [
-            {
-              type: 'paragraph',
-              children: [{ text: '' }],
-            },
-          ],
-        };
-
-        Transforms.insertNodes(editor, newCell, { at: cellPath });
-      }
-
+      insertTableColumn(editor, tablePath, actionColumnIndex, 'after');
       clearSelect();
     } catch (error) {
       console.warn('Failed to insert column after:', error);
@@ -319,7 +184,10 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
   const ref = useRef<HTMLTableDataCellElement>(null);
 
   useClickAway(() => {
-    if (deleteIconPosition && deleteIconPosition.columnIndex === columnIndex) {
+    if (
+      deleteIconPosition &&
+      deleteIconPosition.columnIndex === columnIndex
+    ) {
       clearSelect();
     }
   }, ref);
