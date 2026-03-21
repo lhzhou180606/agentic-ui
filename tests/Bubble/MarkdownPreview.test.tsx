@@ -41,6 +41,12 @@ vi.mock('../../src', () => ({
   parserMdToSchema: () => ({ schema: {} }),
 }));
 
+vi.mock('../../src/MarkdownRenderer', () => ({
+  MarkdownRenderer: ({ content }: { content?: string }) => (
+    <div data-testid="markdown-renderer-markdown-mode">{content}</div>
+  ),
+}));
+
 vi.mock('../../src/Bubble/MessagesContent/BubbleContext', () => ({
   MessagesContext: React.createContext({ hidePadding: false }),
 }));
@@ -158,6 +164,22 @@ describe('MarkdownPreview', () => {
       expect(
         screen.queryByTestId('markdown-preview-popover-wrapper'),
       ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('renderMode', () => {
+    it('renderMode 为 markdown 时走 MarkdownRenderer 路径 (131)', () => {
+      render(
+        <MarkdownPreview
+          {...defaultProps}
+          content="# Hello"
+          markdownRenderConfig={{ renderMode: 'markdown' }}
+        />,
+      );
+      expect(
+        screen.getByTestId('markdown-renderer-markdown-mode'),
+      ).toHaveTextContent('# Hello');
+      expect(screen.queryByTestId('markdown-editor')).not.toBeInTheDocument();
     });
   });
 });

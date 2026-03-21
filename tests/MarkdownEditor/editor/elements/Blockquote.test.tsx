@@ -281,4 +281,25 @@ describe('Blockquote Component', () => {
       expect(screen.getByText('Inner quote')).toBeInTheDocument();
     });
   });
+
+  describe('markdown-container 提示块 (55-76)', () => {
+    it('otherProps 含 markdownContainerType 时渲染 div.markdown-container', () => {
+      const props = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          otherProps: {
+            markdownContainerType: 'warning',
+            markdownContainerTitle: '注意',
+          },
+        },
+      };
+      renderWithProvider(<Blockquote {...props} />);
+      expect(screen.getByTestId('markdown-container')).toBeInTheDocument();
+      expect(screen.getByTestId('markdown-container-title')).toHaveTextContent(
+        '注意',
+      );
+      expect(screen.getByTestId('markdown-container')).toHaveClass('warning');
+    });
+  });
 });

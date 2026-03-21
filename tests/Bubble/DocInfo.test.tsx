@@ -415,5 +415,6 @@ describe('DocInfoList', () => {
       expect(screen.getByText(longContent)).toBeInTheDocument();
       expect(renderItem).toHaveBeenCalled();
     });
+
   });
 });

@@ -500,6 +500,35 @@ describe('BubbleExtra', () => {
       expect(screen.queryByTestId('chat-item-copy-button')).not.toBeInTheDocument();
     });
 
+    it('isAborted 且未完成时展示中止提示 (350)', () => {
+      const originData = {
+        ...defaultProps.bubble.originData!,
+        isAborted: true,
+        isFinished: false,
+        content: 'partial',
+        extra: {},
+      };
+      render(
+        <BubbleExtra
+          {...defaultProps}
+          bubble={{ ...defaultProps.bubble, originData }}
+        />,
+      );
+      expect(screen.getByText('回答已停止生成')).toBeInTheDocument();
+    });
+
+    it('点击重新生成应调用 onReply (362)', async () => {
+      const onReply = vi.fn();
+      render(
+        <BubbleExtra {...defaultProps} onReply={onReply} />,
+      );
+      const retry = screen.getByTestId('reply-button');
+      fireEvent.click(retry);
+      await waitFor(() => {
+        expect(onReply).toHaveBeenCalledWith('Test preset message');
+      });
+    });
+
     it('pure 时返回数组 [reSend, like, disLike, copyDom, voiceDom] (424)', () => {
       const props = { ...defaultProps, pure: true };
       render(<BubbleExtra {...props} />);

@@ -6,6 +6,7 @@ import {
   MElement,
   MLeaf,
 } from '../../../../src/MarkdownEditor/editor/elements';
+import { EditorUtils } from '../../../../src/MarkdownEditor/editor/utils/editorUtils';
 
 // Mock antd theme - 这个 mock 会在后面被合并
 
@@ -573,6 +574,21 @@ describe('Elements Index', () => {
         expect(element).toHaveStyle({ background: '#f59e0b' });
       });
 
+      it('jinjaDelimiter 与 jinjaPlaceholder 追加类名 (568-572)', () => {
+        const props = {
+          ...defaultLeafProps,
+          leaf: {
+            ...defaultLeafProps.leaf,
+            jinjaDelimiter: true,
+            jinjaPlaceholder: true,
+          },
+        };
+        const { container } = render(<MLeaf {...props} />);
+        const span = container.querySelector('[data-be="text"]');
+        expect(span?.className).toContain('jinja-delimiter');
+        expect(span?.className).toContain('jinja-placeholder');
+      });
+
       it('应该渲染 HTML 文本', () => {
         const props = {
           ...defaultLeafProps,
@@ -765,6 +781,15 @@ describe('Elements Index', () => {
         fireEvent.dblClick(element!);
         // 验证事件处理逻辑（这里主要是确保不抛出错误）
         expect(element).toBeInTheDocument();
+      });
+
+      it('双击且 isDirtLeaf 为 true 时尝试选区 (585-592)', () => {
+        vi.mocked(EditorUtils.isDirtLeaf).mockReturnValueOnce(true);
+        const { container } = render(<MLeaf {...defaultLeafProps} />);
+        const span = container.querySelector('[data-be="text"]');
+        expect(span).toBeTruthy();
+        fireEvent.click(span!, { detail: 2 });
+        expect(EditorUtils.isDirtLeaf).toHaveBeenCalled();
       });
 
       it('应该处理拖拽开始事件', () => {
