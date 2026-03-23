@@ -140,8 +140,9 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
 
   const deps = useMemo(() => [props.style], [props.style]);
 
-  // 为 loading 项生成唯一的 key，使用 ref 缓存以确保稳定性
   const loadingKeysRef = useRef<Map<string, string>>(new Map());
+  const loadingKeyByIndexRef = useRef<Map<number, string>>(new Map());
+  const realIdToStableKeyRef = useRef<Map<string, string>>(new Map());
 
   const listDom = useMemo(() => {
     const isLazyEnabled = props.lazy?.enable;
@@ -158,15 +159,26 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
         isLast,
       };
 
-      // 如果 id 是 LOADING_FLAT，使用 uuid 作为 key
-      // 使用 index 和 createAt 的组合作为缓存 key，确保同一项在重新渲染时保持相同的 key
-      let itemKey = item.id;
+      let itemKey: string;
       if (item.id === LOADING_FLAT) {
         const cacheKey = `${index}-${item.createAt || Date.now()}`;
         if (!loadingKeysRef.current.has(cacheKey)) {
           loadingKeysRef.current.set(cacheKey, nanoid());
         }
         itemKey = loadingKeysRef.current.get(cacheKey)!;
+        loadingKeyByIndexRef.current.set(index, itemKey);
+      } else {
+        const realId = item.id as string;
+        const prevLoadingKey = loadingKeyByIndexRef.current.get(index);
+        if (prevLoadingKey) {
+          itemKey = prevLoadingKey;
+          realIdToStableKeyRef.current.set(realId, prevLoadingKey);
+          loadingKeyByIndexRef.current.delete(index);
+        } else if (realIdToStableKeyRef.current.has(realId)) {
+          itemKey = realIdToStableKeyRef.current.get(realId)!;
+        } else {
+          itemKey = realId;
+        }
       }
 
       const bubbleElement = (

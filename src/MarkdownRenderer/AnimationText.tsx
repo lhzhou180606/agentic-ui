@@ -42,25 +42,18 @@ const hasElementNode = (children: React.ReactNode): boolean => {
   return React.isValidElement(children);
 };
 
-interface ChunkState {
-  key: string;
-  text: string;
-  /** 富文本内容（重置时保留），否则用 text */
-  content?: React.ReactNode;
-  /** 是否已完成动画 */
-  done: boolean;
-}
-
 /**
  * 流式文字淡入动画组件。
  *
  * 采用 opacity + translateY（GPU 硬件加速），清爽流派。
- * 动画结束后通过 animationend 标记 done，仍用 span 包裹以保持布局稳定。
+ * 同一段流式前缀追加只触发**一次**入场动画；后续增量仅更新文案。内容被替换
+ * （非前缀增长）时重新播放入场。动画结束后仍用 span 包裹以保持布局稳定。
  */
 const AnimationText = React.memo<AnimationTextProps>(
   ({ children, animationConfig }) => {
     const { fadeDuration = 200, easing = 'ease-out' } = animationConfig || {};
-    const [chunks, setChunks] = useState<ChunkState[]>([]);
+    const [animComplete, setAnimComplete] = useState(false);
+    const [animSession, setAnimSession] = useState(0);
     const prevTextRef = useRef('');
 
     const text = extractText(children);
@@ -74,27 +67,26 @@ const AnimationText = React.memo<AnimationTextProps>(
 
       if (text === prevTextRef.current) return;
 
-      if (!prevTextRef.current || !text.startsWith(prevTextRef.current)) {
-        setChunks([{ key: '0', text, content: children, done: false }]);
+      const prev = prevTextRef.current;
+
+      if (!prev) {
+        if (!text) return;
+        prevTextRef.current = text;
+        setAnimComplete(false);
+        return;
+      }
+
+      if (text.length > prev.length && text.startsWith(prev)) {
         prevTextRef.current = text;
         return;
       }
 
-      const prevLen = prevTextRef.current.length;
-      const newText = text.slice(prevLen);
-      const newKey = `anim-${Date.now()}-${prevLen}`;
-      setChunks((prev) => [
-        ...prev,
-        { key: newKey, text: newText, done: false },
-      ]);
+      setAnimComplete(false);
+      setAnimSession((s) => s + 1);
       prevTextRef.current = text;
-    }, [text, children, hasElementContent]);
+    }, [text, hasElementContent]);
 
-    const handleAnimationEnd = (key: string) => {
-      setChunks((prev) =>
-        prev.map((c) => (c.key === key ? { ...c, done: true } : c)),
-      );
-    };
+    const handleAnimationEnd = () => setAnimComplete(true);
 
     const animationStyle = useMemo(
       () => ({
@@ -119,25 +111,16 @@ const AnimationText = React.memo<AnimationTextProps>(
       return <>{children}</>;
     }
 
-    return (
-      <>
-        {chunks.map((chunk) => {
-          const rendered = chunk.content ?? chunk.text;
-          return chunk.done ? (
-            <span key={chunk.key} style={doneChunkStyle}>
-              {rendered}
-            </span>
-          ) : (
-            <span
-              key={chunk.key}
-              style={animationStyle}
-              onAnimationEnd={() => handleAnimationEnd(chunk.key)}
-            >
-              {rendered}
-            </span>
-          );
-        })}
-      </>
+    return animComplete ? (
+      <span style={doneChunkStyle}>{children}</span>
+    ) : (
+      <span
+        key={animSession}
+        style={animationStyle}
+        onAnimationEnd={handleAnimationEnd}
+      >
+        {children}
+      </span>
     );
   },
 );

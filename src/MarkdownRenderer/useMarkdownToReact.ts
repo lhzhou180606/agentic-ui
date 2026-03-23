@@ -1028,6 +1028,8 @@ export const useMarkdownToReact = (
     element: React.ReactNode;
   } | null>(null);
 
+  const prevContentRef = useRef<string>('');
+
   const processor = useMemo(() => {
     const p = createHastProcessor(options?.remarkPlugins, options?.htmlConfig);
     processorRef.current = p;
@@ -1047,7 +1049,21 @@ export const useMarkdownToReact = (
   }, [prefixCls, options?.components, options?.streaming, options?.linkConfig]);
 
   return useMemo(() => {
-    if (!content) return null;
+    if (!content) {
+      prevContentRef.current = '';
+      return null;
+    }
+
+    const prevContent = prevContentRef.current;
+    if (
+      prevContent &&
+      content !== prevContent &&
+      !content.startsWith(prevContent)
+    ) {
+      blockCacheRef.current = new Map();
+      lastBlockRef.current = null;
+    }
+    prevContentRef.current = content;
 
     try {
       const preprocessed = content.replace(
@@ -1062,15 +1078,26 @@ export const useMarkdownToReact = (
       const newCache = new Map<string, BlockCacheEntry>();
       const elements: React.ReactNode[] = [];
 
+      const KEY_PREFIX_LEN = 64;
       for (let i = 0; i < blocks.length; i++) {
         const block = blocks[i];
         const isLast = i === blocks.length - 1;
         // 用 index + 内容前 64 字符作 key，保持稳定性：
-        // 相同位置 + 相同内容开头 → 相同 key → React 不 unmount
-        // 流式场景下，最后一个块内容频繁变化，若 key 随内容变会导致反复 unmount/remount，
-        // ChartBlockRenderer 等会重复展示 Loading，故对末块使用稳定 key
-        const stableKey =
-          isLast && options?.streaming ? `b${i}-last` : `b${i}-${block.slice(0, 64)}`;
+        // - 末块在流式中节流时，用 lastBlockRef.source 的切片作 key，避免每次追加字符导致 key 变化
+        // - 末块变为非末块时，必须与先前 key 一致，否则 ChartBlockRenderer 等会 unmount/remount 闪烁
+        // - 因此统一用「实际展示内容」的 slice 作 key，节流时用 lastBlockRef.source
+        const contentForKey =
+          isLast &&
+          options?.streaming &&
+          lastBlockRef.current &&
+          !shouldReparseLastBlock(
+            lastBlockRef.current.source,
+            block,
+            options?.streaming,
+          )
+            ? lastBlockRef.current.source.slice(0, KEY_PREFIX_LEN)
+            : block.slice(0, KEY_PREFIX_LEN);
+        const stableKey = `b${i}-${contentForKey}`;
 
         if (!isLast) {
           const cached = cache.get(block);

@@ -1,7 +1,8 @@
-import { memo, MutableRefObject, useContext } from 'react';
+import { memo, MutableRefObject, useContext, useRef } from 'react';
 
 import { ConfigProvider, Flex } from 'antd';
 import clsx from 'clsx';
+import { nanoid } from 'nanoid';
 import React from 'react';
 import { WhiteBoxProcessInterface } from '../ThoughtChainList/types';
 import { BubbleAvatar } from './Avatar';
@@ -10,6 +11,7 @@ import { BubbleConfigContext } from './BubbleConfigProvide';
 import { BubbleFileView } from './FileView';
 import { BubbleMessageDisplay } from './MessagesContent';
 import { MessagesContext } from './MessagesContent/BubbleContext';
+import { LOADING_FLAT } from './MessagesContent';
 import { BubbleExtra } from './MessagesContent/BubbleExtra';
 import { useStyle } from './style';
 import { BubbleTitle } from './Title';
@@ -84,6 +86,7 @@ export const AIBubble: React.FC<
   } = props;
 
   const [hidePadding, setHidePadding] = React.useState(false);
+  const messageDisplayKeyRef = useRef<string | null>(null);
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const context = useContext(BubbleConfigContext);
@@ -125,6 +128,15 @@ export const AIBubble: React.FC<
     />,
   );
 
+  const id = props?.originData?.id;
+  if (id === undefined || id === LOADING_FLAT) {
+    if (!messageDisplayKeyRef.current) {
+      messageDisplayKeyRef.current = nanoid();
+    }
+  }
+  const messageDisplayKey =
+    messageDisplayKeyRef.current ?? id ?? nanoid();
+
   const messageContent = (
     <BubbleMessageDisplay
       markdownRenderConfig={props.markdownRenderConfig}
@@ -133,7 +145,7 @@ export const AIBubble: React.FC<
       bubbleListItemExtraStyle={styles?.bubbleListItemExtraStyle}
       bubbleRef={props.bubbleRef}
       content={props?.originData?.content}
-      key={props?.originData?.id}
+      key={messageDisplayKey}
       data-id={props?.originData?.id}
       avatar={props?.originData?.meta as BubbleMetaData}
       readonly={props.readonly ?? false}

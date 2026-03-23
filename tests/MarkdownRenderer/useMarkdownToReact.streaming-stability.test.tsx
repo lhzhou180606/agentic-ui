@@ -78,4 +78,37 @@ describe('useMarkdownToReact streaming stability', () => {
     unmount();
     expect(counters.unmounts).toBe(1);
   });
+
+  it('末块变为非末块时（流式追加新块），已完成块不应卸载重挂', () => {
+    const counters: Counters = { mounts: 0, unmounts: 0 };
+    const CodeBlockProbe = createCodeBlockProbe(counters);
+
+    const chartBlock = '```chart\n{"config":[{"chartType":"line"}],"dataSource":[]}';
+
+    const { rerender, unmount } = render(
+      <HookHarness
+        content={chartBlock}
+        streaming
+        codeBlockComponent={CodeBlockProbe}
+      />,
+    );
+
+    expect(screen.getByTestId('streaming-code-block-probe')).toBeInTheDocument();
+    expect(counters.mounts).toBe(1);
+    expect(counters.unmounts).toBe(0);
+
+    rerender(
+      <HookHarness
+        content={`${chartBlock}\n\n后续段落`}
+        streaming
+        codeBlockComponent={CodeBlockProbe}
+      />,
+    );
+
+    expect(counters.mounts).toBe(1);
+    expect(counters.unmounts).toBe(0);
+
+    unmount();
+    expect(counters.unmounts).toBe(1);
+  });
 });
