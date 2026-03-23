@@ -1067,7 +1067,10 @@ export const useMarkdownToReact = (
         const isLast = i === blocks.length - 1;
         // 用 index + 内容前 64 字符作 key，保持稳定性：
         // 相同位置 + 相同内容开头 → 相同 key → React 不 unmount
-        const stableKey = `b${i}-${block.slice(0, 64)}`;
+        // 流式场景下，最后一个块内容频繁变化，若 key 随内容变会导致反复 unmount/remount，
+        // ChartBlockRenderer 等会重复展示 Loading，故对末块使用稳定 key
+        const stableKey =
+          isLast && options?.streaming ? `b${i}-last` : `b${i}-${block.slice(0, 64)}`;
 
         if (!isLast) {
           const cached = cache.get(block);
