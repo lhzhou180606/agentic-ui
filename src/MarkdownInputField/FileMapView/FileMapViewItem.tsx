@@ -78,7 +78,8 @@ export const FileMapViewItem: React.FC<{
       ? fileName.slice(lastDotIndex + 1)
       : '';
 
-  const fileSize = file.size ? kbToSize(file.size / 1024) : '';
+  const showSize = typeof file.size === 'number' && file.size > 0;
+  const fileSize = showSize ? kbToSize(file.size / 1024) : '';
   const lastModifiedTime = file?.lastModified
     ? dayjs(file.lastModified).format('HH:mm')
     : '';
