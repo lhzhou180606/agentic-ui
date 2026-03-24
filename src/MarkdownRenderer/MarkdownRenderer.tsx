@@ -252,6 +252,7 @@ const InternalMarkdownRenderer = forwardRef<
     linkConfig,
     streaming,
     streamingParagraphAnimation,
+    contentRevisionSource: streaming ? displayedContent : undefined,
   });
 
   return wrapVarSSR(

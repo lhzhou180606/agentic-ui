@@ -13,5 +13,7 @@ export type {
   RenderMode,
   RendererBlockProps,
 } from './types';
+export type { UseMarkdownToReactOptions } from './markdownReactShared';
 export { markdownToReactSync, useMarkdownToReact } from './useMarkdownToReact';
+export { useStreamingMarkdownReact } from './streaming/useStreamingMarkdownReact';
 export { useStreaming } from './useStreaming';

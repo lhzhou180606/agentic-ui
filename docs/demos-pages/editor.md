@@ -63,6 +63,10 @@ group:
 
 <code src="../demos/rerender.tsx" background="var(--main-bg-color)" iframe=540></code>
 
+### Bubble 内动态 render（流式 Markdown）
+
+<code src="../demos/bubble/rerender-bubble-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
 ### 编辑模式-动态render
 
 <code src="../demos/rerender-edit.tsx" background="var(--main-bg-color)" iframe=540></code>
