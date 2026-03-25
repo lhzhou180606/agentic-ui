@@ -4,7 +4,6 @@ import React, { useContext } from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
-import remarkDirective from 'remark-directive';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -14,6 +13,7 @@ import type { Plugin, Processor } from 'unified';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
 import { remarkDirectiveContainer } from '../MarkdownEditor/editor/parser/remarkDirectiveContainer';
+import remarkDirectiveContainersOnly from '../MarkdownEditor/editor/parser/remarkDirectiveContainersOnly';
 import {
   convertParagraphToImage,
   fixStrongWithSpecialChars,
@@ -234,7 +234,7 @@ const createHastProcessor = (
     .use(protectJinjaDollarInText)
     .use(remarkMath, INLINE_MATH_WITH_SINGLE_DOLLAR)
     .use(remarkFrontmatter, FRONTMATTER_LANGUAGES)
-    .use(remarkDirective)
+    .use(remarkDirectiveContainersOnly)
     .use(remarkDirectiveContainer, REMARK_DIRECTIVE_CONTAINER_OPTIONS)
     .use(remarkChartFromComment)
     .use(remarkRehypePlugin, {
@@ -1023,8 +1023,8 @@ export interface UseMarkdownToReactOptions {
 }
 
 export {
-  createHastProcessor,
   buildEditorAlignedComponents,
+  createHastProcessor,
   markLastParagraphStreamingTail,
   renderMarkdownBlock,
   splitMarkdownBlocks,
