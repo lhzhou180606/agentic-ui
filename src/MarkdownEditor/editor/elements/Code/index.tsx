@@ -59,17 +59,13 @@ export const Code = ({ attributes, children, element }: RenderElementProps) => {
         fontSize: '0.8em',
         lineHeight: '1.5',
         overflowX: 'auto',
-        whiteSpace: 'pre-wrap',
-        wordBreak: 'break-all',
-        fontFamily: `'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace`,
-        wordWrap: 'break-word',
         borderRadius: '12px',
         background: '#FFFFFF',
         boxShadow: 'var(--shadow-control-base)',
         position: 'relative',
       }}
     >
-      {children}
+      <div style={{ width: '100%', height: '100%' }}>{children}</div>
     </div>
   );
 };
