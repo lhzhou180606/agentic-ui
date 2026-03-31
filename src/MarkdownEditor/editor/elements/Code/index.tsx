@@ -56,7 +56,7 @@ export const Code = ({ attributes, children, element }: RenderElementProps) => {
         color: 'rgb(27, 27, 27)',
         padding: '1em',
         margin: '1em 0',
-        fontSize: '0.8em',
+        fontSize: '1em',
         lineHeight: '1.5',
         overflowX: 'auto',
         borderRadius: '12px',
