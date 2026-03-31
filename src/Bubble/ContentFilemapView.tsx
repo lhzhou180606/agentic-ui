@@ -72,7 +72,7 @@ const FilemapItem: React.FC<{
       placement={placement}
       onPreview={events?.onPreview}
       onDownload={events?.onDownload}
-      itemRender={fileViewConfig?.itemRender as any}
+      itemRender={fileViewConfig?.itemRender}
       maxDisplayCount={fileViewConfig?.maxDisplayCount}
       showMoreButton={fileViewConfig?.showMoreButton}
       customSlot={fileViewConfig?.customSlot}
