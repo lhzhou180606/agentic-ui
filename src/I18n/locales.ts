@@ -771,7 +771,6 @@ export const enLabels: typeof cnLabels = {
   // MarkdownInputField related
   'input.fileUpload': 'Upload attachments',
   'input.attachmentListTitle': 'Uploaded attachments',
-  'chat.fileMapTitle': 'Result files',
   'input.voiceInput': 'Voice input',
   'input.voiceInputting': 'Voice input in progress, click to stop.',
   'input.placeholder': 'Please input',

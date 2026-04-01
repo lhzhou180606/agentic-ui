@@ -175,7 +175,6 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
     width: IMAGE_THUMBNAIL_SIZE,
     height: IMAGE_THUMBNAIL_SIZE,
   });
-  const hasAnyFiles = fileList.length > 0;
 
   return wrapSSR(
     <div
