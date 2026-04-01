@@ -300,7 +300,10 @@ export const upLoadFileToServer = async (
 
   // Wrap all internal change notifications to use notifyChange so every update
   // produces a new Map reference that React's state setter will always accept.
-  const propsWithNotify: UploadProps = { ...props, onFileMapChange: notifyChange };
+  const propsWithNotify: UploadProps = {
+    ...props,
+    onFileMapChange: notifyChange as UploadProps['onFileMapChange'],
+  };
 
   if (isMaxExceeded || isMinNotMet) {
     hideLoading();
@@ -311,7 +314,10 @@ export const upLoadFileToServer = async (
         'markdownInput.maxFileCountExceeded',
         DEFAULT_MESSAGES.maxFileCountExceeded(maxCount),
       );
-      const errorMessage = rawMessage.replace(/\$\{maxFileCount\}/g, String(maxCount));
+      const errorMessage = rawMessage.replace(
+        /\$\{maxFileCount\}/g,
+        String(maxCount),
+      );
       fileList.forEach((file) => {
         file.status = 'error';
         file.errorCode = 'FILE_COUNT_EXCEEDED';
@@ -329,7 +335,9 @@ export const upLoadFileToServer = async (
   }
 
   // 验证通过后再添加到 fileMap
-  fileList.forEach((file) => updateFileMap(map, file, notifyChange));
+  fileList.forEach((file) =>
+    updateFileMap(map, file, notifyChange as UploadProps['onFileMapChange']),
+  );
 
   try {
     for (let i = 0; i < fileList.length; i++) {
@@ -338,7 +346,7 @@ export const upLoadFileToServer = async (
   } catch (error) {
     fileList.forEach((file) => {
       file.status = 'error';
-      updateFileMap(map, file, notifyChange);
+      updateFileMap(map, file, notifyChange as UploadProps['onFileMapChange']);
     });
   } finally {
     hideLoading();
