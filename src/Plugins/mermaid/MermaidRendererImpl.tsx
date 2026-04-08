@@ -292,6 +292,11 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
         return;
       }
 
+      const target = event.target as HTMLElement | null;
+      if (target?.closest?.('[data-mermaid-toolbar]')) {
+        return;
+      }
+
       event.preventDefault();
       const scaleMultiplier = event.deltaY < 0 ? ZOOM_STEP_RATIO : 1 / ZOOM_STEP_RATIO;
       applyScaleAtPoint(scale * scaleMultiplier, event.clientX, event.clientY);
@@ -302,6 +307,11 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
   const handlePointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (!isRendered || event.button !== 0) {
+        return;
+      }
+
+      const target = event.target as HTMLElement | null;
+      if (target?.closest?.('[data-mermaid-toolbar]')) {
         return;
       }
 
@@ -413,11 +423,22 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
         data-mermaid-viewport="true"
         style={viewportStyle}
       >
+        <div
+          contentEditable={false}
+          ref={divRef}
+          className={classNames(hashId)}
+          style={transformedContainerStyle}
+          data-mermaid-container="true"
+        />
         {isRendered && (
           <div
             className={classNames(`${baseCls}-toolbar-float`, hashId)}
             role="toolbar"
             aria-label="Mermaid diagram controls"
+            data-mermaid-toolbar
+            onPointerDown={(e) => {
+              e.stopPropagation();
+            }}
           >
             <span data-mermaid-action="fit">
               <ActionIconBox
@@ -479,13 +500,6 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
             </span>
           </div>
         )}
-        <div
-          contentEditable={false}
-          ref={divRef}
-          className={classNames(hashId)}
-          style={transformedContainerStyle}
-          data-mermaid-container="true"
-        />
       </div>
       {error && (
         <div className={classNames(`${baseCls}-error`, hashId)}>

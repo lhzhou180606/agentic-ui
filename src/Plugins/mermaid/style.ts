@@ -41,10 +41,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         top: token.paddingSM,
         insetInlineEnd: token.paddingSM,
         left: 'auto',
-        zIndex: 5,
+        zIndex: 10,
         display: 'flex',
         alignItems: 'center',
-        gap: token.paddingXS,
+        gap: token.paddingXXS,
         pointerEvents: 'auto',
       },
 
@@ -69,6 +69,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       '& [data-mermaid-container="true"]': {
+        zIndex: 0,
         width: '100%',
         minHeight: 220,
         display: 'block',
