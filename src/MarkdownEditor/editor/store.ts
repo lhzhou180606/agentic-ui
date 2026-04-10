@@ -362,6 +362,7 @@ export class EditorStore {
         children: [{ text: '' }],
       },
     ];
+    this._editor.current.onChange();
   }
 
   /**
@@ -457,8 +458,8 @@ export class EditorStore {
   ): void {
     try {
       const nodeList = parserMdToSchema(md, plugins).schema;
+      this._editor.current.selection = null;
       this.setContent(nodeList);
-      this._editor.current.children = nodeList;
       this._safeDeselect();
       onProgress?.(1);
     } catch (error) {
@@ -478,8 +479,8 @@ export class EditorStore {
     try {
       const allNodes = this._parseChunksToNodes(chunks, plugins);
       if (allNodes.length > 0) {
+        this._editor.current.selection = null;
         this.setContent(allNodes);
-        this._editor.current.children = allNodes;
         this._safeDeselect();
       }
       onProgress?.(1);
@@ -600,7 +601,7 @@ export class EditorStore {
 
                 if (schema.length > 0) {
                   if (isFirstBatch) {
-                    // 第一批：清空并插入
+                    this._editor.current.selection = null;
                     this._editor.current.children = schema;
                     this._editor.current.onChange();
                     isFirstBatch = false;
@@ -919,9 +920,9 @@ export class EditorStore {
    */
   setContent(nodeList: Node[]) {
     const currentChildren = this._editor.current.children;
+    this._editor.current.selection = null;
     this._editor.current.children = nodeList;
     this._editor.current.onChange();
-    // 检查最后一个节点是否以换行符结尾
     const lastNode = currentChildren[currentChildren.length - 1];
     if (lastNode && Text.isText(lastNode)) {
       const text = Node.string(lastNode);
@@ -972,7 +973,9 @@ export class EditorStore {
       }
     } catch (error) {
       console.error('Failed to update nodes with optimized method:', error);
+      this._editor.current.selection = null;
       this._editor.current.children = nodeList;
+      this._editor.current.onChange();
     }
   }
 
