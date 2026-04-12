@@ -112,6 +112,41 @@ describe('useStreaming', () => {
     });
   });
 
+  it('enabled 从 false 恢复为 true 时应重置缓存，正确处理新一轮流式', async () => {
+    const { result, rerender } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: 'Hello World',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('Hello World');
+    });
+
+    rerender({ input: 'Hello World', enabled: false });
+
+    await waitFor(() => {
+      expect(result.current).toBe('Hello World');
+    });
+
+    rerender({ input: 'New', enabled: true });
+
+    await waitFor(() => {
+      expect(result.current).toBe('New');
+    });
+
+    rerender({ input: 'New content', enabled: true });
+
+    await waitFor(() => {
+      expect(result.current).toBe('New content');
+    });
+  });
+
   it('disabled 时应直接透传 input', async () => {
     const { result } = renderHook(
       ({ input, enabled }: UseStreamingHookProps) =>
