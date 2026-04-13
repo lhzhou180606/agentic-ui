@@ -387,6 +387,10 @@ export class EditorStore {
     },
   ): void | Promise<void> {
     if (md === undefined) return;
+    if (!md) {
+      this.clearContent();
+      return;
+    }
     if (this._shouldSkipSetContent(md)) return;
 
     this.cancelSetMDContent();

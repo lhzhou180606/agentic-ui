@@ -48,7 +48,8 @@ const rebuildOrDefaultBlock = (raw: unknown): Node => {
   if (
     raw &&
     typeof raw === 'object' &&
-    !Node.isText(raw as Node) &&
+    //@ts-ignore
+    !Node?.isText(raw as Node) &&
     typeof (raw as { type?: unknown }).type === 'string'
   ) {
     return rebuildElement(raw as Node);
@@ -83,7 +84,8 @@ const repairBrokenChildArrays = (editor: Editor): boolean => {
     if (!node || typeof node !== 'object') {
       return false;
     }
-    if (Node.isText(node as Node)) {
+    //@ts-ignore
+    if (Node?.isText?.(node as Node)) {
       return false;
     }
     const rawChildren = (node as { children?: unknown }).children;
@@ -91,7 +93,7 @@ const repairBrokenChildArrays = (editor: Editor): boolean => {
       Object.assign(node as object, rebuildElement(node as Node));
       return true;
     }
-    if (rawChildren.some((c) => !isValidChild(c))) {
+    if (rawChildren?.some((c) => !isValidChild(c))) {
       const fixedChildren = rawChildren.filter(isValidChild) as Node[];
       (node as { children: Node[] }).children =
         fixedChildren.length === 0 ? [{ text: '' }] : fixedChildren;
@@ -133,7 +135,8 @@ export const withSanitizeInvalidChildren = (editor: Editor) => {
     const [node, path] = entry;
 
     // `Node.isNode` is true for text leaves, but they have no `children`; never call `.some` on them.
-    if (Node.isText(node)) {
+    //@ts-ignore
+    if (Node?.isText?.(node)) {
       normalizeNode(entry);
       return;
     }
@@ -156,6 +159,7 @@ export const withSanitizeInvalidChildren = (editor: Editor) => {
       return;
     }
 
+    //@ts-ignore
     if (!Editor.isEditor(node) && !Node.isText(node)) {
       const rawChildren = (node as { children?: unknown }).children;
       if (!Array.isArray(rawChildren)) {
@@ -165,6 +169,7 @@ export const withSanitizeInvalidChildren = (editor: Editor) => {
       }
     }
 
+    //@ts-ignore
     if (Node.isElement(node)) {
       const childList = getChildList(node);
       const hasInvalid = childList.some((c) => !isValidChild(c));
