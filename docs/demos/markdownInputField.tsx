@@ -79,7 +79,16 @@ export default () => {
   }, []);
 
   return (
-    <div style={{ padding: 20, margin: 'auto', maxWidth: 800, display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div
+      style={{
+        padding: 20,
+        margin: 'auto',
+        maxWidth: 800,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 20,
+      }}
+    >
       <div>
         圆角：
         <Slider value={borderRadius} onChange={setBorderRadius} />
@@ -149,10 +158,17 @@ export default () => {
           items: TAG_ITEMS,
           tagRender: (props, defaultDom: React.ReactNode) => (
             <TagRender
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
               defaultDom={defaultDom}
               placeholder={props.placeholder || ''}
-              onSelect={(value: string) => props.onSelect?.(value, { value: '123' })}
+              onSelect={(value: string) =>
+                props.onSelect?.(value, { value: '123' })
+              }
             />
           ),
         }}
@@ -195,7 +211,9 @@ export default () => {
         borderRadius={borderRadius}
         tagInputProps={{ enable: true, items: TAG_ITEMS }}
         onSend={handleSend}
-        value={'《原神》克洛琳德将于6月正式上线，官方也放出了克洛琳德的突破材料，那么克洛琳德的突破材料都是什么，又要在哪里采集呢？下面请看由\u201C关蝎\u201D为大家分享的《原神》克洛琳德突破材料一览，希望可以帮助到大家。《原神》克洛琳德将于6月正式上线，官方也放出了克洛琳德的突破材料，那么克洛琳德的突破材料都是什么，又要在哪里采集呢？下面请看由\u201C关蝎\u201D为大家分享的《原神》克洛琳德突破材料一览，希望可以帮助到大家。《原神》克洛琳德将于6月正式上线，官方也放出了克洛琳德的突破材料，那么克洛琳德的突破材料都是什么，又要在哪里采集呢？下面请看由\u201C关蝎\u201D为大家分享的《原神》克洛琳德突破材料一览，希望可以帮助到大家。《原神》克洛琳德将于6月正式上线，官方也放出了克洛琳德的突破材料，那么克洛琳德的突破材料都是什么，又要在哪里采集呢？下面请看由\u201C关蝎\u201D为大家分享的《原神》克洛琳德突破材料一览，希望可以帮助到大家。'}
+        value={
+          '《原神》克洛琳德将于6月正式上线，官方也放出了克洛琳德的突破材料，那么克洛琳德的突破材料都是什么，又要在哪里采集呢？下面请看由\u201C关蝎\u201D为大家分享的《原神》克洛琳德突破材料一览，希望可以帮助到大家。《原神》克洛琳德将于6月正式上线，官方也放出了克洛琳德的突破材料，那么克洛琳德的突破材料都是什么，又要在哪里采集呢？下面请看由\u201C关蝎\u201D为大家分享的《原神》克洛琳德突破材料一览，希望可以帮助到大家。《原神》克洛琳德将于6月正式上线，官方也放出了克洛琳德的突破材料，那么克洛琳德的突破材料都是什么，又要在哪里采集呢？下面请看由\u201C关蝎\u201D为大家分享的《原神》克洛琳德突破材料一览，希望可以帮助到大家。《原神》克洛琳德将于6月正式上线，官方也放出了克洛琳德的突破材料，那么克洛琳德的突破材料都是什么，又要在哪里采集呢？下面请看由\u201C关蝎\u201D为大家分享的《原神》克洛琳德突破材料一览，希望可以帮助到大家。'
+        }
         onStop={() => console.log('stop...')}
         placeholder="请输入内容"
       />
