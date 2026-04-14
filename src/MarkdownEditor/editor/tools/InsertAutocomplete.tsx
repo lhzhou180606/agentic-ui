@@ -1,4 +1,4 @@
-import {
+﻿import {
   CheckSquareOutlined,
   CodeOutlined,
   FontSizeOutlined,
@@ -707,6 +707,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
         {!state.insertLink && !state.insertAttachment && (
           <>
             <Menu
+              _internalDisableMenuItemTitleTooltip
               items={
                 props.optionsRender?.(
                   state.filterOptions

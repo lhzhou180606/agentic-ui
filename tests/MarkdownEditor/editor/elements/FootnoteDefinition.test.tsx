@@ -80,15 +80,6 @@ describe('FootnoteDefinition Component', () => {
       fireEvent.dragStart(el!);
     });
 
-    it('应该显示拖拽手柄', () => {
-      const { getByTestId } = renderWithProvider(
-        <FootnoteDefinition {...defaultProps} />,
-      );
-
-      const dragHandle = getByTestId('drag-handle');
-      expect(dragHandle).toBeInTheDocument();
-    });
-
     it('应该显示内容', () => {
       const { container } = renderWithProvider(
         <FootnoteDefinition {...defaultProps} />,

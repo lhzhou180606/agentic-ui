@@ -1,12 +1,34 @@
-﻿import { renderHook } from '@testing-library/react';
+﻿import { render } from '@testing-library/react';
+import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as markdownReactShared from '../markdownReactShared';
 import { useStreamingMarkdownReact } from '../streaming/useStreamingMarkdownReact';
 
+interface HarnessProps {
+  content: string;
+  remarkPlugins?: unknown[];
+  fncProps?: Record<string, unknown>;
+}
+
+/**
+ * 必须真实挂载：MarkdownBlockPiece 在子组件 useMemo 中才调用 renderMarkdownBlock，
+ * renderHook 不挂载子树会导致 spy 统计为 0。
+ */
+function StreamingHarness(props: HarnessProps) {
+  const { content, remarkPlugins, fncProps } = props;
+  const node = useStreamingMarkdownReact(content, {
+    streaming: true,
+    contentRevisionSource: content,
+    ...(remarkPlugins !== undefined ? { remarkPlugins } : {}),
+    ...(fncProps !== undefined ? { fncProps: fncProps as any } : {}),
+  });
+  return <div data-testid="streaming-harness-out">{node}</div>;
+}
+
 /**
  * 密封块缓存与 Bubble 侧稳定 fncProps 配套：
  * - 末块增长 / fncProps 仅换引用：密封块不应重复 renderMarkdownBlock
- * - remarkPlugins 变引用导致 processor 重建：应清空缓存并重新 parse（与 useEffect 仅依赖 processor 一致）
+ * - remarkPlugins 变引用导致 processor 重建：应清空缓存并重新 parse
  */
 describe('useStreamingMarkdownReact sealed subtree cache', () => {
   beforeEach(() => {
@@ -19,19 +41,12 @@ describe('useStreamingMarkdownReact sealed subtree cache', () => {
     const md1 = 'sealed\n\n\n';
     const md2 = 'sealed\n\n\ntail';
 
-    const { rerender } = renderHook(
-      ({ content }: { content: string }) =>
-        useStreamingMarkdownReact(content, {
-          streaming: true,
-          contentRevisionSource: content,
-        }),
-      { initialProps: { content: md1 } },
-    );
+    const { rerender } = render(<StreamingHarness content={md1} />);
 
     const countAfterFirst = spy.mock.calls.length;
     expect(countAfterFirst).toBeGreaterThan(0);
 
-    rerender({ content: md2 });
+    rerender(<StreamingHarness content={md2} />);
 
     expect(spy.mock.calls.length - countAfterFirst).toBe(1);
   });
@@ -42,20 +57,14 @@ describe('useStreamingMarkdownReact sealed subtree cache', () => {
     const md1 = 'sealed\n\n\n';
     const md2 = 'sealed\n\n\ntail';
 
-    const { rerender } = renderHook(
-      ({ content, fp }: { content: string; fp: Record<string, unknown> }) =>
-        useStreamingMarkdownReact(content, {
-          streaming: true,
-          contentRevisionSource: content,
-          fncProps: fp as any,
-        }),
-      { initialProps: { content: md1, fp: { tag: 'a' } } },
+    const { rerender } = render(
+      <StreamingHarness content={md1} fncProps={{ tag: 'a' }} />,
     );
 
     const afterFirst = spy.mock.calls.length;
     expect(afterFirst).toBeGreaterThan(0);
 
-    rerender({ content: md2, fp: { tag: 'b' } });
+    rerender(<StreamingHarness content={md2} fncProps={{ tag: 'b' }} />);
 
     expect(spy.mock.calls.length - afterFirst).toBe(1);
   });
@@ -65,20 +74,14 @@ describe('useStreamingMarkdownReact sealed subtree cache', () => {
     const noop = () => {};
     const fixedMd = 'sealed\n\n\n';
 
-    const { rerender } = renderHook(
-      ({ plugins }: { plugins: unknown[] }) =>
-        useStreamingMarkdownReact(fixedMd, {
-          streaming: true,
-          contentRevisionSource: fixedMd,
-          remarkPlugins: plugins,
-        }),
-      { initialProps: { plugins: [noop] } },
+    const { rerender } = render(
+      <StreamingHarness content={fixedMd} remarkPlugins={[noop]} />,
     );
 
     expect(spy.mock.calls.length).toBeGreaterThan(0);
     spy.mockClear();
 
-    rerender({ plugins: [noop] });
+    rerender(<StreamingHarness content={fixedMd} remarkPlugins={[noop]} />);
 
     expect(spy.mock.calls.length).toBeGreaterThan(0);
   });

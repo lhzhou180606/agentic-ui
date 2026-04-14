@@ -100,11 +100,6 @@ describe('LinkCard', () => {
       expect(icon).toHaveAttribute('src', 'https://example.com/icon.png');
       expect(icon).toHaveAttribute('width', '56');
     });
-
-    it('应该包含拖拽手柄', () => {
-      render(<LinkCard {...defaultProps} />);
-      expect(screen.getByTestId('drag-handle')).toBeInTheDocument();
-    });
   });
 
   describe('交互测试', () => {

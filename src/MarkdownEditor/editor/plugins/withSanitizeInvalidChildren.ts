@@ -1,4 +1,4 @@
-import { Editor, Node, NodeEntry, Transforms } from 'slate';
+﻿import { Editor, Element, Node, NodeEntry, Text, Transforms } from 'slate';
 import { HistoryEditor } from 'slate-history';
 
 import { EditorUtils } from '../utils/editorUtils';
@@ -61,8 +61,7 @@ const rebuildOrDefaultBlock = (raw: unknown): Node => {
   if (
     raw &&
     typeof raw === 'object' &&
-    //@ts-ignore
-    !Node?.isText(raw as Node) &&
+    !Text.isText(raw as Node) &&
     typeof (raw as { type?: unknown }).type === 'string'
   ) {
     return rebuildElement(raw as Node);
@@ -119,8 +118,11 @@ const repairBrokenChildArrays = (editor: Editor): boolean => {
     if (!node || typeof node !== 'object') {
       return false;
     }
-    //@ts-ignore
-    if (Node?.isText?.(node as Node)) {
+    if (Text.isText(node as Node)) {
+      if ('children' in (node as object)) {
+        delete (node as { children?: unknown }).children;
+        return true;
+      }
       return false;
     }
     const rawChildren = (node as { children?: unknown }).children;
@@ -159,9 +161,14 @@ export const withSanitizeInvalidChildren = (editor: Editor) => {
   const { normalizeNode, normalize } = editor;
 
   editor.normalize = (options?: Parameters<Editor['normalize']>[0]) => {
-    let guard = 0;
-    while (guard < 100 && repairBrokenChildArrays(editor)) {
-      guard += 1;
+    // 与 Slate 默认 `normalize` 一致：在 `withoutNormalizing` 嵌套批次末尾仍会调用
+    // `Editor.normalize`，此时 `isNormalizing` 为 false，文档可能短暂为空（合法中间态）。
+    // 若在此处 `repairBrokenChildArrays` 强行插入默认块，会与后续 `insertNodes` 叠成双段落。
+    if (Editor.isNormalizing(editor)) {
+      let guard = 0;
+      while (guard < 100 && repairBrokenChildArrays(editor)) {
+        guard += 1;
+      }
     }
     return normalize.call(editor, options);
   };
@@ -169,9 +176,11 @@ export const withSanitizeInvalidChildren = (editor: Editor) => {
   editor.normalizeNode = (entry: NodeEntry) => {
     const [node, path] = entry;
 
-    // `Node.isNode` is true for text leaves, but they have no `children`; never call `.some` on them.
-    //@ts-ignore
-    if (Node?.isText?.(node)) {
+    // Text leaves have no `children`; also strip invalid `children` on text (Slate may treat as element).
+    if (Text.isText(node)) {
+      if ('children' in (node as object)) {
+        delete (node as { children?: unknown }).children;
+      }
       normalizeNode(entry);
       return;
     }
@@ -191,8 +200,7 @@ export const withSanitizeInvalidChildren = (editor: Editor) => {
       return;
     }
 
-    //@ts-ignore
-    if (!Editor.isEditor(node) && !Node.isText(node)) {
+    if (!Editor.isEditor(node) && !Text.isText(node)) {
       const rawChildren = (node as { children?: unknown }).children;
       if (!Array.isArray(rawChildren)) {
         Object.assign(node as object, rebuildElement(node as Node));
@@ -201,8 +209,7 @@ export const withSanitizeInvalidChildren = (editor: Editor) => {
       }
     }
 
-    //@ts-ignore
-    if (Node.isElement(node)) {
+    if (Element.isElement(node)) {
       const childList = getChildList(node);
       const hasInvalid = childArrayHasInvalidEntries(childList);
       if (hasInvalid) {

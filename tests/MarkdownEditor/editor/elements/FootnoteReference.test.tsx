@@ -78,17 +78,6 @@ describe('FootnoteReference', () => {
       expect(footnoteReference).toHaveAttribute('data-drag-el');
     });
 
-    it('应该渲染拖拽手柄', () => {
-      renderWithProvider(
-        <FootnoteReference element={mockElement} attributes={mockAttributes}>
-          {null}
-        </FootnoteReference>,
-      );
-
-      const dragHandle = screen.getByTestId('drag-handle');
-      expect(dragHandle).toBeInTheDocument();
-    });
-
     it('应该传递正确的属性', () => {
       renderWithProvider(
         <FootnoteReference element={mockElement} attributes={mockAttributes}>

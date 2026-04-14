@@ -1,4 +1,4 @@
-import { BaseEditor, createEditor, Transforms } from 'slate';
+﻿import { BaseEditor, createEditor, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';

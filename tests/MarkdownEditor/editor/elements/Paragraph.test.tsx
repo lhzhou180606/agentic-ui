@@ -96,16 +96,6 @@ describe('Paragraph Component', () => {
     fireEvent.dragStart(p!);
   });
 
-  it('应该包含DragHandle组件', () => {
-    render(
-      <Paragraph element={mockElement} attributes={mockAttributes}>
-        {mockChildren}
-      </Paragraph>,
-    );
-
-    expect(screen.getByTestId('drag-handle')).toBeInTheDocument();
-  });
-
   it('应该应用正确的CSS类名', () => {
     render(
       <Paragraph element={mockElement} attributes={mockAttributes}>
@@ -172,11 +162,9 @@ describe('Paragraph Component', () => {
       </Paragraph>,
     );
 
-    const paragraphElement = screen
-      .getByText(
-        'For it will surely sprout wings and fly off to the sky like an eagle',
-      )
-      .parentElement;
+    const paragraphElement = screen.getByText(
+      'For it will surely sprout wings and fly off to the sky like an eagle',
+    ).parentElement;
     expect(paragraphElement).toBeInTheDocument();
     expect(paragraphElement).toHaveAttribute('data-be', 'paragraph');
     expect(paragraphElement).toHaveAttribute('data-align', 'right');

@@ -1,10 +1,10 @@
-/**
+﻿/**
  * 文件名 `EditorStore.*` 在同目录字典序上晚于 `Editor.branches.*`，使 vitest 先注册后者对 slate 的 vi.mock，
  * 再加载本文件中的真实 slate，避免剪贴板等用例的 mock 被覆盖。
  */
 import { render, screen } from '@testing-library/react';
 import React from 'react';
-import { createEditor, Editor, Path, Text, Transforms } from 'slate';
+import { createEditor, Editor, Path, Transforms } from 'slate';
 import { withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -321,15 +321,6 @@ describe('EditorStore', () => {
       editor.children = [
         { type: 'paragraph', children: [{ text: 'hello world' }] },
       ];
-      vi.spyOn(Editor, 'nodes').mockImplementation(function* (
-        _e: any,
-        opts: any,
-      ) {
-        if (opts?.match) {
-          yield [{ text: 'hello world' }, [0, 0]];
-        }
-      });
-      vi.spyOn(Text, 'isText').mockReturnValue(true);
       const count = store.replaceText('world', 'x', {
         replaceAll: true,
         caseSensitive: true,

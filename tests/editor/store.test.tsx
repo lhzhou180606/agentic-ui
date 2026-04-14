@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+﻿import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
@@ -716,7 +716,8 @@ describe('EditorStore', () => {
 
       (store as any).executeOperations(operations);
 
-      expect(editor.children.length).toBe(0);
+      expect(editor.children.length).toBe(1);
+      expect((editor.children[0] as any).type).toBe('paragraph');
     });
 
     it('应该执行更新操作', () => {

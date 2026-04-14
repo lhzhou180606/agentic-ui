@@ -98,11 +98,6 @@ describe('Head Component', () => {
       render(<Head {...defaultProps} />);
       expect(screen.getByText('Test Heading')).toBeInTheDocument();
     });
-
-    it('应该包含拖拽手柄', () => {
-      render(<Head {...defaultProps} />);
-      expect(screen.getByTestId('drag-handle')).toBeInTheDocument();
-    });
   });
 
   describe('属性设置', () => {

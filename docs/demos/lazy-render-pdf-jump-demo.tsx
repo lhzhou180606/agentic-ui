@@ -1,4 +1,4 @@
-/**
+﻿/**
  * title: 懒加载 PDF 跳转示例
  * description: 模拟 PDF 双栏展示，点击左侧段落跳转到右侧对应位置并强制加载内容
  */
@@ -89,7 +89,9 @@ const CustomPlaceholder: React.FC<{
       className="pml-item pml-placeholder"
     >
       {isLoading ? (
-        <Spin tip="强制加载中..." />
+        <Spin tip="强制加载中...">
+          <div style={{ minHeight: 48 }} aria-hidden />
+        </Spin>
       ) : (
         <>
           <div

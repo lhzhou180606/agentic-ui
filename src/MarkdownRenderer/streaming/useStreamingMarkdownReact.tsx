@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useMemo, useRef } from 'react';
+﻿import React, { useMemo, useRef } from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 import {
   JINJA_DOLLAR_PLACEHOLDER,
@@ -8,34 +8,16 @@ import {
 import {
   buildEditorAlignedComponents,
   createHastProcessor,
-  renderMarkdownBlock,
   splitMarkdownBlocks,
   type UseMarkdownToReactOptions,
 } from '../markdownReactShared';
-import { StreamingAnimationContext } from '../StreamingAnimationContext';
 
 import { MarkdownBlockPiece } from './MarkdownBlockPiece';
 import { shouldResetRevisionProgress } from './revisionPolicy';
 
-interface SealedSubtreeProps {
-  children: React.ReactNode;
-}
-
-/** 已密封块：子树在 hook 层缓存，避免父 Fragment 重建时整段子树 reconcile */
-const SealedMarkdownSubtree = memo(function SealedMarkdownSubtree({
-  children,
-}: SealedSubtreeProps) {
-  return (
-    <StreamingAnimationContext.Provider value={{ animateBlock: false }}>
-      {children}
-    </StreamingAnimationContext.Provider>
-  );
-});
-
-SealedMarkdownSubtree.displayName = 'SealedMarkdownSubtree';
-
 /**
- * 流式优先的 Markdown → React：每块独立 memo 组件；tail 与 sealed 共用组件类型以便块晋升时复用实例。
+ * 流式优先的 Markdown → React：每块独立 MarkdownBlockPiece，末块 tail、其余 sealed。
+ * 块 key 仅用修订代 + 下标，使「末块晋升为 sealed」时外层组件类型不变，避免子树卸载重挂。
  */
 export const useStreamingMarkdownReact = (
   content: string,
@@ -48,10 +30,6 @@ export const useStreamingMarkdownReact = (
 
   const prevRevisionRef = useRef<string | undefined>(undefined);
   const revisionGenerationRef = useRef(0);
-  /** 修订代 + 块下标 → 已解析子树，供密封块跨父级 useMemo 周期复用同一 React 元素引用 */
-  const sealedSubtreeCacheRef = useRef<
-    Map<string, { source: string; node: React.ReactNode }>
-  >(new Map());
 
   const processor = useMemo(
     () => createHastProcessor(options?.remarkPlugins, options?.htmlConfig),
@@ -82,20 +60,9 @@ export const useStreamingMarkdownReact = (
     ],
   );
 
-  /**
-   * 仅 processor（remark/html 管线）变化时清空密封缓存。
-   * `components` 由 `buildEditorAlignedComponents(..., fncProps, ...)` 合成，上游常因
-   * `fncProps`/`render` 引用每帧换新而变引用；若此处随 components clear，
-   * 流式下已密封的表格等子树会在每个 tick 丢失缓存并被销毁重建。
-   */
-  useEffect(() => {
-    sealedSubtreeCacheRef.current.clear();
-  }, [processor]);
-
   return useMemo(() => {
     if (!content) {
       prevRevisionRef.current = '';
-      sealedSubtreeCacheRef.current.clear();
       return null;
     }
 
@@ -105,7 +72,6 @@ export const useStreamingMarkdownReact = (
       shouldResetRevisionProgress(prevRev, revisionSource)
     ) {
       revisionGenerationRef.current += 1;
-      sealedSubtreeCacheRef.current.clear();
     }
     prevRevisionRef.current = revisionSource;
 
@@ -121,45 +87,19 @@ export const useStreamingMarkdownReact = (
 
       const elements = blocks.map((blockSource, index) => {
         const isLast = index === blocks.length - 1;
-        // 仅用修订代 + 块下标作 key，避免末块随文本增长导致 identity 变化而整段 remount
         const key = `b-${gen}-${index}`;
-        if (isLast) {
-          return jsx(
-            MarkdownBlockPiece,
-            {
-              variant: 'tail',
-              blockSource,
-              processor,
-              components,
-              streaming: !!options?.streaming,
-            },
-            key,
-          );
-        }
-
-        const cacheKey = `${gen}:${index}`;
-        const cache = sealedSubtreeCacheRef.current;
-        const hit = cache.get(cacheKey);
-        const node =
-          hit && hit.source === blockSource
-            ? hit.node
-            : renderMarkdownBlock(blockSource, processor, components);
-        cache.set(cacheKey, { source: blockSource, node });
-
-        return jsx(SealedMarkdownSubtree, { children: node }, key);
+        return jsx(
+          MarkdownBlockPiece,
+          {
+            variant: isLast ? 'tail' : 'sealed',
+            blockSource,
+            processor,
+            components,
+            streaming: !!options?.streaming,
+          },
+          key,
+        );
       });
-
-      const maxSealedIndex = blocks.length - 2;
-      if (maxSealedIndex >= 0) {
-        const cachePrefix = `${gen}:`;
-        for (const k of [...sealedSubtreeCacheRef.current.keys()]) {
-          if (!k.startsWith(cachePrefix)) continue;
-          const idx = Number(k.slice(cachePrefix.length));
-          if (Number.isNaN(idx) || idx > maxSealedIndex) {
-            sealedSubtreeCacheRef.current.delete(k);
-          }
-        }
-      }
 
       return jsxs(Fragment, { children: elements });
     } catch (error) {

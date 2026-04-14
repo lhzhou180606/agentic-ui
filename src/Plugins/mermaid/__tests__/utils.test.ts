@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+﻿import { describe, expect, it, vi } from 'vitest';
 import {
   applyMermaidTheme,
   cleanupTempElement,
@@ -88,7 +88,11 @@ describe('applyMermaidTheme', () => {
   it('initializes without theme config', () => {
     const api = { initialize: vi.fn() };
     applyMermaidTheme(api as any);
-    expect(api.initialize).toHaveBeenCalledWith({ startOnLoad: false });
+    expect(api.initialize).toHaveBeenCalledWith({
+      startOnLoad: false,
+      htmlLabels: false,
+      flowchart: { htmlLabels: false },
+    });
   });
 
   it('initializes with theme config', () => {
@@ -97,6 +101,9 @@ describe('applyMermaidTheme', () => {
     applyMermaidTheme(api as any, config);
     expect(api.initialize).toHaveBeenCalledWith(
       expect.objectContaining({
+        startOnLoad: false,
+        htmlLabels: false,
+        flowchart: { htmlLabels: false },
         theme: 'base',
         darkMode: config.darkMode,
       }),

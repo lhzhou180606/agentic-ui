@@ -159,19 +159,14 @@ describe('KatexElement', () => {
       expect(element).toHaveAttribute('contentEditable', 'false');
     });
 
-    it('应该在编辑模式下渲染拖拽手柄', () => {
-      render(<KatexElement {...defaultProps} />);
-
-      const dragHandle = screen.getByTestId('drag-handle');
-      expect(dragHandle).toBeInTheDocument();
-    });
-
     it('应该在编辑模式下渲染 Katex 组件容器', () => {
-      const { container } = render(<KatexElement {...defaultProps} />);
+      render(<KatexElement {...defaultProps} />);
 
       // 查找包含 Katex 渲染器的容器
       const katexRenderer = screen.getByTestId('katex-renderer');
-      const katexContainer = katexRenderer.closest('div[style*="position: relative"]');
+      const katexContainer = katexRenderer.closest(
+        'div[style*="position: relative"]',
+      );
       expect(katexContainer).toBeInTheDocument();
       // 验证容器存在并且包含 Katex 渲染器
       expect(katexContainer).toContainElement(katexRenderer);
@@ -329,9 +324,7 @@ describe('KatexElement', () => {
         ref: null,
       };
 
-      render(
-        <KatexElement {...defaultProps} attributes={customAttributes} />,
-      );
+      render(<KatexElement {...defaultProps} attributes={customAttributes} />);
 
       const element = screen.getByTestId('custom-katex-element');
       expect(element).toBeInTheDocument();

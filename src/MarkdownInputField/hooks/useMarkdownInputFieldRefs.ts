@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+﻿import { useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { ReactEditor } from 'slate-react';
 import type { MarkdownEditorInstance } from '../../MarkdownEditor';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
@@ -60,10 +60,6 @@ export const useMarkdownInputFieldRefs = (
         // ReactEditor.isFocused can throw if the editor is being torn down
       }
     }
-    if (props.value === undefined || props.value === '') {
-      return;
-    }
-
     markdownEditorRef.current?.store?.setMDContent(props.value ?? '');
   }, [props.value]);
 

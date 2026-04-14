@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useRef } from 'react';
+﻿import React, { memo, useMemo, useRef } from 'react';
 import type { Processor } from 'unified';
 
 import { renderMarkdownBlock } from '../markdownReactShared';
@@ -29,13 +29,29 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
     node: React.ReactNode;
   } | null>(null);
   const cacheRef = useRef<Map<string, React.ReactNode>>(new Map());
+  const processorRef = useRef<Processor | null>(null);
+  /**
+   * 宿主常把 `components: { __codeBlock: X }` 内联在每次 render，引用恒变。
+   * 若列入 useMemo 依赖，末块晋升为 sealed 时会误触发重 parse，子树卸载重挂。
+   * 密封命中缓存时故意不随 components 引用抖动；需重算时由 variant / blockSource / processor 驱动。
+   */
+  const componentsRef = useRef(components);
+  componentsRef.current = components;
 
   const node = useMemo(() => {
+    if (processorRef.current !== processor) {
+      processorRef.current = processor;
+      cacheRef.current.clear();
+      lastParsedRef.current = null;
+    }
+
+    const comps = componentsRef.current;
+
     const cached = cacheRef.current.get(blockSource);
     if (cached && variant === 'sealed') return cached;
 
     if (variant === 'sealed' || !streaming) {
-      const el = renderMarkdownBlock(blockSource, processor, components);
+      const el = renderMarkdownBlock(blockSource, processor, comps);
       cacheRef.current.set(blockSource, el);
       if (variant === 'tail')
         lastParsedRef.current = { source: blockSource, node: el };
@@ -47,11 +63,11 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
       return prev.node;
     }
 
-    const el = renderMarkdownBlock(blockSource, processor, components);
+    const el = renderMarkdownBlock(blockSource, processor, comps);
     cacheRef.current.set(blockSource, el);
     lastParsedRef.current = { source: blockSource, node: el };
     return el;
-  }, [variant, blockSource, processor, components, streaming]);
+  }, [variant, blockSource, processor, streaming]);
 
   const animateBlock = variant === 'tail' && streaming;
 

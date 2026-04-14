@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-this-alias */
+﻿/* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable no-param-reassign */
 import isEqual from 'lodash-es/isEqual';
 import { parse } from 'querystring';
@@ -388,6 +388,7 @@ export class EditorStore {
   ): void | Promise<void> {
     if (md === undefined) return;
     if (!md) {
+      if (this._shouldSkipSetContent('')) return;
       this.clearContent();
       return;
     }

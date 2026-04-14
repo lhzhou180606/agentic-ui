@@ -1,4 +1,4 @@
-import { LoadingOutlined } from '@ant-design/icons';
+﻿import { LoadingOutlined } from '@ant-design/icons';
 import {
   Download as DownloadIcon,
   ArrowLeft as LeftIcon,
@@ -343,7 +343,13 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
           <Spin
             size="large"
             tip={locale?.['workspace.file.processing'] || '正在处理文件...'}
-          />
+          >
+            <div
+              className={classNames(`${prefixCls}-spin-anchor`, hashId)}
+              style={{ minHeight: 64, width: '100%' }}
+              aria-hidden
+            />
+          </Spin>
         </PlaceholderContent>
       );
     }
@@ -523,7 +529,13 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
                 locale?.['workspace.loadingFileContent'] ||
                 '正在加载文件内容...'
               }
-            />
+            >
+              <div
+                className={classNames(`${prefixCls}-spin-anchor`, hashId)}
+                style={{ minHeight: 64, width: '100%' }}
+                aria-hidden
+              />
+            </Spin>
           </PlaceholderContent>
         );
       }

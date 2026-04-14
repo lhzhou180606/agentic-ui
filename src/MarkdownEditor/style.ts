@@ -1,4 +1,4 @@
-import type { CSSInterpolation } from '@ant-design/cssinjs';
+﻿import type { CSSInterpolation } from '@ant-design/cssinjs';
 import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
 import {
   ChatTokenType,
@@ -603,13 +603,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
               strokeWidth: '1px',
               fill: '#fff',
             },
-          },
-
-          // 强制设置所有文字样式
-          '& text': {
-            // 确保文字不会被裁剪
-            dominantBaseline: 'middle',
-            textAnchor: 'middle',
           },
 
           // 节点标签 - 更大的字体
