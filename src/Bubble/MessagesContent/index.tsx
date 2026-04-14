@@ -1,7 +1,7 @@
 import { ExportOutlined } from '@ant-design/icons';
 import { ConfigProvider, Popover, Tooltip, Typography } from 'antd';
 import classNames from 'clsx';
-import React, { useContext, useMemo } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';
 import { MarkdownEditor, useRefFunction } from '../../index';
@@ -89,6 +89,10 @@ export const BubbleMessageDisplay: React.FC<
     return node;
   });
 
+  const handleFootnoteDefinitionChange = useCallback((list: typeof nodeList) => {
+    setNodeList(list);
+  }, []);
+
   const typing = useMemo(() => {
     return (
       props.originData?.isAborted !== true &&
@@ -126,6 +130,144 @@ export const BubbleMessageDisplay: React.FC<
     props.originData?.isLast,
     contentAfterDom,
   ]);
+
+  const mdReferenceRender = useCallback(
+    (mdProps: { children?: React.ReactNode }, _: React.ReactNode) => {
+      const reference_url_info_list =
+        props.originData?.extra?.reference_url_info_list || [];
+      const item =
+        reference_url_info_list.find(
+          (row: { placeholder: string; docId: string }) =>
+            row.placeholder === `[${mdProps.children}]` ||
+            row.placeholder === `[^${mdProps.children}]`,
+        ) || funRender(mdProps as { identifier?: string });
+
+      if (!item) return;
+      if (!item?.origin_text) return null;
+      return (
+        <Popover
+          title={
+            <div
+              className={classNames(
+                `${baseChatCls}-messages-content-popover-title`,
+                hashId,
+              )}
+              style={props?.customConfig?.PopoverProps?.titleStyle}
+            >
+              <div>
+                {locale?.['chat.message.referenceDocument'] || '参考文档'}
+              </div>
+              {item?.origin_url ? (
+                <ActionIconBox
+                  title={locale?.['chat.message.viewOriginal'] || '查看原文'}
+                  tooltipProps={props?.customConfig?.TooltipProps}
+                  onClick={() => {
+                    if (props.markdownRenderConfig?.fncProps?.onOriginUrlClick) {
+                      props.markdownRenderConfig.fncProps.onOriginUrlClick(
+                        item.origin_url,
+                      );
+                      return;
+                    }
+                    window.open(item.origin_url);
+                  }}
+                >
+                  <ExportOutlined />
+                </ActionIconBox>
+              ) : null}
+            </div>
+          }
+          content={
+            <div
+              className={classNames(
+                `${baseChatCls}-messages-content-popover-content`,
+                hashId,
+              )}
+              style={props?.customConfig?.PopoverProps?.contentStyle}
+            >
+              <MarkdownEditor
+                style={{
+                  padding: 0,
+                  width: '100%',
+                }}
+                tableConfig={{
+                  actions: {
+                    fullScreen: 'modal',
+                  },
+                }}
+                readonly
+                contentStyle={{
+                  padding: 0,
+                  width: '100%',
+                }}
+                initValue={item?.origin_text?.trim()}
+              />
+              {item?.docId && item.doc_name ? (
+                <Tooltip
+                  mouseEnterDelay={0.3}
+                  title={
+                    <Typography.Text copyable={{ text: item.docId }}>
+                      {item.docId}
+                    </Typography.Text>
+                  }
+                >
+                  <div
+                    className={classNames(
+                      `${baseChatCls}-messages-content-doc-tag`,
+                      hashId,
+                    )}
+                  >
+                    <img
+                      className={classNames(
+                        `${baseChatCls}-messages-content-doc-tag-icon`,
+                        hashId,
+                      )}
+                      src={
+                        'https://mdn.alipayobjects.com/huamei_ptjqan/afts/img/A*kF_GTppRbp4AAAAAAAAAAAAADkN6AQ/original'
+                      }
+                    />
+                    <div
+                      className={classNames(
+                        `${baseChatCls}-messages-content-doc-name`,
+                        hashId,
+                      )}
+                    >
+                      {item?.doc_name}
+                    </div>
+                  </div>
+                </Tooltip>
+              ) : null}
+            </div>
+          }
+        >
+          {_}
+        </Popover>
+      );
+    },
+    [
+      props.originData?.extra?.reference_url_info_list,
+      funRender,
+      locale,
+      baseChatCls,
+      hashId,
+      props?.customConfig?.PopoverProps?.titleStyle,
+      props?.customConfig?.PopoverProps?.contentStyle,
+      props?.customConfig?.TooltipProps,
+      props.markdownRenderConfig?.fncProps?.onOriginUrlClick,
+    ],
+  );
+
+  const markdownPreviewFncProps = useMemo(
+    () => ({
+      render: mdReferenceRender,
+      onFootnoteDefinitionChange: handleFootnoteDefinitionChange,
+      ...(props.markdownRenderConfig?.fncProps || {}),
+    }),
+    [
+      mdReferenceRender,
+      handleFootnoteDefinitionChange,
+      props.markdownRenderConfig?.fncProps,
+    ],
+  );
 
   const messageContent = useMemo(() => {
     if (
@@ -338,128 +480,7 @@ export const BubbleMessageDisplay: React.FC<
         isFinished={props.originData?.isFinished}
         beforeContent={beforeContent}
         afterContent={afterContent}
-        fncProps={{
-          render: (mdProps, _) => {
-            const reference_url_info_list =
-              props.originData?.extra?.reference_url_info_list || [];
-            const item =
-              reference_url_info_list.find(
-                (item: { placeholder: string; docId: string }) =>
-                  item.placeholder === `[${mdProps.children}]` ||
-                  item.placeholder === `[^${mdProps.children}]`,
-              ) || funRender(mdProps as any);
-
-            if (!item) return;
-            if (!item?.origin_text) return null;
-            return (
-              <Popover
-                title={
-                  <div
-                    className={classNames(
-                      `${baseChatCls}-messages-content-popover-title`,
-                      hashId,
-                    )}
-                    style={props?.customConfig?.PopoverProps?.titleStyle}
-                  >
-                    <div>
-                      {locale?.['chat.message.referenceDocument'] || '参考文档'}
-                    </div>
-                    {item?.origin_url ? (
-                      <ActionIconBox
-                        title={
-                          locale?.['chat.message.viewOriginal'] || '查看原文'
-                        }
-                        tooltipProps={props?.customConfig?.TooltipProps}
-                        onClick={() => {
-                          if (
-                            props.markdownRenderConfig?.fncProps
-                              ?.onOriginUrlClick
-                          ) {
-                            props.markdownRenderConfig?.fncProps?.onOriginUrlClick(
-                              item.origin_url,
-                            );
-                            return;
-                          }
-                          window.open(item.origin_url);
-                        }}
-                      >
-                        <ExportOutlined />
-                      </ActionIconBox>
-                    ) : null}
-                  </div>
-                }
-                content={
-                  <div
-                    className={classNames(
-                      `${baseChatCls}-messages-content-popover-content`,
-                      hashId,
-                    )}
-                    style={props?.customConfig?.PopoverProps?.contentStyle}
-                  >
-                    <MarkdownEditor
-                      style={{
-                        padding: 0,
-                        width: '100%',
-                      }}
-                      tableConfig={{
-                        actions: {
-                          fullScreen: 'modal',
-                        },
-                      }}
-                      readonly
-                      contentStyle={{
-                        padding: 0,
-                        width: '100%',
-                      }}
-                      initValue={item?.origin_text?.trim()}
-                    />
-                    {item?.docId && item.doc_name ? (
-                      <Tooltip
-                        mouseEnterDelay={0.3}
-                        title={
-                          <Typography.Text copyable={{ text: item.docId }}>
-                            {item.docId}
-                          </Typography.Text>
-                        }
-                      >
-                        <div
-                          className={classNames(
-                            `${baseChatCls}-messages-content-doc-tag`,
-                            hashId,
-                          )}
-                        >
-                          <img
-                            className={classNames(
-                              `${baseChatCls}-messages-content-doc-tag-icon`,
-                              hashId,
-                            )}
-                            src={
-                              'https://mdn.alipayobjects.com/huamei_ptjqan/afts/img/A*kF_GTppRbp4AAAAAAAAAAAAADkN6AQ/original'
-                            }
-                          />
-                          <div
-                            className={classNames(
-                              `${baseChatCls}-messages-content-doc-name`,
-                              hashId,
-                            )}
-                          >
-                            {item?.doc_name}
-                          </div>
-                        </div>
-                      </Tooltip>
-                    ) : null}
-                  </div>
-                }
-              >
-                {_}
-              </Popover>
-            );
-          },
-          onFootnoteDefinitionChange: (nodeList) => {
-            setNodeList(nodeList);
-          },
-          ...(props.markdownRenderConfig?.fncProps || {}),
-        }}
+        fncProps={markdownPreviewFncProps}
         typing={typing}
         placement={props.placement}
         docListNode={docInfoDom}
@@ -486,6 +507,7 @@ export const BubbleMessageDisplay: React.FC<
     props.deps,
     props.bubbleRenderConfig?.beforeMessageRender,
     props.bubbleRenderConfig?.afterMessageRender,
+    markdownPreviewFncProps,
   ]);
 
   return messageContent;

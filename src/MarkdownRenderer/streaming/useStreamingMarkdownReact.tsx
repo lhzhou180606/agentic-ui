@@ -82,9 +82,15 @@ export const useStreamingMarkdownReact = (
     ],
   );
 
+  /**
+   * 仅 processor（remark/html 管线）变化时清空密封缓存。
+   * `components` 由 `buildEditorAlignedComponents(..., fncProps, ...)` 合成，上游常因
+   * `fncProps`/`render` 引用每帧换新而变引用；若此处随 components clear，
+   * 流式下已密封的表格等子树会在每个 tick 丢失缓存并被销毁重建。
+   */
   useEffect(() => {
     sealedSubtreeCacheRef.current.clear();
-  }, [processor, components]);
+  }, [processor]);
 
   return useMemo(() => {
     if (!content) {

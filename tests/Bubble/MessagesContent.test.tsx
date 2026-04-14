@@ -1,4 +1,4 @@
-/* eslint-disable react/button-has-type */
+﻿/* eslint-disable react/button-has-type */
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
@@ -6,6 +6,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { BubbleConfigContext } from '../../src/Bubble/BubbleConfigProvide';
 import { BubbleMessageDisplay } from '../../src/Bubble/MessagesContent';
 import { BubbleProps, MessageBubbleData } from '../../src/Bubble/type';
+
+/** MarkdownPreview 每次渲染时的 fncProps，用于流式下引用稳定性回归 */
+const markdownPreviewFncPropsHistory: unknown[] = [];
 
 vi.mock('../../src/Bubble/MessagesContent/MarkdownPreview', () => ({
   MarkdownPreview: ({
@@ -20,6 +23,7 @@ vi.mock('../../src/Bubble/MessagesContent/MarkdownPreview', () => ({
     originData,
     htmlRef,
   }: any) => {
+    markdownPreviewFncPropsHistory.push(fncProps);
     return (
       <div data-testid="markdown-preview">
         <div data-testid="content">{content}</div>
@@ -338,6 +342,7 @@ describe('BubbleMessageDisplay', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    markdownPreviewFncPropsHistory.length = 0;
   });
 
   describe('基本渲染测试', () => {
@@ -943,6 +948,107 @@ describe('BubbleMessageDisplay', () => {
       renderWithContext(props);
 
       expect(screen.getByTestId('html-ref')).toBeInTheDocument();
+    });
+  });
+
+  describe('流式 Markdown fncProps 稳定性（回归）', () => {
+    const markdownRenderConfigStable = { renderMode: 'markdown' as const };
+
+    it('未完成流式仅 content 变长时，传给 MarkdownPreview 的 fncProps 引用保持不变', () => {
+      const originBase: MessageBubbleData = {
+        ...defaultProps.originData!,
+        role: 'assistant',
+        isFinished: false,
+        content: 'a',
+      };
+      const propsA = {
+        ...defaultProps,
+        content: 'a',
+        markdownRenderConfig: markdownRenderConfigStable,
+        bubbleRenderConfig: { extraRender: false as const },
+        originData: { ...originBase, content: 'a' },
+      };
+
+      const { rerender } = render(
+        <BubbleConfigContext.Provider value={defaultContext as any}>
+          <BubbleMessageDisplay {...propsA} />
+        </BubbleConfigContext.Provider>,
+      );
+
+      const definedAfterMount = markdownPreviewFncPropsHistory.filter(Boolean);
+      expect(definedAfterMount.length).toBeGreaterThan(0);
+      const fncPropsAfterMount =
+        definedAfterMount[definedAfterMount.length - 1] as object;
+
+      rerender(
+        <BubbleConfigContext.Provider value={defaultContext as any}>
+          <BubbleMessageDisplay
+            {...propsA}
+            content="ab"
+            originData={{ ...originBase, content: 'ab' }}
+          />
+        </BubbleConfigContext.Provider>,
+      );
+
+      const definedAfterRerender = markdownPreviewFncPropsHistory.filter(
+        Boolean,
+      );
+      expect(definedAfterRerender.length).toBeGreaterThan(
+        definedAfterMount.length,
+      );
+      const fncPropsAfterStream =
+        definedAfterRerender[definedAfterRerender.length - 1] as object;
+      expect(fncPropsAfterStream).toBe(fncPropsAfterMount);
+    });
+
+    it('markdownRenderConfig.fncProps 引用变化时，合并后的 fncProps 应换新引用', () => {
+      const originBase: MessageBubbleData = {
+        ...defaultProps.originData!,
+        role: 'assistant',
+        isFinished: false,
+        content: 'x',
+      };
+      const propsV1 = {
+        ...defaultProps,
+        content: 'x',
+        markdownRenderConfig: {
+          renderMode: 'markdown' as const,
+          fncProps: { custom: 'v1' },
+        },
+        bubbleRenderConfig: { extraRender: false as const },
+        originData: { ...originBase, content: 'x' },
+      };
+
+      const { rerender } = render(
+        <BubbleConfigContext.Provider value={defaultContext as any}>
+          <BubbleMessageDisplay {...propsV1} />
+        </BubbleConfigContext.Provider>,
+      );
+
+      const first = markdownPreviewFncPropsHistory.filter(
+        Boolean,
+      ) as object[];
+      expect(first.length).toBeGreaterThan(0);
+      const refV1 = first[first.length - 1];
+
+      rerender(
+        <BubbleConfigContext.Provider value={defaultContext as any}>
+          <BubbleMessageDisplay
+            {...propsV1}
+            markdownRenderConfig={{
+              renderMode: 'markdown' as const,
+              fncProps: { custom: 'v2' },
+            }}
+          />
+        </BubbleConfigContext.Provider>,
+      );
+
+      const second = markdownPreviewFncPropsHistory.filter(
+        Boolean,
+      ) as object[];
+      const refV2 = second[second.length - 1];
+      expect(refV2).not.toBe(refV1);
+      expect((refV2 as { custom?: string }).custom).toBe('v2');
     });
   });
 });
