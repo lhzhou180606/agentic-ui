@@ -120,6 +120,8 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
   );
 
   const markdownContainerRef = useRef<HTMLDivElement | null>(null);
+  const pluginsForInitParseRef = useRef(props.plugins);
+  pluginsForInitParseRef.current = props.plugins;
 
   // 错误捕获
   useEffect(() => {
@@ -195,7 +197,10 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
    */
   const initSchemaValue = useMemo(() => {
     // 安全地获取解析结果，确保 list 始终是数组
-    const parseResult = parserMdToSchema(initValue || '', props.plugins);
+    const parseResult = parserMdToSchema(
+      initValue || '',
+      pluginsForInitParseRef.current || [],
+    );
     let list = parseResult?.schema || [];
 
     // 非只读时保证末尾有可编辑块：解析结果常已含空段落（如空 initValue），
@@ -210,27 +215,30 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
       (initValue ? list : JSON.parse(JSON.stringify([EditorUtils.p])));
 
     // 过滤掉无效的空节点
-    return schema?.filter((item: any) => {
-      if (item.type === 'paragraph' && item.children.length === 0) {
-        return false;
-      }
-      if (
-        (item.type === 'list' ||
-          item.type === 'bulleted-list' ||
-          item.type === 'numbered-list') &&
-        item.children.length === 0
-      ) {
-        return false;
-      }
-      if (item.type === 'listItem' && item.children.length === 0) {
-        return false;
-      }
-      if (item.type === 'heading' && item.children.length === 0) {
-        return false;
-      }
-      return true;
-    });
-  }, []);
+    const filtered =
+      schema?.filter((item: any) => {
+        if (item.type === 'paragraph' && item.children.length === 0) {
+          return false;
+        }
+        if (
+          (item.type === 'list' ||
+            item.type === 'bulleted-list' ||
+            item.type === 'numbered-list') &&
+          item.children.length === 0
+        ) {
+          return false;
+        }
+        if (item.type === 'listItem' && item.children.length === 0) {
+          return false;
+        }
+        if (item.type === 'heading' && item.children.length === 0) {
+          return false;
+        }
+        return true;
+      }) || [];
+
+    return EditorUtils.coalesceRootAllEmptyParagraphs(filtered) as Elements[];
+  }, [initValue, props.readonly, props.initSchemaValue]);
 
   // 初始化实例
   const instance = useMemo(() => {
@@ -269,6 +277,12 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
 
   // schema 数据
   const [schema, setSchema] = useState<Elements[]>(initSchemaValue);
+
+  // initSchemaValue 随 initValue / initSchemaValue prop 变化时同步到 state，供 Toc 等与编辑器树一致
+  useEffect(() => {
+    setSchema(initSchemaValue);
+  }, [initSchemaValue]);
+
   const [openInsertCompletion, setOpenInsertCompletion] = useState(false);
   const [refreshFloatBar, setRefreshFloatBar] = useState(false);
 

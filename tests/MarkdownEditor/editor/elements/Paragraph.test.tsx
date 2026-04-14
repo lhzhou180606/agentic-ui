@@ -1,4 +1,5 @@
 import { Paragraph } from '@ant-design/agentic-ui/MarkdownEditor/editor/elements/Paragraph';
+import { ReadonlyParagraph } from '@ant-design/agentic-ui/MarkdownEditor/editor/elements/Paragraph/ReadonlyParagraph';
 import { ParagraphNode } from '@ant-design/agentic-ui/MarkdownEditor/el';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
@@ -120,6 +121,46 @@ describe('Paragraph Component', () => {
     expect(emptyElement.type).toBe('paragraph');
     expect(emptyElement.children[0].text).toBe('');
     expect(emptyElement.align).toBe('left');
+  });
+
+  it('空编辑段落根节点不使用 display:none（Slate/IME 需在块内锚定）', () => {
+    const emptyElement: ParagraphNode = {
+      type: 'paragraph',
+      children: [{ text: '' }],
+      align: 'left',
+    };
+
+    const { container } = render(
+      <Paragraph element={emptyElement} attributes={mockAttributes}>
+        <span data-testid="slate-leaf" />
+      </Paragraph>,
+    );
+
+    const root = container.querySelector(
+      '[data-be="paragraph"]',
+    ) as HTMLElement;
+    expect(root).toBeInTheDocument();
+    expect(root.style.display).not.toBe('none');
+  });
+
+  it('空只读段落根节点不使用 display:none', () => {
+    const emptyElement: ParagraphNode = {
+      type: 'paragraph',
+      children: [{ text: '' }],
+      align: 'left',
+    };
+
+    const { container } = render(
+      <ReadonlyParagraph element={emptyElement} attributes={mockAttributes}>
+        <span data-testid="ro-leaf" />
+      </ReadonlyParagraph>,
+    );
+
+    const root = container.querySelector(
+      '[data-be="paragraph"]',
+    ) as HTMLElement;
+    expect(root).toBeInTheDocument();
+    expect(root.style.display).not.toBe('none');
   });
 
   it('应该处理不同的对齐方式', () => {

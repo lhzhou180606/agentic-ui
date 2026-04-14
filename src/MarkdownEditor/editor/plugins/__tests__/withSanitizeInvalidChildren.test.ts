@@ -95,4 +95,34 @@ describe('withSanitizeInvalidChildren', () => {
       editor.normalizeNode([{ text: 'hi' }, [0, 0]] as any),
     ).not.toThrow();
   });
+
+  it('merges multiple all-empty root paragraphs into one', () => {
+    const editor = withSanitizeInvalidChildren(createEditor());
+    editor.children = [
+      { type: 'paragraph', children: [{ text: '' }] },
+      { type: 'paragraph', children: [{ text: '' }] },
+    ] as any;
+
+    editor.normalizeNode([editor, []]);
+
+    expect(editor.children).toHaveLength(1);
+    expect(editor.children[0]).toEqual({
+      type: 'paragraph',
+      children: [{ text: '' }],
+    });
+  });
+
+  it('does not merge root when one empty paragraph is followed by text', () => {
+    const editor = withSanitizeInvalidChildren(createEditor());
+    editor.children = [
+      { type: 'paragraph', children: [{ text: '' }] },
+      { type: 'paragraph', children: [{ text: 'hello' }] },
+    ] as any;
+
+    editor.normalizeNode([editor, []]);
+
+    expect(editor.children).toHaveLength(2);
+    expect((editor.children[0] as any).type).toBe('paragraph');
+    expect((editor.children[1] as any).children[0].text).toBe('hello');
+  });
 });

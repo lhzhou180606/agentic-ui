@@ -2066,3 +2066,48 @@ describe('Utility functions', () => {
     });
   });
 });
+
+describe('EditorUtils.coalesceRootAllEmptyParagraphs', () => {
+  it('returns single empty paragraph for empty input', () => {
+    expect(EditorUtils.coalesceRootAllEmptyParagraphs([])).toEqual([
+      { type: 'paragraph', children: [{ text: '' }] },
+    ]);
+  });
+
+  it('collapses multiple root empty paragraphs', () => {
+    const two = [
+      { type: 'paragraph', children: [{ text: '' }] },
+      { type: 'paragraph', children: [{ text: '' }] },
+    ];
+    const out = EditorUtils.coalesceRootAllEmptyParagraphs(two as any);
+    expect(out).toHaveLength(1);
+    expect(out[0]).toEqual({ type: 'paragraph', children: [{ text: '' }] });
+  });
+
+  it('does not collapse when there is non-empty content', () => {
+    const mixed = [
+      { type: 'paragraph', children: [{ text: '' }] },
+      { type: 'paragraph', children: [{ text: 'a' }] },
+    ];
+    expect(EditorUtils.coalesceRootAllEmptyParagraphs(mixed as any)).toEqual(
+      mixed,
+    );
+  });
+
+  it('preserves single empty paragraph including custom fields', () => {
+    const one = [
+      {
+        type: 'paragraph',
+        align: 'center' as const,
+        children: [{ text: '' }],
+      },
+    ];
+    const out = EditorUtils.coalesceRootAllEmptyParagraphs(one as any);
+    expect(out).toBe(one);
+    expect(out[0]).toEqual({
+      type: 'paragraph',
+      align: 'center',
+      children: [{ text: '' }],
+    });
+  });
+});

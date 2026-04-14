@@ -196,6 +196,17 @@ export const withSanitizeInvalidChildren = (editor: Editor) => {
         normalizeNode(entry);
         return;
       }
+      // 清空后 Slate 规范化可能再插一个空段，根上出现多个仅空文本的 paragraph；
+      // 与 replaceEditorContent 已插入的一块叠成双 DOM（见 debug H6）。
+      const validTop = childList.filter(isValidChild) as Node[];
+      if (validTop.length > 1) {
+        const collapsed = EditorUtils.coalesceRootAllEmptyParagraphs(validTop);
+        if (collapsed.length < validTop.length) {
+          EditorUtils.replaceEditorContent(editor, collapsed);
+          normalizeNode(entry);
+          return;
+        }
+      }
       normalizeNode(entry);
       return;
     }

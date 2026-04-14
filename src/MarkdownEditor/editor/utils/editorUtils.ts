@@ -27,6 +27,30 @@ export class EditorUtils {
   }
 
   /**
+   * 当根节点全部为「仅空白」的段落时，合并为单个空段。
+   * 避免解析 `\\n\\n` 或外部 schema 产生多个空段，导致 Slate/占位与双 DOM。
+   * 仅一个根块时原样返回，以保留单空段上的 align 等段落级字段。
+   */
+  static coalesceRootAllEmptyParagraphs(nodes: Node[]): Node[] {
+    if (!nodes?.length) {
+      return [JSON.parse(JSON.stringify(EditorUtils.p)) as ParagraphNode];
+    }
+    if (nodes.length === 1) {
+      return nodes;
+    }
+    const onlyEmptyParagraphs = nodes.every(
+      (n) =>
+        Element.isElement(n) &&
+        n.type === 'paragraph' &&
+        Node.string(n).trim() === '',
+    );
+    if (onlyEmptyParagraphs) {
+      return [JSON.parse(JSON.stringify(EditorUtils.p)) as ParagraphNode];
+    }
+    return nodes;
+  }
+
+  /**
    * 通过 Slate Transforms API 安全替换编辑器全部内容。
    * 避免直接赋值 editor.children，确保 Operation/History/Normalizer 管线正常运行。
    *
@@ -42,6 +66,7 @@ export class EditorUtils {
     const { withoutHistory = true } = options || {};
 
     const doReplace = () => {
+      const normalized = EditorUtils.coalesceRootAllEmptyParagraphs(nodes);
       Editor.withoutNormalizing(editor, () => {
         if (editor.selection) {
           Transforms.deselect(editor);
@@ -50,7 +75,7 @@ export class EditorUtils {
         for (let i = totalChildren - 1; i >= 0; i--) {
           Transforms.removeNodes(editor, { at: [i] });
         }
-        Transforms.insertNodes(editor, nodes, { at: [0] });
+        Transforms.insertNodes(editor, normalized, { at: [0] });
       });
     };
 
