@@ -202,7 +202,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           '&::before': {
             cursor: 'text',
             content: 'attr(data-slate-placeholder)',
-            color: 'rgba(0,0,0,0.45)',
+            color:
+              'var(--color-gray-text-disabled, rgba(20, 22, 28, 0.25))',
             display: 'inline-block',
             position: 'absolute',
             width: 'max-content',
@@ -225,6 +226,15 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       '&> *:first-child': {
         marginTop: 0,
+      },
+      '* :not(div[data-be="paragraph"]):last-child': {
+        marginBottom: '0 !important',
+      },
+      '* :not(div[data-be="paragraph"]):first-child': {
+        marginTop: '0 !important',
+      },
+      '&-readonly': {
+        '--agentic-ui-table-cell-min-width': 'unset',
       },
       '&-report': {
         fontSize: '16px',

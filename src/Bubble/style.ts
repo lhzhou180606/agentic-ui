@@ -110,10 +110,24 @@ const genStyle = (
         '&-standalone': {
           maxWidth: 'min(860px,100%)',
         },
-        '*': {
-          whiteSpace: 'pre-wrap',
+        // 换行仅作用于 Markdown 正文节点（不再对 bubble-content 使用 `*`）
+        [`& ${token.antCls}-agentic-md-editor-content div[data-be="paragraph"],
+          & ${token.antCls}-agentic-md-editor-content h1,
+          & ${token.antCls}-agentic-md-editor-content h2,
+          & ${token.antCls}-agentic-md-editor-content h3,
+          & ${token.antCls}-agentic-md-editor-content h4,
+          & ${token.antCls}-agentic-md-editor-content h5,
+          & ${token.antCls}-agentic-md-editor-content h6,
+          & ${token.antCls}-agentic-md-editor-content li,
+          & ${token.antCls}-agentic-md-editor-content blockquote`]: {
+          whiteSpace: 'normal',
+          wordBreak: 'normal',
           textWrap: 'wrap',
-          wordWrap: 'break-word',
+          overflowWrap: 'break-word',
+        },
+        [`& ${token.antCls}-agentic-md-editor-content div[data-be="code"]`]: {
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-all',
         },
         video: {
           borderRadius: '12px',
@@ -155,8 +169,9 @@ const genStyle = (
       '&-bubble-content-right': {
         maxWidth: '75%',
         borderRadius: '16px 16px 2px 16px',
-        background: 'var(--color-primary-control-fill-secondary-active)',
-        color: 'var(--color-gray-text-default)',
+        background:
+          'var(--color-primary-control-fill-tag, var(--color-primary-control-fill-secondary-active, rgba(230, 244, 255, 0.92)))',
+        color: 'var(--color-gray-text-default, rgba(20, 22, 28, 0.88))',
         boxShadow: 'none',
         // inline-code 基础规则用 code.cls（元素+类）选择器，需匹配相同结构才能覆盖
         [`& code${token.antCls}-agentic-md-editor-content-inline-code`]: {

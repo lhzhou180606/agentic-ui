@@ -228,19 +228,23 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
       '&-item-meta-placeholder': {
-        background: 'var(--color-fill-quaternary, rgba(0,0,0,0.04))',
+        background:
+          'var(--color-gray-bg-card-light, #f7f9fc) !important',
         [`${token.componentCls}-item-file-name-text`]: {
-          color: 'var(--color-text-tertiary, rgba(0,0,0,0.45))',
+          color:
+            'var(--color-gray-text-light, rgba(80, 94, 119, 0.53)) !important',
         },
         [`${token.componentCls}-item-file-size`]: {
-          color: 'var(--color-text-tertiary, rgba(0,0,0,0.45))',
+          color:
+            'var(--color-gray-text-light, rgba(80, 94, 119, 0.53)) !important',
         },
       },
     },
     [`${token.componentCls}-container`]: {
       position: 'relative',
       background: 'var(--color-gray-bg-page)',
-      borderBottom: '1px solid rgba(0, 16, 64, 0.0627)',
+      borderBottom:
+        '1px solid var(--color-gray-border-light, rgba(20, 22, 28, 0.12)) !important',
       '&-empty': {
         border: 'none',
       },
