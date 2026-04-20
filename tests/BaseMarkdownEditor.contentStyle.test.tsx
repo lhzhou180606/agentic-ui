@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+﻿import '@testing-library/jest-dom';
 import { render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -107,6 +107,37 @@ describe('BaseMarkdownEditor - contentStyle 测试', () => {
         expect(contentElement).toBeInTheDocument();
         expect(contentElement.style.padding).toBe('0px');
         expect(contentElement.style.height).toBe('200px');
+      });
+    });
+
+    it('应忽略 padding 相关空字符串，避免出现无效的 padding-top 等内联声明', async () => {
+      const { container } = render(
+        <BaseMarkdownEditor
+          {...defaultProps}
+          contentStyle={{
+            height: '100%',
+            '--agentic-ui-content-padding': 'var(--padding-3x)',
+            padding: 'var(--padding-3x)',
+            paddingTop: '',
+            paddingBottom: '',
+            paddingLeft: '',
+            paddingRight: 'var(--padding-3x)',
+            alignItems: 'flex-start',
+          }}
+        />,
+      );
+
+      await waitFor(() => {
+        const contentElement = container.querySelector(
+          '.ant-agentic-md-editor-container',
+        ) as HTMLElement;
+        expect(contentElement).toBeInTheDocument();
+        const attr = contentElement.getAttribute('style') || '';
+        expect(attr).not.toMatch(/padding-top:\s*;/);
+        expect(attr).not.toMatch(/padding-bottom:\s*;/);
+        expect(attr).not.toMatch(/padding-left:\s*;/);
+        expect(attr).toContain('--agentic-ui-content-padding');
+        expect(attr).toContain('padding-right');
       });
     });
   });

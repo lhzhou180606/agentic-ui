@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+﻿import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { memo, useContext, useState } from 'react';
 import { TextLoading } from '../Components/lotties/TextLoading';
@@ -83,6 +83,11 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   testId,
   ...props
 }) => {
+  const {
+    contentStyle: markdownContentStyle,
+    ...markdownPropsRest
+  } = markdownProps ?? {};
+
   // 默认关闭文件上传，需显式传入 attachment.enable: true 开启
   const attachment = { ...DEFAULT_ATTACHMENT, ...props.attachment };
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
@@ -412,6 +417,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   alignItems: 'flex-start',
                   padding: 'var(--padding-3x)',
                   paddingRight: computedRightPadding || 'var(--padding-3x)',
+                  ...markdownContentStyle,
                 }}
                 textAreaProps={{
                   enable: true,
@@ -468,7 +474,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   plainTextOnly: true,
                   ...props.pasteConfig,
                 }}
-                {...markdownProps}
+                {...markdownPropsRest}
               >
                 {props?.quickActionRender ||
                 props.refinePrompt?.enable ||

@@ -1,4 +1,4 @@
-import { Keyframes } from '@ant-design/cssinjs';
+﻿import { Keyframes } from '@ant-design/cssinjs';
 import {
   ChatTokenType,
   GenerateStyle,
@@ -26,10 +26,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       lineHeight: '32px',
       cursor: 'pointer',
       marginLeft: 4,
-      '&&-disabled': {
-        cursor: 'not-allowed',
-        opacity: 1,
-      },
       // 旋转动画样式
       '.pause-icon-ring': {
         transition: 'transform 0.1s ',
@@ -39,6 +35,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         animationTimingFunction: 'linear',
         animationIterationCount: 'infinite',
       },
+    },
+    // 使用完整 modifier 类名，避免嵌套 `&&-disabled` 与 BEM 类名拼接不一致导致 cursor 等未生效
+    [`${token.componentCls}-disabled`]: {
+      cursor: 'not-allowed',
+      // 发送图标圆形 fill 使用 var(--color-primary-control-fill-primary)，禁用时改为灰色语义
+      '--color-primary-control-fill-primary': '#8c8c8c',
+      '--color-gray-bg-card-white': 'black',
     },
   };
 };

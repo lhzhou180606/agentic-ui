@@ -308,7 +308,7 @@ export const SendButton: React.FC<SendButtonProps> = (props) => {
         style={style}
         className={classNames(baseCls, hashId, {
           [`${baseCls}-compact`]: props.compact,
-          [`${baseCls}-disabled`]: disabled,
+          [`${baseCls}-disabled`]: disabled || !isSendable,
           [`${baseCls}-typing`]: typing,
         })}
       >

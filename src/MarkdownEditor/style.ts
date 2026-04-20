@@ -536,10 +536,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         background: 'var(--color-primary-bg-tip)',
 
         '[data-tag-popup-input]': {
-          border:
-            '1px solid var(--color-gray-control-border-default, rgba(20, 22, 28, 0.12))',
-          color:
-            'var(--color-primary-text-default, rgba(20, 22, 28, 0.88))',
+          color: 'var(--color-primary-text-default, rgba(20, 22, 28, 0.88))',
           '&:not([data-composition]).empty::before': {
             color: 'var(--color-gray-text-light, rgba(80, 94, 119, 0.53))',
             content: 'attr(title)',

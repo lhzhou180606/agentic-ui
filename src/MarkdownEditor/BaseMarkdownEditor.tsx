@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+﻿import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, {
   useContext,
@@ -50,6 +50,27 @@ export * from './editor/utils';
 export * from './el';
 export * from './types';
 
+/** padding 相关值为 `''` 时会产生 `padding-top: ;` 等无效内联样式，需剔除 */
+function filterInvalidPaddingStyles(
+  style: React.CSSProperties | undefined,
+): React.CSSProperties {
+  if (!style) return {};
+  const paddingKeys = [
+    'padding',
+    'paddingTop',
+    'paddingRight',
+    'paddingBottom',
+    'paddingLeft',
+  ] as const;
+  const out: React.CSSProperties = { ...style };
+  for (const k of paddingKeys) {
+    if (out[k] === '') {
+      delete out[k];
+    }
+  }
+  return out;
+}
+
 // 组合器函数
 const composeEditors = (editor: Editor, plugins: MarkdownEditorPlugin[]) => {
   if (plugins.length > 1) {
@@ -86,7 +107,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
     readonly,
     lazy,
     style,
-    contentStyle = {
+    contentStyle: rawContentStyle = {
       height: '100%',
     },
     editorStyle,
@@ -96,6 +117,8 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
     renderType,
     ...rest
   } = props;
+
+  const contentStyle = filterInvalidPaddingStyles(rawContentStyle);
 
   const effectiveRenderMode = renderMode ?? renderType ?? 'slate';
   // 是否挂载
