@@ -140,5 +140,49 @@ describe('BaseMarkdownEditor - contentStyle 测试', () => {
         expect(attr).toContain('padding-right');
       });
     });
+
+    it('应剔除 contentStyle 中空字符串的 --* 自定义属性', async () => {
+      const { container } = render(
+        <BaseMarkdownEditor
+          {...defaultProps}
+          contentStyle={{
+            height: '100%',
+            ['--agentic-ui-content-padding' as string]: '',
+            padding: '12px',
+          }}
+        />,
+      );
+
+      await waitFor(() => {
+        const contentElement = container.querySelector(
+          '.ant-agentic-md-editor-container',
+        ) as HTMLElement;
+        const attr = contentElement.getAttribute('style') || '';
+        expect(attr).not.toMatch(/--agentic-ui-content-padding:\s*;/);
+        expect(attr).toContain('padding');
+      });
+    });
+
+    it('应对根节点 style 做同样清理，避免出现无效 padding 内联', async () => {
+      const { container } = render(
+        <BaseMarkdownEditor
+          {...defaultProps}
+          style={{
+            paddingTop: '',
+            minWidth: 0,
+          }}
+        />,
+      );
+
+      await waitFor(() => {
+        const root = container.querySelector(
+          '.markdown-editor',
+        ) as HTMLElement;
+        expect(root).toBeInTheDocument();
+        const attr = root.getAttribute('style') || '';
+        expect(attr).not.toMatch(/padding-top:\s*;/);
+        expect(attr).toContain('min-width');
+      });
+    });
   });
 });

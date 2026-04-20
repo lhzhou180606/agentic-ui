@@ -42,34 +42,15 @@ import {
   MarkdownEditorProps,
 } from './types';
 import { exportHtml } from './utils/exportHtml';
+import { sanitizeEditorChromeStyle } from './utils/sanitizeChromeStyle';
 // 原生表格功能已集成到编辑器中
 export { EditorUtils, parserMdToSchema };
+export { sanitizeEditorChromeStyle } from './utils/sanitizeChromeStyle';
 
 export * from './editor/elements';
 export * from './editor/utils';
 export * from './el';
 export * from './types';
-
-/** padding 相关值为 `''` 时会产生 `padding-top: ;` 等无效内联样式，需剔除 */
-function filterInvalidPaddingStyles(
-  style: React.CSSProperties | undefined,
-): React.CSSProperties {
-  if (!style) return {};
-  const paddingKeys = [
-    'padding',
-    'paddingTop',
-    'paddingRight',
-    'paddingBottom',
-    'paddingLeft',
-  ] as const;
-  const out: React.CSSProperties = { ...style };
-  for (const k of paddingKeys) {
-    if (out[k] === '') {
-      delete out[k];
-    }
-  }
-  return out;
-}
 
 // 组合器函数
 const composeEditors = (editor: Editor, plugins: MarkdownEditorPlugin[]) => {
@@ -106,7 +87,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
     toc = false,
     readonly,
     lazy,
-    style,
+    style: rawStyle,
     contentStyle: rawContentStyle = {
       height: '100%',
     },
@@ -118,7 +99,8 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
     ...rest
   } = props;
 
-  const contentStyle = filterInvalidPaddingStyles(rawContentStyle);
+  const contentStyle = sanitizeEditorChromeStyle(rawContentStyle);
+  const rootStyle = sanitizeEditorChromeStyle(rawStyle);
 
   const effectiveRenderMode = renderMode ?? renderType ?? 'slate';
   // 是否挂载
@@ -367,7 +349,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
             style={{
               width: width || '100%',
               height: height || 'auto',
-              ...style,
+              ...rootStyle,
             }}
             ref={markdownContainerRef}
           >
@@ -448,7 +430,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
             style={{
               width: width || '100%',
               height: height || 'auto',
-              ...style,
+              ...rootStyle,
             }}
           >
             {!readonly && toolBar?.enable === true ? (
