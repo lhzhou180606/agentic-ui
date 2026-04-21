@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ThinkBlock alwaysExpandedDeepThink 属性集成测试
  * 测试 alwaysExpandedDeepThink 属性如何影响 ToolUseBarThink 的 expanded 状态
  */

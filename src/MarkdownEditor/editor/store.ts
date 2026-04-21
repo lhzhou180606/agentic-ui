@@ -1,4 +1,4 @@
-﻿/* eslint-disable @typescript-eslint/no-this-alias */
+/* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable no-param-reassign */
 import isEqual from 'lodash-es/isEqual';
 import { parse } from 'querystring';

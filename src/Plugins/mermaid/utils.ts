@@ -1,4 +1,4 @@
-﻿import type { MermaidApi } from './types';
+import type { MermaidApi } from './types';
 
 let mermaidLoader: Promise<MermaidApi> | null = null;
 

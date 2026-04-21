@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 export function useThrottleFn(fn: any, interval = 100) {
   const fnRef = useRef(fn);

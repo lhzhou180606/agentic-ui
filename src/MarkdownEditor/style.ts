@@ -1,4 +1,4 @@
-﻿import type { CSSInterpolation } from '@ant-design/cssinjs';
+import type { CSSInterpolation } from '@ant-design/cssinjs';
 import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
 import {
   ChatTokenType,

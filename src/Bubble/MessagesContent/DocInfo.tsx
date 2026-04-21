@@ -1,4 +1,4 @@
-﻿import { ExportOutlined, RightOutlined } from '@ant-design/icons';
+import { ExportOutlined, RightOutlined } from '@ant-design/icons';
 
 import { ConfigProvider, Descriptions, Drawer, Popover } from 'antd';
 import classNames from 'clsx';

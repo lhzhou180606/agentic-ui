@@ -1,4 +1,4 @@
-﻿import Lottie from 'lottie-react';
+import Lottie from 'lottie-react';
 import React from 'react';
 import creativeSpark from './creativeSpark.json';
 

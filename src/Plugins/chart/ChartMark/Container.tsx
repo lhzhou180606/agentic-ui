@@ -1,4 +1,4 @@
-﻿import { Chart } from 'chart.js';
+import { Chart } from 'chart.js';
 import ResizeObserver from 'rc-resize-observer';
 import React, { useEffect, useRef, useState } from 'react';
 import { debounce } from '../utils';

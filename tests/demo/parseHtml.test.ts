@@ -1,4 +1,4 @@
-﻿import { docxDeserializer } from '@ant-design/agentic-ui';
+import { docxDeserializer } from '@ant-design/agentic-ui';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { html, rtl } from './word';

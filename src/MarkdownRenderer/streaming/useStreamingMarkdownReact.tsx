@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 import {
   JINJA_DOLLAR_PLACEHOLDER,

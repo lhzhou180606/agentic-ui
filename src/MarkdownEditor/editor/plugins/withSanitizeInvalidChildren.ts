@@ -1,4 +1,4 @@
-﻿import { Editor, Element, Node, NodeEntry, Text, Transforms } from 'slate';
+import { Editor, Element, Node, NodeEntry, Text, Transforms } from 'slate';
 import { HistoryEditor } from 'slate-history';
 
 import { EditorUtils } from '../utils/editorUtils';

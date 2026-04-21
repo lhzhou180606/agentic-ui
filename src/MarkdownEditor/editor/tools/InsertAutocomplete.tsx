@@ -1,4 +1,4 @@
-﻿import {
+import {
   CheckSquareOutlined,
   CodeOutlined,
   FontSizeOutlined,

@@ -1,4 +1,4 @@
-﻿import type { CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 import { describe, expect, it } from 'vitest';
 import { sanitizeEditorChromeStyle } from '../../src/MarkdownEditor/utils/sanitizeChromeStyle';
 

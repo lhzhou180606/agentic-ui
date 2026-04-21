@@ -1,4 +1,4 @@
-﻿import { CopyOutlined, DownloadOutlined } from '@ant-design/icons';
+import { CopyOutlined, DownloadOutlined } from '@ant-design/icons';
 import { ConfigProvider, theme } from 'antd';
 import classNames from 'clsx';
 import copy from 'copy-to-clipboard';
