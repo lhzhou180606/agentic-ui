@@ -16,6 +16,9 @@ const REDACTED_THINKING_ALIAS_OPEN =
 const REDACTED_THINKING_ALIAS_CLOSE =
   '</' + 'redacted_' + 'thinking' + '>';
 
+const THINKING_ALIAS_OPEN = '<' + 'thinking' + '>';
+const THINKING_ALIAS_CLOSE = '</' + 'thinking' + '>';
+
 const escapeRegExp = (value: string) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -23,6 +26,13 @@ const escapeRegExp = (value: string) =>
 const REDACTED_THINKING_ALIAS_PAIR_REGEX = new RegExp(
   `${escapeRegExp(REDACTED_THINKING_ALIAS_OPEN)}([\\s\\S]*?)${escapeRegExp(
     REDACTED_THINKING_ALIAS_CLOSE,
+  )}`,
+  'gi',
+);
+
+const THINKING_ALIAS_PAIR_REGEX = new RegExp(
+  `${escapeRegExp(THINKING_ALIAS_OPEN)}([\\s\\S]*?)${escapeRegExp(
+    THINKING_ALIAS_CLOSE,
   )}`,
   'gi',
 );
@@ -35,9 +45,7 @@ const FIND_THINK_CANONICAL_BLOCK_RE = new RegExp(
 );
 
 const FIND_THINK_ALIAS_BLOCK_RE = new RegExp(
-  `^\\s*${escapeRegExp(REDACTED_THINKING_ALIAS_OPEN)}([\\s\\S]*?)${escapeRegExp(
-    REDACTED_THINKING_ALIAS_CLOSE,
-  )}\\s*$`,
+  `^\\s*(?:${escapeRegExp(REDACTED_THINKING_ALIAS_OPEN)}|${escapeRegExp(THINKING_ALIAS_OPEN)})([\\s\\S]*?)(?:${escapeRegExp(REDACTED_THINKING_ALIAS_CLOSE)}|${escapeRegExp(THINKING_ALIAS_CLOSE)})\\s*$`,
   'i',
 );
 
@@ -46,14 +54,18 @@ const FIND_THINK_ALIAS_BLOCK_RE = new RegExp(
  * 否则 `preprocessThinkTags` 无法把思考区内的 ``` 围栏换成 【CODE_BLOCK】，内层 JSON 会变成顶层独立 code 节点。
  */
 export function normalizeThinkTagAliases(markdown: string): string {
-  if (!markdown || markdown.indexOf(REDACTED_THINKING_ALIAS_OPEN) === -1) {
-    return markdown;
+  if (!markdown) return markdown;
+  const replaceToCanonical = (_match: string, inner: string) =>
+    `${THINK_TAG_CANONICAL_OPEN}${inner}${THINK_TAG_CANONICAL_CLOSE}`;
+
+  let result = markdown;
+  if (result.indexOf(REDACTED_THINKING_ALIAS_OPEN) !== -1) {
+    result = result.replace(REDACTED_THINKING_ALIAS_PAIR_REGEX, replaceToCanonical);
   }
-  return markdown.replace(
-    REDACTED_THINKING_ALIAS_PAIR_REGEX,
-    (_match, inner: string) =>
-      `${THINK_TAG_CANONICAL_OPEN}${inner}${THINK_TAG_CANONICAL_CLOSE}`,
-  );
+  if (result.indexOf(THINKING_ALIAS_OPEN) !== -1) {
+    result = result.replace(THINKING_ALIAS_PAIR_REGEX, replaceToCanonical);
+  }
+  return result;
 }
 
 
