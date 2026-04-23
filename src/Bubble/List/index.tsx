@@ -436,10 +436,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
   ) {
     prevStyleRef.current = props.style;
   }
-  const deps = useMemo(
-    () => [prevStyleRef.current],
-    [prevStyleRef.current],
-  );
+  const deps = useMemo(() => [prevStyleRef.current], [prevStyleRef.current]);
 
   // 为 loading 项生成唯一的 key，使用 ref 缓存以确保稳定性
   const loadingKeysRef = useRef<Map<string, string>>(new Map());
@@ -451,9 +448,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
   const bubbleMergedStylesRef = useRef<Map<string, BubbleProps['styles']>>(
     new Map(),
   );
-  const bubbleMergedAvatarRef = useRef<Map<string, BubbleMetaData>>(
-    new Map(),
-  );
+  const bubbleMergedAvatarRef = useRef<Map<string, BubbleMetaData>>(new Map());
 
   const bubbleListDom = useMemo(() => {
     const isLazyEnabled = props.lazy?.enable;
@@ -498,7 +493,10 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
         ...(item as any).meta,
       } as BubbleMetaData;
       const prevAvatar = bubbleMergedAvatarRef.current.get(itemKey);
-      if (!prevAvatar || !shallowEqualRecord(prevAvatar as any, candidateAvatar as any)) {
+      if (
+        !prevAvatar ||
+        !shallowEqualRecord(prevAvatar as any, candidateAvatar as any)
+      ) {
         bubbleMergedAvatarRef.current.set(itemKey, candidateAvatar);
       }
       const mergedAvatar = bubbleMergedAvatarRef.current.get(itemKey)!;
@@ -513,7 +511,10 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
         },
       };
       const prevMergedStyles = bubbleMergedStylesRef.current.get(itemKey);
-      if (!prevMergedStyles || !shallowEqualStyles(prevMergedStyles, candidateStyles)) {
+      if (
+        !prevMergedStyles ||
+        !shallowEqualStyles(prevMergedStyles, candidateStyles)
+      ) {
         bubbleMergedStylesRef.current.set(itemKey, candidateStyles);
       }
       const mergedStyles = bubbleMergedStylesRef.current.get(itemKey)!;
@@ -527,7 +528,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
       const bubbleElement = (
         <div
           key={itemKey}
-          style={useLazyWrapper ? { minWidth: 0, width: '100%' } : { display: 'contents' }}
+          style={{ minWidth: 0, width: '100%' }}
           data-bubble-list-item
           data-is-last={isLast ? 'true' : 'false'}
         >
@@ -599,51 +600,52 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
         totalCount: count,
         useLazyWrapper,
       }) => {
-      // 如果启用了懒加载，用 LazyElement 包裹
-      if (lazyOn) {
-        // 如果不需要懒加载，直接返回元素
-        if (!useLazyWrapper) {
-          return bubbleElement;
+        // 如果启用了懒加载，用 LazyElement 包裹
+        if (lazyOn) {
+          // 如果不需要懒加载，直接返回元素
+          if (!useLazyWrapper) {
+            return bubbleElement;
+          }
+
+          // 创建适配的 renderPlaceholder，将 role 信息添加到 elementInfo
+          const adaptedRenderPlaceholder = props.lazy?.renderPlaceholder
+            ? (
+                lazyProps: Parameters<
+                  NonNullable<typeof props.lazy.renderPlaceholder>
+                >[0],
+              ) => {
+                return props.lazy!.renderPlaceholder!({
+                  ...lazyProps,
+                  elementInfo: lazyProps.elementInfo
+                    ? {
+                        ...lazyProps.elementInfo,
+                        role: item.role as 'user' | 'assistant',
+                      }
+                    : undefined,
+                });
+              }
+            : undefined;
+
+          return (
+            <LazyElement
+              key={itemKey}
+              placeholderHeight={props.lazy?.placeholderHeight ?? 100}
+              rootMargin={props.lazy?.rootMargin ?? '200px'}
+              renderPlaceholder={adaptedRenderPlaceholder}
+              elementInfo={{
+                type: 'bubble',
+                index,
+                total: count,
+              }}
+            >
+              {bubbleElement}
+            </LazyElement>
+          );
         }
 
-        // 创建适配的 renderPlaceholder，将 role 信息添加到 elementInfo
-        const adaptedRenderPlaceholder = props.lazy?.renderPlaceholder
-          ? (
-              lazyProps: Parameters<
-                NonNullable<typeof props.lazy.renderPlaceholder>
-              >[0],
-            ) => {
-              return props.lazy!.renderPlaceholder!({
-                ...lazyProps,
-                elementInfo: lazyProps.elementInfo
-                  ? {
-                      ...lazyProps.elementInfo,
-                      role: item.role as 'user' | 'assistant',
-                    }
-                  : undefined,
-              });
-            }
-          : undefined;
-
-        return (
-          <LazyElement
-            key={itemKey}
-            placeholderHeight={props.lazy?.placeholderHeight ?? 100}
-            rootMargin={props.lazy?.rootMargin ?? '200px'}
-            renderPlaceholder={adaptedRenderPlaceholder}
-            elementInfo={{
-              type: 'bubble',
-              index,
-              total: count,
-            }}
-          >
-            {bubbleElement}
-          </LazyElement>
-        );
-      }
-
-      return bubbleElement;
-    });
+        return bubbleElement;
+      },
+    );
   }, [
     bubbleList,
     bubbleListRef,
