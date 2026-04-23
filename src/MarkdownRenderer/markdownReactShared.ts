@@ -310,6 +310,14 @@ const extractChildrenText = (children: React.ReactNode): string => {
   return '';
 };
 
+const THINK_BLOCK_STYLES = {
+  root: {
+    boxSizing: 'border-box' as const,
+    maxWidth: '680px',
+    marginTop: 8,
+  },
+};
+
 /** <think> 标签 → ToolUseBarThink（MarkdownRenderer 无 Slate 上下文，直接渲染） */
 const ThinkBlockRendererComponent = (props: any) => {
   const { children } = props;
@@ -318,13 +326,7 @@ const ThinkBlockRendererComponent = (props: any) => {
 
   return React.createElement(ToolUseBarThink, {
     testId: 'think-block-renderer',
-    styles: {
-      root: {
-        boxSizing: 'border-box',
-        maxWidth: '680px',
-        marginTop: 8,
-      },
-    },
+    styles: THINK_BLOCK_STYLES,
     toolName: isLoading ? '深度思考...' : '深度思考',
     thinkContent: content,
     status: isLoading ? 'loading' : 'success',

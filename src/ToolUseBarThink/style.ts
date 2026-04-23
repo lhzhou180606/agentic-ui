@@ -10,6 +10,20 @@ const LIGHT_MODE_BACKDROP_FILTER = 'blur(12px)';
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     [token.componentCls]: {
+      '@keyframes thinkSpin': {
+        from: { '--think-rotate': '0deg' },
+        to: { '--think-rotate': '360deg' },
+      },
+      '@keyframes thinkMaskSweep': {
+        '0%': {
+          maskPosition: '200% 0',
+          WebkitMaskPosition: '200% 0',
+        },
+        '100%': {
+          maskPosition: '-100% 0',
+          WebkitMaskPosition: '-100% 0',
+        },
+      },
       position: 'relative',
       cursor: 'pointer',
       borderRadius: 'var(--radius-card-base)',
@@ -105,26 +119,21 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
 
-      '&-header-left': {
+      '&-header-left-icon': {
+        font: 'var(--font-text-body-emphasized-base)',
+        color: 'var(--color-gray-text-default)',
+        height: 20,
         display: 'flex',
         alignItems: 'center',
-        gap: 4,
-        '&-icon': {
-          font: 'var(--font-text-body-emphasized-base)',
-          color: 'var(--color-gray-text-default)',
-          height: 20,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: 'var(--radius-control-sm)',
+        justifyContent: 'center',
+        borderRadius: 'var(--radius-control-sm)',
+        '&:hover': {
+          backgroundColor: 'var(--color-gray-control-fill-hover)',
+        },
+        '&-light': {
+          color: 'var(--color-gray-text-light)',
           '&:hover': {
-            backgroundColor: 'var(--color-gray-control-fill-hover)',
-          },
-          '&-light': {
-            color: 'var(--color-gray-text-light)',
-            '&:hover': {
-              color: 'var(--color-gray-text-secondary)',
-            },
+            color: 'var(--color-gray-text-secondary)',
           },
         },
       },
@@ -162,41 +171,34 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         justifyContent: 'center',
         alignItems: 'center',
         padding: '4px',
-        gap: '0px 8px',
-        flexWrap: 'wrap',
-        alignContent: 'center',
         borderRadius: '200px',
         boxSizing: 'border-box',
         boxShadow: 'var(--shadow-border-base)',
         background: 'var(--color-gray-bg-card-white)',
         zIndex: 0,
+        position: 'relative',
+        color: '#767E8B',
+        fontSize: 'var(--font-size-lg)',
+        '& > svg, & > *:first-child': {
+          position: 'relative',
+          zIndex: 1,
+        },
         '&-loading': {
           borderRadius: '50%',
           transition: 'border-radius 0.3s ease-in-out',
-          position: 'relative',
+          animation: 'thinkSpin 1s linear infinite',
           '&::after': {
             content: '""',
             position: 'absolute',
             inset: '0',
             borderRadius: '50%',
             background:
-              'conic-gradient(from var(--rotate, 0deg),transparent 0deg 0deg, #5EF050 35deg 55deg, #37ABFF 105deg 115deg,  #D7B9FF 135deg 135deg, transparent 165deg 360deg)',
+              'conic-gradient(from var(--think-rotate, 0deg),transparent 0deg 0deg, #5EF050 35deg 55deg, #37ABFF 105deg 115deg,  #D7B9FF 135deg 135deg, transparent 165deg 360deg)',
             WebkitMask:
               'radial-gradient(50% 50% at 50% 50%, rgba(255, 0, 0, 0) 65%, #FF0000 100%)',
             mask: 'radial-gradient(50% 50% at 50% 50%, rgba(255, 0, 0, 0) 80%, #FF0000 80%, #FF0000 100%)',
           },
         },
-      },
-
-      '&-image': {
-        color: '#767E8B',
-        fontSize: 'var(--font-size-lg)',
-        position: 'absolute',
-        zIndex: 999,
-        borderRadius: '50%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
       },
 
       '&-target': {
@@ -284,6 +286,15 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         alignItems: 'center',
         gap: 8,
         flex: 1,
+        '&-loading': {
+          maskImage:
+            'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,1) 100%)',
+          WebkitMaskImage:
+            'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,1) 100%)',
+          maskSize: '200% 100%',
+          WebkitMaskSize: '200% 100%',
+          animation: 'thinkMaskSweep 1.5s linear infinite',
+        },
       },
       '&-content': {
         font: 'var(--font-text-paragraph-sm)',
@@ -335,6 +346,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         zIndex: 10,
         transform: 'translateY(100%)',
         opacity: 0,
+        transition: 'transform 0.2s ease, opacity 0.2s ease',
         '&:hover': {
           boxShadow: 'var(--shadow-popover-base)',
         },
