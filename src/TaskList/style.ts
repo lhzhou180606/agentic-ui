@@ -164,13 +164,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
+          animation: 'taskTextFadeIn 0.3s ease',
         },
 
-        [`${componentCls}-simple-progress`]: {
-          flexShrink: 0,
-          font: 'var(--font-text-paragraph-sm, 12px)',
-          color: 'var(--color-gray-text-secondary, rgba(0,3,9,0.45))',
-        },
 
         [`${componentCls}-simple-arrow`]: {
           flexShrink: 0,
@@ -199,6 +195,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       '&-simple-list': {
         padding: '4px 12px 8px',
+      },
+
+      '@keyframes taskTextFadeIn': {
+        '0%': { opacity: 0, filter: 'blur(4px)' },
+        '100%': { opacity: 1, filter: 'blur(0)' },
       },
     },
   };

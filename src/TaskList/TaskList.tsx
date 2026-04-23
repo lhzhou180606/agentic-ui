@@ -62,7 +62,7 @@ export const TaskList = memo(
       setSimpleExpanded((prev: boolean) => !prev);
     });
 
-    const { summaryStatus, summaryText, progressText, isCancelled, lastItem } =
+    const { summaryStatus, summaryText, isCancelled, lastItem } =
       useMemo(() => {
         const completedCount = items.filter(
           (i) => i.status === 'success',
@@ -95,7 +95,6 @@ export const TaskList = memo(
         return {
           summaryStatus: status,
           summaryText: text,
-          progressText: `${completedCount}/${items.length}`,
           isCancelled: hasError,
           lastItem: items[items.length - 1] as TaskItem | undefined,
         };
@@ -155,11 +154,8 @@ export const TaskList = memo(
               hashId={hashId}
             />
           </div>
-          <div className={classNames(`${simpleCls}-text`, hashId)}>
+          <div key={summaryText} className={classNames(`${simpleCls}-text`, hashId)}>
             {summaryText}
-          </div>
-          <div className={classNames(`${simpleCls}-progress`, hashId)}>
-            {progressText}
           </div>
           <div className={classNames(`${simpleCls}-arrow`, hashId)}>
             <ActionIconBox
