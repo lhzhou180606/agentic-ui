@@ -101,7 +101,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           flexShrink: 0,
           width: 16,
           height: 16,
-          transition: 'all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)',
+          transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
         },
       },
 
@@ -135,7 +135,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         cursor: 'pointer',
         userSelect: 'none' as const,
         borderRadius: 'var(--radius-control-base, 8px)',
-        transition: 'background 0.2s ease',
+        transition: 'background 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
 
         '&:hover': {
           background: 'var(--color-gray-control-fill-active, rgba(0,0,0,0.04))',
@@ -164,7 +164,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
-          animation: 'taskTextFadeIn 0.3s ease',
+          animation: 'taskTextFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         },
 
 
@@ -181,7 +181,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'grid',
         gridTemplateRows: '0fr',
         opacity: 0,
-        transition: 'grid-template-rows 0.25s ease, opacity 0.25s ease',
+        transition:
+          'grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
 
         '& > *': {
           overflow: 'hidden',
@@ -198,8 +199,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       '@keyframes taskTextFadeIn': {
-        '0%': { opacity: 0, filter: 'blur(4px)' },
-        '100%': { opacity: 1, filter: 'blur(0)' },
+        '0%': { opacity: 0, filter: 'blur(4px)', transform: 'translateY(2px)' },
+        '100%': { opacity: 1, filter: 'blur(0)', transform: 'translateY(0)' },
       },
     },
   };

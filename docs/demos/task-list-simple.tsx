@@ -1,6 +1,5 @@
 import type { TaskItem, TaskStatus } from '@ant-design/agentic-ui';
 import { TaskList, ToolUseBar } from '@ant-design/agentic-ui';
-import { Button, Space } from 'antd';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 const allTasks: Array<{ key: string; title: string; contentItems: string[] }> = [
@@ -33,22 +32,22 @@ const allTasks: Array<{ key: string; title: string; contentItems: string[] }> = 
   },
 ];
 
+/** 每步推进间隔(ms) */
+const STEP_INTERVAL = 3000;
+/** 完成后停留时间(ms)，之后重新开始 */
+const RESTART_DELAY = 4000;
+
 export default () => {
   const [activeKeys, setActiveKeys] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<TaskItem[]>([]);
-  const [running, setRunning] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
   const stepRef = useRef(0);
 
   const buildItems = useCallback(
     (step: number): TaskItem[] => {
-      // step 0: empty (initial)
-      // step 1..N: task N-1 transitions to loading
-      // step 2..N+1: task N-2 becomes success, task N-1 loading
-      // final: all success
       const totalSteps = allTasks.length + 1;
-      const currentLoading = step - 1; // index of currently loading task (0-based)
+      const currentLoading = step - 1;
 
       return allTasks
         .filter((_, idx) => idx <= currentLoading)
@@ -90,57 +89,41 @@ export default () => {
     [activeKeys],
   );
 
-  const advance = useCallback(() => {
-    const totalSteps = allTasks.length + 1;
-    stepRef.current += 1;
-    const step = stepRef.current;
-    setItems(buildItems(step));
-
-    if (step >= totalSteps) {
-      setRunning(false);
-      return;
-    }
-
-    timerRef.current = setTimeout(advance, 3000);
-  }, [buildItems]);
-
-  const handleStart = useCallback(() => {
-    if (running) return;
-    // reset
+  const startCycle = useCallback(() => {
     stepRef.current = 0;
     setItems([]);
-    setRunning(true);
     setOpen(false);
 
     timerRef.current = setTimeout(() => {
       setOpen(true);
+      const advance = () => {
+        const totalSteps = allTasks.length + 1;
+        stepRef.current += 1;
+        const step = stepRef.current;
+        setItems(buildItems(step));
+
+        if (step >= totalSteps) {
+          // 全部完成，等待一段时间后重新循环
+          timerRef.current = setTimeout(startCycle, RESTART_DELAY);
+          return;
+        }
+
+        timerRef.current = setTimeout(advance, STEP_INTERVAL);
+      };
       timerRef.current = setTimeout(advance, 800);
     }, 500);
-  }, [running, advance]);
+  }, [buildItems]);
 
-  const handleReset = useCallback(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    stepRef.current = 0;
-    setItems([]);
-    setRunning(false);
-    setOpen(false);
-  }, []);
-
+  // 组件挂载后自动开始循环
   useEffect(() => {
+    startCycle();
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div style={{ padding: 24, maxWidth: 480 }}>
-      <Space style={{ marginBottom: 16 }}>
-        <Button type="primary" onClick={handleStart} disabled={running}>
-          开始执行
-        </Button>
-        <Button onClick={handleReset}>重置</Button>
-        <Button onClick={() => setOpen(!open)}>{open ? '收起' : '展开'}</Button>
-      </Space>
       {items.length > 0 && (
         <TaskList
           items={items}

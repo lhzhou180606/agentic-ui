@@ -8,13 +8,13 @@ export const COLLAPSE_VARIANTS = {
 };
 
 export const COLLAPSE_TRANSITION = {
-  height: { duration: 0.26, ease: [0.4, 0, 0.2, 1] },
-  opacity: { duration: 0.2, ease: 'linear' },
+  height: { duration: 0.35, ease: [0.4, 0, 0.2, 1] },
+  opacity: { duration: 0.25, ease: [0.4, 0, 0.2, 1] },
 };
 
 export const getArrowRotation = (collapsed: boolean): React.CSSProperties => ({
   transform: collapsed ? 'rotate(0deg)' : 'rotate(180deg)',
-  transition: 'transform 0.3s ease',
+  transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
 });
 
 export const hasTaskContent = (
