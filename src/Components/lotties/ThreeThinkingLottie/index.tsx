@@ -1,5 +1,7 @@
 import Lottie from 'lottie-react';
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
+
+import { useAsyncLottieData } from '../useAsyncLottieData';
 
 export interface ThreeThinkingLottieProps {
   /**
@@ -75,18 +77,8 @@ export const ThreeThinkingLottie: React.FC<ThreeThinkingLottieProps> = ({
   size = 32,
   fallback,
 }) => {
-  const [animationData, setAnimationData] = useState<any>(null);
-
-  useEffect(() => {
-    // 动态加载 lottie JSON 文件
-    import('./three-thinking.json')
-      .then((data) => {
-        setAnimationData(data.default || data);
-      })
-      .catch((error) => {
-        console.error('Failed to load ThreeThinkingLottie animation:', error);
-      });
-  }, []);
+  const loadJson = useMemo(() => () => import('./three-thinking.json'), []);
+  const animationData = useAsyncLottieData(loadJson);
 
   const containerStyle: React.CSSProperties = {
     width: size,

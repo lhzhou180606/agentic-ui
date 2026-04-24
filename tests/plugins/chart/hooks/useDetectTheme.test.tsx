@@ -198,20 +198,27 @@ describe('useDetectTheme', () => {
 
     it('应支持自定义亮度阈值', () => {
       document.documentElement.removeAttribute('data-theme');
+      // Y=(0.299+0.587+0.114)*R/1 ≈ 160，不低于默认阈值 145 → light
       mockGetComputedStyle.mockReturnValue({
         getPropertyValue: (prop: string) => {
           if (prop === '--color-gray-bg-page') {
-            return '#808080'; // 亮度约 128
+            return '#a0a0a0';
           }
           return '';
         },
       });
-
-      // 默认阈值 145，#808080 应该是 light
       const { result: result1 } = renderHook(() => useDetectTheme());
       expect(result1.current).toBe('light');
 
-      // 阈值 100，#808080 应该是 dark
+      // Y ≈ 80，低于自定义阈值 100 → dark
+      mockGetComputedStyle.mockReturnValue({
+        getPropertyValue: (prop: string) => {
+          if (prop === '--color-gray-bg-page') {
+            return '#505050';
+          }
+          return '';
+        },
+      });
       const { result: result2 } = renderHook(() =>
         useDetectTheme({ darknessThreshold: 100 }),
       );

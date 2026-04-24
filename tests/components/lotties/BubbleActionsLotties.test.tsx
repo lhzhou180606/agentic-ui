@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { CopyLottie } from '../../../src/Components/lotties/bubble-actions/Copy';
@@ -52,14 +52,16 @@ const lottieComponents = [
 ];
 
 describe.each(lottieComponents)('$name', ({ Component }) => {
-  it('should render with animation data and aria-hidden', () => {
+  it('should render with animation data and aria-hidden', async () => {
     render(<Component />);
-    const el = screen.getByTestId('lottie-animation');
-    expect(el).toHaveAttribute('data-animation', 'loaded');
+    const el = await screen.findByTestId('lottie-animation');
+    await waitFor(() => {
+      expect(el).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(el).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('should apply size, className, style, active, loop, autoplay', () => {
+  it('should apply size, className, style, active, loop, autoplay', async () => {
     render(
       <Component
         size={48}
@@ -70,7 +72,10 @@ describe.each(lottieComponents)('$name', ({ Component }) => {
         autoplay={true}
       />,
     );
-    const el = screen.getByTestId('lottie-animation');
+    const el = await screen.findByTestId('lottie-animation');
+    await waitFor(() => {
+      expect(el).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(el).toHaveStyle({ width: '48px', height: '48px', opacity: '0.5' });
     expect(el.className).toContain('test-cls');
     expect(el).toHaveAttribute('data-loop', 'true');

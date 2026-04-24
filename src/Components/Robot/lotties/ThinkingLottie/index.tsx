@@ -1,6 +1,7 @@
 import Lottie from 'lottie-react';
-import React from 'react';
-import thinkingLottie from './thinking.json';
+import React, { useMemo } from 'react';
+
+import { useAsyncLottieData } from '../../../lotties/useAsyncLottieData';
 
 export interface ThinkingLottieProps {
   /**
@@ -65,6 +66,9 @@ export const ThinkingLottie: React.FC<ThinkingLottieProps> = ({
   style,
   size = 32,
 }) => {
+  const loadJson = useMemo(() => () => import('./thinking.json'), []);
+  const animationData = useAsyncLottieData(loadJson);
+
   const containerStyle: React.CSSProperties = {
     width: size,
     height: size,
@@ -74,12 +78,16 @@ export const ThinkingLottie: React.FC<ThinkingLottieProps> = ({
     ...style,
   };
 
+  if (animationData == null) {
+    return <div style={containerStyle} className={className} aria-hidden />;
+  }
+
   return (
     <Lottie
       style={containerStyle}
       className={className}
       aria-hidden="true"
-      animationData={thinkingLottie}
+      animationData={animationData}
       loop={loop}
       autoplay={autoplay}
     />

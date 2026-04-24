@@ -1,6 +1,7 @@
 import Lottie from 'lottie-react';
-import React from 'react';
-import dazingLottie from './dazing.json';
+import React, { useMemo } from 'react';
+
+import { useAsyncLottieData } from '../useAsyncLottieData';
 
 export interface DazingLottieProps {
   /**
@@ -66,6 +67,9 @@ export const DazingLottie: React.FC<DazingLottieProps> = ({
   style,
   size,
 }) => {
+  const loadJson = useMemo(() => () => import('./dazing.json'), []);
+  const animationData = useAsyncLottieData(loadJson);
+
   const containerStyle: React.CSSProperties = {
     width: size,
     height: size,
@@ -75,12 +79,16 @@ export const DazingLottie: React.FC<DazingLottieProps> = ({
     ...style,
   };
 
+  if (animationData == null) {
+    return <div style={containerStyle} className={className} aria-hidden />;
+  }
+
   return (
     <Lottie
       style={containerStyle}
       className={className}
       aria-hidden="true"
-      animationData={dazingLottie}
+      animationData={animationData}
       loop={loop}
       autoplay={autoplay}
     />

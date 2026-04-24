@@ -1,6 +1,7 @@
 import Lottie from 'lottie-react';
-import React from 'react';
-import lottieData from './lottie.json';
+import React, { useMemo } from 'react';
+
+import { useAsyncLottieData } from '../../../lotties/useAsyncLottieData';
 
 export interface BouncingLottieProps {
   /**
@@ -65,6 +66,9 @@ export const BouncingLottie: React.FC<BouncingLottieProps> = ({
   style,
   size = 32,
 }) => {
+  const loadJson = useMemo(() => () => import('./lottie.json'), []);
+  const animationData = useAsyncLottieData(loadJson);
+
   const containerStyle: React.CSSProperties = {
     width: size,
     height: size,
@@ -74,12 +78,16 @@ export const BouncingLottie: React.FC<BouncingLottieProps> = ({
     ...style,
   };
 
+  if (animationData == null) {
+    return <div style={containerStyle} className={className} aria-hidden />;
+  }
+
   return (
     <Lottie
       style={containerStyle}
       className={className}
       aria-hidden="true"
-      animationData={lottieData}
+      animationData={animationData}
       loop={loop}
       autoplay={autoplay}
     />

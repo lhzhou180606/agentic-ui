@@ -1,6 +1,7 @@
 import Lottie from 'lottie-react';
-import React from 'react';
-import creativeSpark from './creativeSpark.json';
+import React, { useMemo } from 'react';
+
+import { useAsyncLottieData } from '../useAsyncLottieData';
 
 export interface CreativeSparkLottieProps {
   /**
@@ -72,6 +73,9 @@ export const CreativeSparkLottie: React.FC<CreativeSparkLottieProps> = ({
   style,
   size,
 }) => {
+  const loadJson = useMemo(() => () => import('./creativeSpark.json'), []);
+  const animationData = useAsyncLottieData(loadJson);
+
   const containerStyle: React.CSSProperties = {
     width: size,
     height: size,
@@ -81,13 +85,17 @@ export const CreativeSparkLottie: React.FC<CreativeSparkLottieProps> = ({
     ...style,
   };
 
+  if (animationData == null) {
+    return <div style={containerStyle} className={className} aria-hidden />;
+  }
+
   return (
     <Lottie
       style={containerStyle}
       className={className}
       data-testid="lottie-animation"
       aria-hidden="true"
-      animationData={creativeSpark}
+      animationData={animationData}
       loop={loop}
       autoplay={autoplay}
     />

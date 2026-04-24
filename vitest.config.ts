@@ -3,7 +3,9 @@ import { defineConfig } from 'vitest/config';
 
 /**
  * 默认排除「非单元」或「纯覆盖率补洞」测试，降低 `pnpm test` 用例数量与耗时。
- * 目标约 5000 条用例；CI 全量：`VITEST_FULL_SUITE=1 pnpm test` 或 `pnpm run test:full`
+ * 全量套件（与 Codecov 任务一致）用以下任一方式：
+ * - `pnpm run test:full` / `pnpm run test:coverage:full`（推荐，使用 `--mode full`）
+ * - `VITEST_FULL_SUITE=1 pnpm test`（兼容仅设环境变量、无 `--mode` 的场景）
  */
 const defaultTestExcludes = [
   '**/node_modules/**',
@@ -53,12 +55,16 @@ const defaultTestExcludes = [
   '**/tests/utils/language.test.ts',
 ];
 
-const testExclude =
-  process.env.VITEST_FULL_SUITE === '1'
-    ? ['**/node_modules/**', '**/dist/**', '**/e2e/**']
-    : defaultTestExcludes;
+const fullSuiteTestExcludes = [
+  '**/node_modules/**',
+  '**/dist/**',
+  '**/e2e/**',
+];
 
-export default defineConfig({
+const isFullSuite = (mode: string | undefined) =>
+  mode === 'full' || process.env.VITEST_FULL_SUITE === '1';
+
+export default defineConfig(({ mode }) => ({
   esbuild: {
     //jsxInject: "import React from 'react'",
   },
@@ -70,7 +76,7 @@ export default defineConfig({
     globals: true,
     setupFiles: './tests/setupTests.ts',
     testTimeout: 500000,
-    exclude: testExclude,
+    exclude: isFullSuite(mode) ? fullSuiteTestExcludes : defaultTestExcludes,
     alias: [
       {
         find: '@ant-design/agentic-ui',
@@ -129,4 +135,4 @@ export default defineConfig({
       }),
     },
   },
-});
+}));

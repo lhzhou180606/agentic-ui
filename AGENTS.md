@@ -75,9 +75,9 @@ pnpm install
 pnpm start              # 启动文档站点（http://localhost:8000）
 pnpm run build          # 构建项目
 pnpm test               # 运行单元测试（默认跳过 e2e、大体积 chart/Workspace 目录、branches/coverage 等补洞套件，见 vitest.config.ts）
-pnpm run test:full      # 与 CI 覆盖率任务一致的全量 Vitest
+pnpm run test:full      # 全量 Vitest（`--mode full`；与 `test:coverage:full` 同一套 exclude，不含覆盖率）
 pnpm run test:coverage  # 生成覆盖率（默认同上精简集）
-pnpm run test:coverage:full  # 全量测试 + 覆盖率（Codecov / 发布前）
+pnpm run test:coverage:full  # 全量测试 + 覆盖率（`--mode full`；Codecov workflow / 发布前）
 pnpm run test:e2e       # 运行 E2E 测试
 pnpm run lint           # 代码检查（ESLint + Stylelint）
 pnpm run prettier       # 代码格式化
@@ -425,7 +425,7 @@ import type { RefType } from './types';
 # 运行单元测试（默认精简集，见 vitest.config.ts 的 exclude）
 pnpm test
 
-# 全量 Vitest（含 targeted-coverage、comprehensive、benchmark 等）
+# 全量 Vitest（`--mode full`；含 targeted-coverage、comprehensive、benchmark 等）
 pnpm run test:full
 
 # 运行测试并生成覆盖率（默认精简集）

@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { VoicePlayLottie } from '../../src/Icons/animated/VoicePlayLottie';
@@ -34,19 +34,21 @@ const voiceLotties = [
 ];
 
 describe.each(voiceLotties)('$name', ({ Component, hasAriaHidden }) => {
-  it('should render with default props (autoplay=true, loop=true)', () => {
+  it('should render with default props (autoplay=true, loop=true)', async () => {
     render(<Component />);
-    const el = screen.getByTestId('lottie-animation');
+    const el = await screen.findByTestId('lottie-animation');
+    await waitFor(() => {
+      expect(el).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(el).toBeInTheDocument();
     expect(el).toHaveAttribute('data-loop', 'true');
     expect(el).toHaveAttribute('data-autoplay', 'true');
-    expect(el).toHaveAttribute('data-animation', 'loaded');
     if (hasAriaHidden) {
       expect(el).toHaveAttribute('aria-hidden', 'true');
     }
   });
 
-  it('should apply custom size, className, style', () => {
+  it('should apply custom size, className, style', async () => {
     render(
       <Component
         size={48}
@@ -54,15 +56,21 @@ describe.each(voiceLotties)('$name', ({ Component, hasAriaHidden }) => {
         style={{ backgroundColor: 'green' }}
       />,
     );
-    const el = screen.getByTestId('lottie-animation');
+    const el = await screen.findByTestId('lottie-animation');
+    await waitFor(() => {
+      expect(el).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(el).toHaveStyle({ width: '48px', height: '48px', display: 'flex' });
     expect(el).toHaveClass('voice-custom');
     expect(el.getAttribute('style')).toContain('background-color: green');
   });
 
-  it('should respect autoplay=false and loop=false', () => {
+  it('should respect autoplay=false and loop=false', async () => {
     render(<Component autoplay={false} loop={false} />);
-    const el = screen.getByTestId('lottie-animation');
+    const el = await screen.findByTestId('lottie-animation');
+    await waitFor(() => {
+      expect(el).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(el).toHaveAttribute('data-autoplay', 'false');
     expect(el).toHaveAttribute('data-loop', 'false');
   });
