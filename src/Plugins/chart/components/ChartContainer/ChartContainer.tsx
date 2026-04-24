@@ -2,6 +2,7 @@ import { ConfigProvider, theme as antdTheme } from 'antd';
 import classNames from 'clsx';
 import React from 'react';
 import type { ChartClassNames, ChartStyles } from '../../types/classNames';
+import { useDetectTheme } from '../../hooks';
 import {
   ChartDarkAntdProvidedContext,
   useChartDarkAntdProvided,
@@ -17,6 +18,8 @@ export interface ChartContainerProps {
   style?: React.CSSProperties;
   /** 图表主题 */
   theme?: 'light' | 'dark';
+  /** 是否自动检测主题（检测 html[data-theme='dark'] 和 CSS 变量亮度） */
+  autoDetectTheme?: boolean;
   /** 是否为移动端 */
   isMobile?: boolean;
   /** 图表变体 */
@@ -55,7 +58,7 @@ export interface ChartContainerRef {
  * @param {string} [props.className] - 自定义CSS类名
  * @param {React.ReactNode} props.children - 子元素
  * @param {React.CSSProperties} [props.style] - 样式对象
- * @param {'light' | 'dark'} [props.theme='light'] - 图表主题
+ * @param {'light' | 'dark'} [props.theme] - 图表主题，不传时自动检测（检测 html[data-theme='dark'] 或 CSS 变量亮度）
  * @param {boolean} [props.isMobile=false] - 是否为移动端
  * @param {object} [props.errorBoundary] - 错误边界配置
  * @param {boolean} [props.errorBoundary.enabled=true] - 是否启用错误边界
@@ -65,13 +68,20 @@ export interface ChartContainerRef {
  *
  * @example
  * ```tsx
- * // 基础使用
+ * // 基础使用（自动检测主题）
  * <ChartContainer
  *   baseClassName="area-chart-container"
  *   className="custom-chart"
- *   theme="light"
  *   isMobile={false}
  *   style={{ width: 600, height: 400 }}
+ * >
+ *   <div>图表内容</div>
+ * </ChartContainer>
+ *
+ * // 显式指定主题
+ * <ChartContainer
+ *   baseClassName="area-chart-container"
+ *   theme="dark"
  * >
  *   <div>图表内容</div>
  * </ChartContainer>
@@ -111,6 +121,7 @@ export interface ChartContainerRef {
  * - 内置错误边界保护，防止图表错误影响整个应用
  * - 错误边界默认启用，可通过配置禁用或自定义
  * - `theme="dark"` 时在本容器内嵌套 Ant Design 暗色算法，工具栏/筛选等 antd 控件与画布暗色一致（嵌套容器不重复包裹）
+ * - 支持自动主题检测：当 theme 未指定时，会自动检测 html[data-theme='dark'] 属性或 CSS 变量亮度判断主题
  */
 const ChartContainer: React.FC<
   ChartContainerProps & {
@@ -126,7 +137,8 @@ const ChartContainer: React.FC<
   style,
   classNames: classNamesProp,
   styles: stylesProp,
-  theme = 'light',
+  theme: themeProp,
+  autoDetectTheme = true,
   variant = 'default',
   isMobile = false,
   errorBoundary = { enabled: true },
@@ -134,6 +146,11 @@ const ChartContainer: React.FC<
 }) => {
   const { wrapSSR, hashId } = useStyle(baseClassName);
   const ancestorDarkAntdProvided = useChartDarkAntdProvided();
+
+  // 自动检测主题：当 themeProp 未指定且 autoDetectTheme 为 true 时，自动检测
+  const detectedTheme = useDetectTheme({ observeChanges: autoDetectTheme });
+  const theme = themeProp ?? (autoDetectTheme ? detectedTheme : 'light');
+
   const wrapDarkAntd = theme === 'dark' && !ancestorDarkAntdProvided;
 
   // 构建动态类名

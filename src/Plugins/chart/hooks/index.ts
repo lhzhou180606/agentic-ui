@@ -11,4 +11,6 @@ export type {
 } from './useChartStatistic';
 export { useChartStatistics } from './useChartStatistics';
 export { useChartTheme } from './useChartTheme';
+export { useDetectTheme } from './useDetectTheme';
+export type { DetectThemeOptions } from './useDetectTheme';
 export { useResponsiveSize } from './useResponsiveSize';
