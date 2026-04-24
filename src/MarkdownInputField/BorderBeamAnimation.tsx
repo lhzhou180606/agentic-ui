@@ -8,7 +8,7 @@ export interface BorderBeamAnimationProps {
   borderRadius: number;
   /** 动画完成回调 */
   onAnimationComplete?: () => void;
-  /** 渐变 ID，用于避免多个实例冲突 */
+  /** 渐变 ID，用于避免多个实例冲突（已废弃，组件内部自动生成唯一 ID） */
   gradientId?: string;
   /** 水平偏移量 */
   offsetX?: number;
@@ -54,15 +54,19 @@ export const BorderBeamAnimation: React.FC<BorderBeamAnimationProps> = ({
   isVisible,
   borderRadius,
   onAnimationComplete,
-  gradientId = 'beam-gradient',
+  gradientId: gradientIdProp,
   offsetX = 1,
-  offsetY = 0,
+  offsetY = 1,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({
     width: 0,
     height: 0,
   });
+
+  // 使用 React.useId 生成唯一渐变 ID，避免多实例冲突
+  const generatedId = React.useId();
+  const gradientId = gradientIdProp ?? `beam-gradient-${generatedId}`;
 
   // 使用 ResizeObserver 监听容器尺寸变化
   useEffect(() => {
@@ -90,8 +94,8 @@ export const BorderBeamAnimation: React.FC<BorderBeamAnimationProps> = ({
 
   const { width, height } = dimensions;
 
-  // Calculate SVG path based on dimensions
-  const radius = 16;
+  // 使用 props 传入的 borderRadius，而非硬编码
+  const radius = borderRadius;
   const w = width;
   const h = height;
 

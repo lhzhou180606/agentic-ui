@@ -7,6 +7,10 @@ import {
 
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
+    '@keyframes thoughtChainSpin': {
+      '0%': { transform: 'rotate(0deg)' },
+      '100%': { transform: 'rotate(360deg)' },
+    },
     [token.componentCls]: {
       padding: '12px',
       '*': {
@@ -43,14 +47,15 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             backgroundSize: '150%',
             backgroundPosition: '0 0',
             backgroundImage: `conic-gradient(
-    from var(--angle, 0deg) at 50% 50%,
     rgba(46, 255, 127, 0.7) 0deg,
     rgba(120, 133, 255, 1) 90deg,
     rgba(255, 0, 153, 0.4) 180deg,
     rgba(0, 221, 255, 0.62) 270deg,
     rgba(46, 255, 127, 0.7) 360deg
   )`,
-            animationName: 'spin',
+            transformOrigin: 'center center',
+            willChange: 'transform',
+            animationName: 'thoughtChainSpin',
             animationDuration: '2s',
             animationTimingFunction: 'linear',
             animationIterationCount: 'infinite',
