@@ -70,6 +70,15 @@ const genTableStyle = (
         border: 'none',
         transform: 'translateX(50%)',
         transition: 'all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)',
+        color: 'var(--color-gray-text-default)',
+      },
+
+      // Dark theme for table actions
+      '&-dark': {
+        [`${tableCls}-readonly-table-actions`]: {
+          backgroundColor: 'var(--color-gray-bg-page-dark, #1f1f1f)',
+          color: 'rgba(255, 255, 255, 0.85)',
+        },
       },
 
       table: {
