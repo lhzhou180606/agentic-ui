@@ -866,6 +866,7 @@ export const FileComponent: FC<{
   }, [resetKey]);
 
   // 监听 nodes 变化，同步更新 previewFile
+  // 当外部数据更新时，保持预览文件与最新数据同步
   useEffect(() => {
     if (!previewFile) return;
 
@@ -879,7 +880,7 @@ export const FileComponent: FC<{
           const found = findUpdatedFile(node.children);
           if (found) return found;
         } else {
-          // 文件节点，比较 ID 或文件引用
+          // 文件节点，比较 ID 或文件名+类型
           if (
             (node.id && node.id === previewFile.id) ||
             (node.name === previewFile.name && node.type === previewFile.type)
@@ -897,7 +898,11 @@ export const FileComponent: FC<{
     if (updatedFile) {
       setPreviewFile(updatedFile);
     }
-  }, [nodes]);
+    // 注意：这里故意使用 nodes 而非 safeNodes 作为依赖
+    // 因为 safeNodes 每次渲染都会重新计算，会导致无限循环
+    // nodes 引用变化时才需要检查更新
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodes, previewFile?.id, previewFile?.name, previewFile?.type]);
 
   // 处理分组折叠/展开
   const handleToggleGroup = useRefFunction(
@@ -1066,10 +1071,11 @@ export const FileComponent: FC<{
     if (hasKeyword) {
       return (
         <Typography.Text type="secondary">
-          {(
+          {compileTemplate(
             locale?.['workspace.noResultsFor'] ||
-            `未找到与「${keyword}」匹配的结果`
-          ).replace('${keyword}', String(keyword))}
+              '未找到与「${keyword}」匹配的结果',
+            { keyword: String(keyword) },
+          )}
         </Typography.Text>
       );
     }
@@ -1098,15 +1104,8 @@ export const FileComponent: FC<{
 
   // 渲染文件内容
   const renderFileContent = useRefFunction(() => {
-    if ((!nodes || nodes.length === 0) && !loading) {
-      return (
-        <div className={classNames(`${prefixCls}-empty`, hashId)}>
-          {renderEmptyContent()}
-        </div>
-      );
-    }
-
-    if (safeNodes.length === 0) {
+    // 统一的空状态判断：数据为空且非加载中
+    if (safeNodes.length === 0 && !loading) {
       return (
         <div className={classNames(`${prefixCls}-empty`, hashId)}>
           {renderEmptyContent()}

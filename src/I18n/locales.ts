@@ -455,6 +455,7 @@ export const cnLabels = {
   'fileType.powerpoint': 'PowerPoint 演示文稿',
   // PreviewComponent messages
   'workspace.file.unsupportedPreview': '此文件无法预览，请下载查看。',
+  'workspace.file.unsupportedPreviewNoDownload': '此文件无法预览。',
   'workspace.file.downloadButton': '下载',
   'workspace.file.videoNotSupported': '您的浏览器不支持视频播放',
   'workspace.file.audioNotSupported': '您的浏览器不支持音频播放',
@@ -927,6 +928,8 @@ export const enLabels: typeof cnLabels = {
   // PreviewComponent messages
   'workspace.file.unsupportedPreview':
     'This file cannot be previewed, please download to view.',
+  'workspace.file.unsupportedPreviewNoDownload':
+    'This file cannot be previewed.',
   'workspace.file.downloadButton': 'Download',
   'workspace.file.videoNotSupported':
     'Your browser does not support video playback',

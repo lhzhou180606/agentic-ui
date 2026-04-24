@@ -245,7 +245,11 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
     const isTextOrCode =
       typeInference.category === 'text' || typeInference.category === 'code';
 
-    if (!isTextOrCode) return;
+    // 非文本/代码类型时重置状态
+    if (!isTextOrCode) {
+      setContentState({ status: 'idle', mdContent: '', rawContent: '' });
+      return;
+    }
 
     const setReadyContent = (raw: string) => {
       setContentState({
@@ -279,8 +283,11 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
           setContentState({ status: 'error', error: errorMessage });
           console.error('加载文本内容失败:', err);
         });
+    } else {
+      // 无数据源时重置状态，避免显示旧内容
+      setContentState({ status: 'idle', mdContent: '', rawContent: '' });
     }
-  }, [processResult, file.name, customContent]);
+  }, [processResult, file.name, customContent, locale]);
 
   useEffect(() => {
     if (customContent) return;
@@ -323,8 +330,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
           <div
             className={classNames(`${prefixCls}-content-loading-inner`, hashId)}
           >
-            {file?.content?.padEnd(10000, file?.content) ||
-              '...'.padEnd(10000, '...')}
+            {file?.content || '...'}
           </div>
         </div>
       );
@@ -476,7 +482,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
                 )}
               </div>
             </div>
-            {canDownload && onDownload && (
+            {canDownload && onDownload ? (
               <>
                 <div
                   className={classNames(
@@ -497,6 +503,16 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
                   {locale?.['workspace.file.downloadButton'] || '下载'}
                 </Button>
               </>
+            ) : (
+              <div
+                className={classNames(
+                  `${prefixCls}-unsupported-text`,
+                  hashId,
+                )}
+              >
+                {locale?.['workspace.file.unsupportedPreviewNoDownload'] ||
+                  '此文件无法预览。'}
+              </div>
             )}
           </div>
         </PlaceholderContent>
