@@ -4,7 +4,6 @@ import {
   useEditorStyleRegister,
 } from '../Hooks/useStyle';
 
-const LIGHT_MODE_BACKGROUND = 'rgba(255, 255, 255, 0.65)';
 const LIGHT_MODE_BACKDROP_FILTER = 'blur(12px)';
 
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
@@ -64,12 +63,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
       '&-loading': {
-        background: 'var(--color-gray-bg-card-white)',
         boxSizing: 'border-box',
         boxShadow:
           '0px 0px 1px 0px rgba(0, 19, 41, 0.05),0px 2px 7px 0px rgba(0, 19, 41, 0.05),0px 2px 5px -2px rgba(0, 19, 41, 0.06)',
         '&:hover': {
-          background: 'var(--color-gray-bg-card-white)',
           boxSizing: 'border-box',
           boxShadow:
             '0px 0px 1px 0px rgba(0, 19, 41, 0.05),0px 2px 7px 0px rgba(0, 19, 41, 0.05),0px 2px 5px -2px rgba(0, 19, 41, 0.06)',
@@ -77,7 +74,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '&-success': {
         borderRadius: 'var(--radius-card-base)',
-        background: 'var(--color-gray-bg-card-light)',
         boxShadow: 'inset 0px 0px 1px 0px rgba(0, 19, 41, 0.15)',
       },
       // Placed after &-success so light mode wins when both classes apply (success + light).
@@ -86,11 +82,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         border: 'none',
         borderRadius: '14px',
         padding: 4,
-        background: LIGHT_MODE_BACKGROUND,
         backdropFilter: LIGHT_MODE_BACKDROP_FILTER,
         WebkitBackdropFilter: LIGHT_MODE_BACKDROP_FILTER,
         '&:hover': {
-          background: 'none',
           boxShadow: 'none',
           [`${token.componentCls}-header-left-icon-light`]: {
             color: 'var(--color-gray-text-secondary)',
@@ -231,7 +225,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           paddingLeft: 12,
           marginLeft: 16,
           marginTop: -10,
-          background: LIGHT_MODE_BACKGROUND,
           backdropFilter: LIGHT_MODE_BACKDROP_FILTER,
           WebkitBackdropFilter: LIGHT_MODE_BACKDROP_FILTER,
         },
