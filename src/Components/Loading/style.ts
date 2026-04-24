@@ -101,6 +101,27 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           height: '100%',
         },
       },
+
+      // Dark theme
+      '&-dark': {
+        [`&${token.componentCls}-spinning`]: {
+          background: 'var(--color-gray-bg-page-dark, #141414)',
+
+          '&::before': {
+            background:
+              'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(22, 96, 255, 0.15) 0%, transparent 70%)',
+          },
+
+          '&::after': {
+            background:
+              'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(135, 87, 255, 0.15) 0%, transparent 60%)',
+          },
+        },
+
+        [`${token.componentCls}-tip`]: {
+          color: 'rgba(255, 255, 255, 0.65)',
+        },
+      },
     },
   };
 };
