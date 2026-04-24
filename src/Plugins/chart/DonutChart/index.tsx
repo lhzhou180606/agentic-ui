@@ -21,7 +21,7 @@ import {
 } from '../components';
 import { defaultColorList } from '../const';
 import { isWindowDefined } from '../env';
-import { useChartTheme } from '../hooks';
+import { useChartTheme, useDetectTheme } from '../hooks';
 import { resolveCssVariable } from '../utils';
 import {
   SINGLE_MODE_DESKTOP_CUTOUT,
@@ -99,7 +99,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
   title,
   showToolbar = true,
   onDownload,
-  theme = 'light',
+  theme,
   dataTime,
   filterList,
   selectedFilter,
@@ -130,7 +130,9 @@ const DonutChart: React.FC<DonutChartProps> = ({
   const locale = useLocale();
 
   // 使用 useChartTheme hook 获取主题相关颜色
-  const { isLight } = useChartTheme(theme);
+  const detectedTheme = useDetectTheme();
+  const resolvedTheme = theme ?? detectedTheme;
+  const { isLight } = useChartTheme(resolvedTheme);
 
   // 默认配置：当 configs 不传时，使用默认配置，showLegend 默认为 true
   const defaultConfigs: DonutChartConfig[] = [{ showLegend: true }];
@@ -288,7 +290,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
   const finalOnFilterChange = onFilterChange || handleInternalCategoryChange;
 
   // 使用组件级别的 theme prop，而不是从 configs 中获取
-  const chartFilterTheme: 'light' | 'dark' = theme;
+  const chartFilterTheme: 'light' | 'dark' = resolvedTheme;
 
   const dimensions = useResponsiveDimensions(
     isMobile,
@@ -314,7 +316,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
       baseClassName={baseClassName}
       className={classNames(classNamesProp?.root, className)}
       variant={props.variant}
-      theme={theme}
+      theme={resolvedTheme}
       isMobile={isMobile}
       style={{
         ['--donut-item-min-width' as any]: `${dimensions.width}px`,
@@ -326,7 +328,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
         <ChartContainer
           baseClassName={`${baseClassName}-toolbar-wrapper`}
           variant="borderless"
-          theme={theme}
+          theme={resolvedTheme}
           isMobile={isMobile}
         >
           {title && (
@@ -398,7 +400,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
       <ChartContainer
         baseClassName={`${baseClassName}-content`}
         variant="borderless"
-        theme={theme}
+        theme={resolvedTheme}
         isMobile={isMobile}
       >
         {renderConfigs.map((cfg, idx) => {
@@ -673,14 +675,14 @@ const DonutChart: React.FC<DonutChartProps> = ({
               key={idx}
               baseClassName={`${baseClassName}-chart-wrapper`}
               variant="borderless"
-              theme={theme}
+              theme={resolvedTheme}
               isMobile={isMobile}
             >
               {isSingleValueMode ? (
                 <ChartContainer
                   baseClassName={`${baseClassName}-single`}
                   variant="borderless"
-                  theme={theme}
+                  theme={resolvedTheme}
                   isMobile={isMobile}
                   style={{
                     ['--donut-chart-height' as any]: `${dimensions.height}px`,
@@ -726,7 +728,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
                 <ChartContainer
                   baseClassName={`${baseClassName}-row`}
                   variant="borderless"
-                  theme={theme}
+                  theme={resolvedTheme}
                   isMobile={isMobile}
                   style={{
                     ...(isMobile
@@ -737,7 +739,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
                   <ChartContainer
                     baseClassName={`${baseClassName}-chart`}
                     variant="borderless"
-                    theme={theme}
+                    theme={resolvedTheme}
                     isMobile={isMobile}
                     style={{
                       ['--donut-chart-width' as any]: `${dimensions.chartWidth}px`,
@@ -781,7 +783,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
                       baseClassName={baseClassName}
                       hashId={hashId}
                       isMobile={isMobile}
-                      theme={theme}
+                      theme={resolvedTheme}
                     />
                   )}
                 </ChartContainer>

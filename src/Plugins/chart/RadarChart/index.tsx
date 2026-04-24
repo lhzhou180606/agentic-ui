@@ -22,7 +22,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
-import { useChartTheme } from '../hooks';
+import { useChartTheme, useDetectTheme } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import { hexToRgba, resolveCssVariable } from '../utils';
@@ -92,7 +92,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
   toolbarExtra,
   renderFilterInToolbar = false,
   dataTime,
-  theme = 'light',
+  theme,
   color,
   statistic: statisticConfig,
   textMaxWidth = 80,
@@ -125,7 +125,9 @@ const RadarChart: React.FC<RadarChartProps> = ({
   const { wrapSSR, hashId } = useStyle(prefixCls);
 
   // 主题颜色 - 必须在所有条件返回之前调用
-  const { axisTextColor, gridColor, isLight } = useChartTheme(theme);
+  const detectedTheme = useDetectTheme();
+  const resolvedTheme = theme ?? detectedTheme;
+  const { axisTextColor, gridColor, isLight } = useChartTheme(resolvedTheme);
 
   // 处理 ChartStatistic 组件配置
   const statistics = useMemo(() => {
@@ -250,7 +252,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
     return wrapSSR(
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
-        theme={theme}
+        theme={resolvedTheme}
         className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
@@ -263,7 +265,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
       >
         <ChartToolBar
           title={title || '雷达图'}
-          theme={theme}
+          theme={resolvedTheme}
           onDownload={() => {}}
           extra={toolbarExtra}
           dataTime={dataTime}
@@ -649,7 +651,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
     return wrapSSR(
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
-        theme={theme}
+        theme={resolvedTheme}
         className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
@@ -662,7 +664,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
       >
         <ChartToolBar
           title={title || '雷达图'}
-          theme={theme}
+          theme={resolvedTheme}
           onDownload={handleDownload}
           extra={toolbarExtra}
           dataTime={dataTime}
@@ -678,7 +680,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
                   selectedCustomSelection: selectedFilterLabel,
                   onSelectionChange: setSelectedFilterLabel,
                 })}
-                theme={theme}
+                theme={resolvedTheme}
                 variant="compact"
               />
             ) : undefined
@@ -695,7 +697,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
               selectedCustomSelection: selectedFilterLabel,
               onSelectionChange: setSelectedFilterLabel,
             })}
-            theme={theme}
+            theme={resolvedTheme}
           />
         )}
 
@@ -705,7 +707,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
             className={classNames(`${prefixCls}-statistic-container`, hashId)}
           >
             {statistics.map((config, index) => (
-              <ChartStatistic key={index} {...config} theme={theme} />
+              <ChartStatistic key={index} {...config} theme={resolvedTheme} />
             ))}
           </div>
         )}
@@ -720,7 +722,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
     return wrapSSR(
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
-        theme={theme}
+        theme={resolvedTheme}
         className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
@@ -733,7 +735,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
       >
         <ChartToolBar
           title={title || '雷达图'}
-          theme={theme}
+          theme={resolvedTheme}
           onDownload={() => {}}
           extra={toolbarExtra}
           dataTime={dataTime}

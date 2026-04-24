@@ -21,6 +21,7 @@ import {
   useChartDataFilter,
   useChartStatistics,
   useChartTheme,
+  useDetectTheme,
   useResponsiveSize,
 } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
@@ -217,7 +218,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
   style,
   styles: stylesProp,
   dataTime,
-  theme = 'light',
+  theme,
   color,
   showLegend = true,
   legendPosition = 'bottom',
@@ -267,7 +268,9 @@ const AreaChart: React.FC<AreaChartProps> = ({
   } = useChartDataFilter(data);
 
   // 主题颜色
-  const { axisTextColor, gridColor, isLight } = useChartTheme(theme);
+  const detectedTheme = useDetectTheme();
+  const resolvedTheme = theme ?? detectedTheme;
+  const { axisTextColor, gridColor, isLight } = useChartTheme(resolvedTheme);
 
   // 从数据中提取唯一的类型
   const types = useMemo(() => {
@@ -474,14 +477,14 @@ const AreaChart: React.FC<AreaChartProps> = ({
     <ChartContainer
       baseClassName={baseClassName}
       className={rootClassName}
-      theme={theme}
+      theme={resolvedTheme}
       isMobile={isMobile}
       variant={variant}
       style={rootStyle}
     >
       <ChartToolBar
         title={title}
-        theme={theme}
+        theme={resolvedTheme}
         onDownload={handleDownload}
         className={toolbarClassName}
         style={toolbarStyle}
@@ -499,7 +502,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
                 selectedCustomSelection: selectedFilterLabel,
                 onSelectionChange: setSelectedFilterLabel,
               })}
-              theme={theme}
+              theme={resolvedTheme}
               variant="compact"
             />
           ) : undefined
@@ -511,7 +514,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
           className={classNames(`${baseClassName}-statistic-container`, hashId)}
         >
           {statistics.map((config, index) => (
-            <ChartStatistic key={index} {...config} theme={theme} />
+            <ChartStatistic key={index} {...config} theme={resolvedTheme} />
           ))}
         </div>
       )}
@@ -526,7 +529,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
             selectedCustomSelection: selectedFilterLabel,
             onSelectionChange: setSelectedFilterLabel,
           })}
-          theme={theme}
+          theme={resolvedTheme}
         />
       )}
 

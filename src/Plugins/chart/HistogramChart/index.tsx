@@ -22,6 +22,7 @@ import {
 } from '../components';
 import { defaultColorList } from '../const';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
+import { useDetectTheme } from '../hooks';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import { hexToRgba, resolveCssVariable } from '../utils';
 import { useStyle } from './style';
@@ -163,7 +164,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
   style,
   styles,
   dataTime,
-  theme = 'light',
+  theme,
   color,
   showLegend = true,
   legendPosition = 'bottom',
@@ -454,7 +455,9 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
     };
   }, [histogramData, types, binning, color, stacked]);
 
-  const isLight = theme === 'light';
+  const detectedTheme = useDetectTheme();
+  const resolvedTheme = theme ?? detectedTheme;
+  const isLight = resolvedTheme === 'light';
   const axisTextColor = isLight
     ? 'rgba(0, 25, 61, 0.3255)'
     : 'rgba(255, 255, 255, 0.8)';
@@ -564,7 +567,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
     return wrapSSR(
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`, hashId)}
-        theme={theme}
+        theme={resolvedTheme}
         className={classNames(classNamesProp?.root, className)}
         isMobile={isMobile}
         variant={props.variant}
@@ -602,7 +605,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
   return wrapSSR(
     <ChartContainer
       baseClassName={classNames(`${prefixCls}-container`, hashId)}
-      theme={theme}
+      theme={resolvedTheme}
       className={classNames(classNamesProp?.root, className)}
       isMobile={isMobile}
       variant={props.variant}
@@ -615,7 +618,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
     >
       <ChartToolBar
         title={title || '直方图'}
-        theme={theme}
+        theme={resolvedTheme}
         onDownload={handleDownload}
         extra={toolbarExtra}
         dataTime={dataTime}
@@ -631,7 +634,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
                 selectedCustomSelection: selectedFilterLabel,
                 onSelectionChange: setSelectedFilterLabel,
               })}
-              theme={theme}
+              theme={resolvedTheme}
               variant="compact"
             />
           ) : undefined
@@ -647,7 +650,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
           style={styles?.statisticContainer}
         >
           {statistics.map((config, index) => (
-            <ChartStatistic key={index} {...config} theme={theme} />
+            <ChartStatistic key={index} {...config} theme={resolvedTheme} />
           ))}
         </div>
       )}
@@ -662,7 +665,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
             selectedCustomSelection: selectedFilterLabel,
             onSelectionChange: setSelectedFilterLabel,
           })}
-          theme={theme}
+          theme={resolvedTheme}
         />
       )}
 

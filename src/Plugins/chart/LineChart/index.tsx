@@ -16,6 +16,7 @@ import {
   useChartDataFilter,
   useChartStatistics,
   useChartTheme,
+  useDetectTheme,
   useResponsiveSize,
 } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
@@ -104,7 +105,7 @@ const LineChart: React.FC<LineChartProps> = ({
   className,
   classNames: classNamesProp,
   dataTime,
-  theme = 'light',
+  theme,
   color,
   showLegend = true,
   legendPosition = 'bottom',
@@ -154,7 +155,9 @@ const LineChart: React.FC<LineChartProps> = ({
   } = useChartDataFilter(data);
 
   // 主题颜色
-  const { axisTextColor, gridColor, isLight } = useChartTheme(theme);
+  const detectedTheme = useDetectTheme();
+  const resolvedTheme = theme ?? detectedTheme;
+  const { axisTextColor, gridColor, isLight } = useChartTheme(resolvedTheme);
 
   // 从数据中提取唯一的类型
   const types = useMemo(() => {
@@ -350,14 +353,14 @@ const LineChart: React.FC<LineChartProps> = ({
     <ChartContainer
       baseClassName={baseClassName}
       className={rootClassName}
-      theme={theme}
+      theme={resolvedTheme}
       isMobile={isMobile}
       variant={props.variant}
       style={rootStyle}
     >
       <ChartToolBar
         title={title}
-        theme={theme}
+        theme={resolvedTheme}
         className={toolbarClassName}
         style={toolbarStyle}
         onDownload={handleDownload}
@@ -375,7 +378,7 @@ const LineChart: React.FC<LineChartProps> = ({
                 selectedCustomSelection: selectedFilterLabel,
                 onSelectionChange: setSelectedFilterLabel,
               })}
-              theme={theme}
+              theme={resolvedTheme}
               variant="compact"
             />
           ) : undefined
@@ -387,7 +390,7 @@ const LineChart: React.FC<LineChartProps> = ({
           className={classNames(`${baseClassName}-statistic-container`, hashId)}
         >
           {statistics.map((config, index) => (
-            <ChartStatistic key={index} {...config} theme={theme} />
+            <ChartStatistic key={index} {...config} theme={resolvedTheme} />
           ))}
         </div>
       )}
@@ -402,7 +405,7 @@ const LineChart: React.FC<LineChartProps> = ({
             selectedCustomSelection: selectedFilterLabel,
             onSelectionChange: setSelectedFilterLabel,
           })}
-          theme={theme}
+          theme={resolvedTheme}
         />
       )}
 

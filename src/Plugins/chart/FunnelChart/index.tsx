@@ -22,7 +22,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
-import { useChartTheme } from '../hooks';
+import { useChartTheme, useDetectTheme } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import {
@@ -106,7 +106,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
   className,
   classNames: classNamesProp,
   dataTime,
-  theme = 'light',
+  theme,
   showLegend = true,
   legendPosition = 'bottom',
   legendAlign = 'start',
@@ -429,7 +429,9 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
   }, [filterLabels]);
 
   // 使用 useChartTheme hook 获取主题相关颜色
-  const { axisTextColor, isLight } = useChartTheme(theme);
+  const detectedTheme = useDetectTheme();
+  const resolvedTheme = theme ?? detectedTheme;
+  const { axisTextColor, isLight } = useChartTheme(resolvedTheme);
 
   const options: ChartOptions<'bar'> = {
     responsive: true,
@@ -751,7 +753,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     <ChartContainer
       baseClassName={baseClassName}
       className={classNames(classNamesObj?.root, className, containerClassName)}
-      theme={theme}
+      theme={resolvedTheme}
       isMobile={isMobile}
       variant={props.variant}
       style={{
@@ -762,7 +764,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     >
       <ChartToolBar
         title={title}
-        theme={theme}
+        theme={resolvedTheme}
         onDownload={handleDownload}
         dataTime={dataTime}
         extra={toolbarExtra}
@@ -780,7 +782,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
                 selectedCustomSelection: selectedFilterLabel,
                 onSelectionChange: setSelectedFilterLabel,
               })}
-              theme={theme}
+              theme={resolvedTheme}
               variant="compact"
             />
           ) : undefined
@@ -797,7 +799,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
             selectedCustomSelection: selectedFilterLabel,
             onSelectionChange: setSelectedFilterLabel,
           })}
-          theme={theme}
+          theme={resolvedTheme}
         />
       )}
 
@@ -811,7 +813,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
           style={props.styles?.statisticContainer}
         >
           {statistics.map((config, index) => (
-            <ChartStatistic key={index} {...config} theme={theme} />
+            <ChartStatistic key={index} {...config} theme={resolvedTheme} />
           ))}
         </div>
       )}
