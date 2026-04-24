@@ -29,14 +29,14 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
     const container = markdownContainerRef.current;
     if (!container) return;
 
-    const observer = new MutationObserver(() => {
-      setIsComposing(container.hasAttribute('data-composition'));
-    });
-    observer.observe(container, {
-      attributes: true,
-      attributeFilter: ['data-composition'],
-    });
-    return () => observer.disconnect();
+    const onStart = () => setIsComposing(true);
+    const onEnd = () => setIsComposing(false);
+    container.addEventListener('compositionstart', onStart);
+    container.addEventListener('compositionend', onEnd);
+    return () => {
+      container.removeEventListener('compositionstart', onStart);
+      container.removeEventListener('compositionend', onEnd);
+    };
   }, [markdownContainerRef]);
 
   return React.useMemo(() => {
