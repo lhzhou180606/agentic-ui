@@ -4,3 +4,4 @@ export * from './DazingLottie';
 export * from './LoadingLottie';
 export * from './TextLoading';
 export * from './ThinkingLottie';
+export * from './ThreeThinkingLottie';

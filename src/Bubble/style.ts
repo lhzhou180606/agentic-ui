@@ -196,7 +196,6 @@ const genStyle = (
 
       // 用户消息特定样式
       '&-bubble-user': {
-        marginBlockStart: -20, // title line height
         '&-avatar-title-user': {
           flexDirection: 'row-reverse', // 用户消息头像和标题顺序相反
           justifyContent: 'flex-end',
