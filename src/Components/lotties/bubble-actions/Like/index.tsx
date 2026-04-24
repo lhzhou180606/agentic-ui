@@ -46,7 +46,7 @@ export type LikeLottieProps = Omit<AbstractLottieProps, 'animationData'>;
 export const LikeLottie: React.FC<LikeLottieProps> = (props) => {
   const loadJson = useMemo(() => () => import('./lottie.json'), []);
   const animationData = useAsyncLottieData(loadJson);
-  if (animationData == null) {
+  if (animationData === null) {
     return null;
   }
   return <AbstractLottie {...props} animationData={animationData} />;

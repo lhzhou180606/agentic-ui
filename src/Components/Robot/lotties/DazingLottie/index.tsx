@@ -78,7 +78,7 @@ export const DazingLottie: React.FC<DazingLottieProps> = ({
     ...style,
   };
 
-  if (animationData == null) {
+  if (animationData === null) {
     return <div style={containerStyle} className={className} aria-hidden />;
   }
 

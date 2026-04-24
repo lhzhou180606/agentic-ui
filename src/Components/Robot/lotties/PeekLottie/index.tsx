@@ -78,7 +78,7 @@ export const PeekLottie: React.FC<PeekLottieProps> = ({
     ...style,
   };
 
-  if (animationData == null) {
+  if (animationData === null) {
     return <div style={containerStyle} className={className} aria-hidden />;
   }
 

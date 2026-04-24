@@ -78,7 +78,7 @@ export const BouncingLottie: React.FC<BouncingLottieProps> = ({
     ...style,
   };
 
-  if (animationData == null) {
+  if (animationData === null) {
     return <div style={containerStyle} className={className} aria-hidden />;
   }
 
