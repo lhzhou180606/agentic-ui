@@ -55,27 +55,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           marginRight: '8px',
         },
 
-        [`${token.componentCls}-download-btn`]: {
-          color: 'rgba(0, 25, 61, 0.3255)',
-          padding: '3px',
-          height: 'auto',
-          backgroundColor: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          borderRadius: '6px',
-          transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
-
-          '&:hover': {
-            backgroundColor: 'rgba(0, 0, 0, 0.04)',
-          },
-
-          '&:focus': {
-            backgroundColor: 'rgba(0, 0, 0, 0.04)',
-            outline: 'none',
-          },
-        },
-
-        [`${token.componentCls}-copy-btn`]: {
+        [`${token.componentCls}-download-btn, ${token.componentCls}-copy-btn`]: {
           color: 'rgba(0, 25, 61, 0.3255)',
           padding: '3px',
           height: 'auto',
@@ -114,21 +94,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             color: 'rgba(255, 255, 255, 0.65)',
           },
 
-          [`${token.componentCls}-download-btn`]: {
-            color: 'rgba(255, 255, 255, 0.65)',
-            backgroundColor: 'transparent',
-
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            },
-
-            '&:focus': {
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              outline: 'none',
-            },
-          },
-
-          [`${token.componentCls}-copy-btn`]: {
+          [`${token.componentCls}-download-btn, ${token.componentCls}-copy-btn`]: {
             color: 'rgba(255, 255, 255, 0.65)',
             backgroundColor: 'transparent',
 
