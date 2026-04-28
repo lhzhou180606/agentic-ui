@@ -5,7 +5,7 @@
  */
 
 import { CloseCircleOutlined } from '@ant-design/icons';
-import { ArrowUpRight, ChevronsUpDown, Copy, Moon } from '@sofa-design/icons';
+import { ArrowUpRight, ChevronsUpDown, Copy } from '@sofa-design/icons';
 import { Segmented } from 'antd';
 import copy from 'copy-to-clipboard';
 import React, { useContext, useMemo } from 'react';
@@ -66,7 +66,6 @@ function containsJavaScript(htmlCode: string): boolean {
  */
 export interface CodeToolbarProps {
   theme: string;
-  setTheme: (theme: string) => void;
   isExpanded: boolean;
   /** 代码块元素数据 */
   element: CodeNode;
@@ -135,7 +134,6 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
     theme,
     isExpanded,
     onExpandToggle,
-    setTheme,
     viewMode = 'code',
     onLocalPreview,
   } = props;
@@ -287,15 +285,6 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
             }
           />
         ) : null}
-        <ActionIconBox
-          title={i18n?.locale?.theme || '主题'}
-          theme={theme === 'chaos' ? 'dark' : 'light'}
-          onClick={() => {
-            setTheme(theme === 'github' ? 'chaos' : 'github');
-          }}
-        >
-          <Moon />
-        </ActionIconBox>
 
         {/* 复制按钮 */}
         <ActionIconBox

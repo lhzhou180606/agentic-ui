@@ -1,9 +1,10 @@
-import { ChevronsUpDown, Copy, Moon } from '@sofa-design/icons';
+import { ChevronsUpDown, Copy } from '@sofa-design/icons';
 import copy from 'copy-to-clipboard';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';
 import type { MarkdownEditorProps } from '../../MarkdownEditor/types';
+import { useDetectTheme } from '../../Plugins/chart/hooks';
 import { CodeContainer } from '../../Plugins/code/components/CodeContainer';
 import { LoadImage } from '../../Plugins/code/components/LoadImage';
 import { langIconMap } from '../../Plugins/code/langIconMap';
@@ -30,9 +31,8 @@ export const CodeBlockRenderer: React.FC<
   }
 > = (props) => {
   const { language, children, editorCodeProps } = props;
-  const [theme, setTheme] = useState(
-    () => (editorCodeProps?.theme as string) || 'github',
-  );
+  const detectedTheme = useDetectTheme();
+  const theme = (editorCodeProps?.theme as string) || (detectedTheme === 'dark' ? 'chaos' : 'github');
   const [isExpanded, setIsExpanded] = useState(true);
   const i18n = useContext(I18nContext);
 
@@ -130,13 +130,6 @@ export const CodeBlockRenderer: React.FC<
           </div>
         </div>
         <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
-          <ActionIconBox
-            title={i18n?.locale?.theme || '主题'}
-            theme={theme === 'chaos' ? 'dark' : 'light'}
-            onClick={() => setTheme(theme === 'github' ? 'chaos' : 'github')}
-          >
-            <Moon />
-          </ActionIconBox>
           <ActionIconBox
             theme={theme === 'chaos' ? 'dark' : 'light'}
             title={i18n?.locale?.copy || '复制'}

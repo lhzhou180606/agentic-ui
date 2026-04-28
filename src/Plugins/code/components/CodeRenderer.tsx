@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MarkdownEditor } from '../../../MarkdownEditor';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
 import { CodeNode, ElementProps } from '../../../MarkdownEditor/el';
+import { useDetectTheme } from '../../chart/hooks';
 import {
   useCodeEditorState,
   useRenderConditions,
@@ -98,7 +99,8 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
     handleShowBorderChange,
     handleHideChange,
   } = useCodeEditorState(props.element);
-  const [theme, setTheme] = useState('github');
+  const detectedTheme = useDetectTheme();
+  const theme = detectedTheme === 'dark' ? 'chaos' : 'github';
   const [isExpanded, setIsExpanded] = useState(true);
 
   // 选中状态管理
@@ -256,7 +258,6 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
                 !editorProps.codeProps?.hideToolBar && (
                   <CodeToolbar
                     theme={theme}
-                    setTheme={setTheme}
                     isExpanded={isExpanded}
                     onExpandToggle={() => setIsExpanded(!isExpanded)}
                     {...toolbarProps}
