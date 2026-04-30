@@ -108,7 +108,8 @@ export const TaskList = memo(
           text = tpl.replace('${taskName}', taskName);
         } else if (hasError) {
           status = 'error';
-          text = locale?.['taskList.taskAborted'] || '任务已取消';
+          const tpl = locale?.['taskList.taskInProgress'] || '正在进行任务';
+          text = tpl.replace('${taskName}', '');
         }
 
         return {
