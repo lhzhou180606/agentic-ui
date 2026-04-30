@@ -9,6 +9,160 @@ group:
 
 # Changelog
 
+## v2.31.5
+
+- 🛠 Change some exported types from value exports to type exports, optimize bundle size.
+- 🛠 Remove unused locale keys and fix lint errors.
+- ✅ Remove animation mock files no longer used in tests.
+- 🛠 Clean up MarkdownEditor utility functions and optimize import paths.
+
+## v2.31.4
+
+- 🐞 Fix text display logic for tasks in progress.
+- ⚡️ Optimize tree-shaking — eliminate reverse barrel references, named exports for third-party SDKs, add sideEffects.
+- 🐞 Fix code block styles in dark theme.
+- 🛠 Remove deprecated theme i18n key (code block theme toggle button removed).
+
+## v2.31.3
+
+- ✅ Add unit tests for rehypeSanitizeUserHtml plugin.
+- 🛠 Code block theme follows global theme, remove independent moon icon toggle.
+- 🐞 Add rehypeSanitizeUserHtml plugin to filter dangerous HTML from user input and prevent layout issues.
+- 🛠 Replace hardcoded color values with CSS variables.
+
+## v2.31.2
+
+- ⚡️ Reduce bundle size and improve first screen — direct Lottie imports, split readonly markdown components, lazy load Renderer.
+
+## v2.31.1
+
+- 🛠 Replace hardcoded color values with token variables to support theme switching.
+
+## v2.31.0
+
+- 📖 Add MarkdownInputField component demo.
+- 📖 Add Loading component demo.
+- 💄 Add dark theme support for Loading component.
+- 🛠 Remove test step from prepublishOnly.
+- 💄 Merge download and copy button styles, use unified styles.
+- 💄 Add dark theme support for table and chart toolbar copy buttons.
+
+## v2.30.35
+
+- 🛠 Fix eqeqeq rule errors and unused imports.
+- 🐞 Fix multiple issues in FileTree and FilePreview components.
+- 🛠 Remove MutationObserver from Paragraph, use composition event listener instead.
+- 🐞 Fix multiple issues in animation generation.
+- ⚡️ Optimize useDetectTheme to singleton mode, avoid duplicate MutationObserver.
+- 🐞 Chart components support html[data-theme="dark"] for automatic dark theme switching.
+- ✅ Change Robot component tests to async and add Lottie loading wait logic.
+
+## v2.30.33
+
+- 🆕 Add automatic theme detection for ChartContainer.
+- ✅ Fix async timing in onLoadChildren retry test cases.
+- 🆕 Add ThreeThinkingLottie on-demand loading animation component and remove extra spacing in user messages.
+
+## v2.30.32
+
+- 🆕 Add data-testid attributes to multiple components for automated testing support.
+- 🛠 Adjust BubbleList code formatting and indentation.
+
+## v2.30.31
+
+- 🐞 Remove MarkdownEditor content area margin variable override. [#513](https://github.com/ant-design/agentic-ui/pull/513)
+- 🐞 ActionIconBox no longer prevents event bubbling when there is no onClick.
+- 🆕 Add FileTree component to Workspace with lazy-loaded children support. [#510](https://github.com/ant-design/agentic-ui/pull/510)
+- 🐞 Fix Bubble useMemo/useEffect dependency issues and performance problems.
+- 🐞 Increase ToolUseBarThink light variant style priority after success. [#511](https://github.com/ant-design/agentic-ui/pull/511)
+- 💄 Optimize TaskList easing curves, change demo to auto-loop playback.
+- 💄 Reduce TaskList simple mode demo animation speed.
+- 💄 TaskList simple mode demo supports dynamic change demonstration.
+- 💄 Remove TaskList progress element, add blur fade-in animation when text changes.
+- 💄 Add CSS transition animation for TaskList Simple mode expand/collapse.
+- 🐞 TaskList Simple mode removes background color, always shows last task, cleans up redundancy.
+- 🐞 Fix MarkdownInputField send button solid color by theme to ensure contrast. [#509](https://github.com/ant-design/agentic-ui/pull/509)
+- ⚡️ Remove ToolUseBarThink framer-motion, full CSS animations + performance optimization.
+- 🐞 Fix MarkdownInputField tools bar fixed height and padding conflict causing vertical misalignment. [#508](https://github.com/ant-design/agentic-ui/pull/508)
+- 🆕 Support thinking tag as an alias for think block.
+- ⚡️ Comprehensive improvements to streaming rendering performance and correctness.
+- 🛠 Remove BOM characters from files.
+
+## v2.30.30
+
+- 🛠 Extract MarkdownEditor style cleanup function and support custom properties.
+- 📖 Update bubble examples to file understanding scenarios.
+
+## v2.30.29
+
+- 🛠 No major changes.
+
+## v2.30.28
+
+- 🛠 No major changes.
+
+## v2.30.27
+
+- 🐞 Fix Bubble code block selector and improve SendButton accessibility. [#507](https://github.com/ant-design/agentic-ui/pull/507)
+- 🐞 Streaming JSON code blocks avoid Ace repeated setValue flickering. [#504](https://github.com/ant-design/agentic-ui/pull/504)
+- 💄 Built-in Agentic UI business layer CSS overrides. [#506](https://github.com/ant-design/agentic-ui/pull/506)
+- 🐞 Normalize redacted_thinking alias so nested JSON stays in think block. [#505](https://github.com/ant-design/agentic-ui/pull/505)
+- 🐞 Attachment list file size and error text single-line ellipsis display. [#503](https://github.com/ant-design/agentic-ui/pull/503)
+- ⚡️ Reduce ThoughtChainList deep thinking related re-renders during streaming updates. [#501](https://github.com/ant-design/agentic-ui/pull/501)
+- ✅ Default suite excludes large directories, approximately 5000 test cases. [#500](https://github.com/ant-design/agentic-ui/pull/500)
+- ✅ Reduce duplicate mocks in ace and elements tests. [#498](https://github.com/ant-design/agentic-ui/pull/498)
+- 🐞 Chart x/y and header with unit column names loose matching and supplement RFC. [#499](https://github.com/ant-design/agentic-ui/pull/499)
+
+## v2.30.26
+
+- 🐞 Fix MarkdownEditor IME and root-level double empty paragraph, initSchema sync issues.
+
+## v2.30.25
+
+- 🐞 Improve loading indicators and enhance Markdown rendering.
+- 🆕 Enhance Bubble Markdown rendering with stable fncProps and caching improvements.
+- 🐞 Lazy load rows to avoid display:contents causing LazyElement to never display. [#494](https://github.com/ant-design/agentic-ui/pull/494)
+- 🐞 Paragraph visibility based on Slate children rather than React children. [#493](https://github.com/ant-design/agentic-ui/pull/493)
+- 🛠 Remove todo.md file.
+- 🐞 Stop mutating list items so streaming updates do not rerender all bubbles. [#492](https://github.com/ant-design/agentic-ui/pull/492)
+- 🐞 Fix Mermaid SVG size and adapt canvas scaling conflict causing charts to be too small. [#487](https://github.com/ant-design/agentic-ui/pull/487)
+- 🛠 Remove todo.md and update clean-code rule to no longer require that file. [#491](https://github.com/ant-design/agentic-ui/pull/491)
+- 🐞 Empty initValue no longer repeatedly appends paragraphs to restore placeholder. [#490](https://github.com/ant-design/agentic-ui/pull/490)
+- 📖 rerender demo supports left-side Markdown manual editing. [#488](https://github.com/ant-design/agentic-ui/pull/488)
+- 📖 Optimize MarkdownInputField demos. [#486](https://github.com/ant-design/agentic-ui/pull/486)
+- 📖 Format Props tables in component documentation.
+- 🐞 Fix MarkdownEditor sparse children causing Slate renderLeaf to read undefined. [#485](https://github.com/ant-design/agentic-ui/pull/485)
+- 🛠 Remove document BOM header and optimize MarkdownInputField import order.
+
+## v2.30.24
+
+- 🐞 Fix MarkdownEditor empty markdown content handling and Node method safe calls.
+- 🐞 Harden MarkdownEditor sanitize normalizer against invalid Slate trees. [#484](https://github.com/ant-design/agentic-ui/pull/484)
+
+## v2.30.23
+
+- 🐞 Remove illegal children during MarkdownEditor normalization to avoid Node.string crash. [#483](https://github.com/ant-design/agentic-ui/pull/483)
+
+## v2.30.22
+
+- 🛠 Restore demo check and report scripts. [#482](https://github.com/ant-design/agentic-ui/pull/482)
+- 📖 Optimize MarkdownInputField documentation Demo layout and fix example issues.
+- 🆕 Support Bubble OpenAI/OpenClaw/Ollama message format adapters. [#481](https://github.com/ant-design/agentic-ui/pull/481)
+- 🐞 Fix MarkdownEditor empty paragraph backspace accidentally triggering select-all clear. [#479](https://github.com/ant-design/agentic-ui/pull/479)
+- 🐞 Streaming paragraph animation enabled by default and E2E/unit test stabilization. [#478](https://github.com/ant-design/agentic-ui/pull/478)
+- 🐞 ChatLayout auto-scroll to bottom when streaming text update ends. [#480](https://github.com/ant-design/agentic-ui/pull/480)
+- 🐞 Fix MarkdownRenderer animation failure and add streaming blinking cursor. [#477](https://github.com/ant-design/agentic-ui/pull/477)
+- ✅ Add MarkdownEditor stale selection handling regression coverage. [#476](https://github.com/ant-design/agentic-ui/pull/476)
+- ✅ Add MarkdownEditor invalid selection path regression coverage. [#475](https://github.com/ant-design/agentic-ui/pull/475)
+- ✅ Add Mermaid toolbar interaction regression coverage. [#471](https://github.com/ant-design/agentic-ui/pull/471)
+- 🛠 Slate.js normalized usage improvements (P0-P3 all fixed + coverage met). [#474](https://github.com/ant-design/agentic-ui/pull/474)
+- 🐞 Fix MarkdownEditor isElement crash reading undefined.children. [#472](https://github.com/ant-design/agentic-ui/pull/472)
+- 🆕 SendButton disabled during file upload, support sendButtonProps.disabled external control. [#470](https://github.com/ant-design/agentic-ui/pull/470)
+- ✅ Add attachment preview passthrough regression coverage. [#467](https://github.com/ant-design/agentic-ui/pull/467)
+- ✅ Add MarkdownInputField attachment onPreview passthrough and error handling regression coverage. [#468](https://github.com/ant-design/agentic-ui/pull/468)
+- ✅ Add AttachmentFileListItem retry unit tests. [#465](https://github.com/ant-design/agentic-ui/pull/465)
+- 🐞 Fix Lint errors in non-compliant Demo code. [#466](https://github.com/ant-design/agentic-ui/pull/466)
+
 ## v2.30.22
 
 - Workspace

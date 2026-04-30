@@ -89,22 +89,30 @@ pnpm tsc                # TypeScript 类型检查
 ```
 agentic-ui/
 ├── src/                    # 组件源代码
-│   ├── ComponentName/      # 单个组件目录
-│   │   ├── ComponentName.tsx   # 主组件实现
-│   │   ├── SubComponent.tsx   # 子组件（如有）
-│   │   ├── style.ts           # 样式文件（CSS-in-JS）
-│   │   ├── types.ts           # 类型定义
-│   │   ├── hooks/             # 组件专属 hooks
-│   │   ├── utils/             # 工具函数
-│   │   ├── plugins/           # 插件（如有）
-│   │   └── index.tsx          # 导出入口
-│   ├── Components/          # 通用组件
+│   ├── ComponentName/      # 单个组件目录（如 Bubble、MarkdownEditor、ThoughtChainList 等）
+│   │   ├── ComponentName.tsx   # 主组件实现（部分组件）
+│   │   ├── SubComponent.tsx    # 子组件（如 AIBubble.tsx、UserBubble.tsx）
+│   │   ├── style.ts            # 样式文件（CSS-in-JS）
+│   │   ├── types.ts            # 类型定义
+│   │   ├── hooks/              # 组件专属 hooks
+│   │   ├── utils/              # 工具函数
+│   │   ├── plugins/            # 插件（如 MarkdownEditor）
+│   │   ├── components/         # 子组件目录（如 Bubble/List、Bubble/MessagesContent）
+│   │   ├── __tests__/          # 测试文件
+│   │   └── index.tsx           # 导出入口
+│   ├── Components/           # 通用组件
 │   ├── Hooks/                # 共享 Hooks
 │   ├── Utils/                # 工具函数库
 │   ├── I18n/                 # 国际化
+│   ├── Types/                # 共享类型定义
+│   ├── Constants/            # 常量定义
 │   └── index.ts              # 组件总入口
 ├── docs/                    # 文档
-│   └── development/         # 开发相关文档
+│   ├── components/           # 组件 API 文档
+│   │   ├── bubble.md
+│   │   ├── markdown-editor.md
+│   │   └── ...
+│   └── development/          # 开发相关文档
 │       ├── changelog.zh-CN.md
 │       └── changelog.en-US.md
 ├── tests/                   # 测试文件
@@ -180,15 +188,17 @@ interface ComponentRef {
 
 - **组件**: PascalCase（如 `MarkdownEditor.tsx`、`HistoryItem.tsx`）
 - **文件夹**: PascalCase 或 kebab-case（与组件一致，如 `MarkdownEditor`、`markdown-editor`）
-- **Hooks**: camelCase，以 `use` 开头（如 `useEditor.ts`）
-- **工具函数**: camelCase（如 `parseMarkdown.ts`）
+- **Hooks**: camelCase，以 `use` 开头（如 `useAutoScroll.ts`、`useClickAway.ts`）
+  - 复杂 Hook 可使用目录结构，如 `useStyle/index.tsx`、`useDebounceFn/index.ts`
+- **工具函数**: camelCase（如 `parseMarkdown.ts`、`debugUtils.ts`）
 - **样式文件**: `style.ts`
+- **类型文件**: `types.ts` 或 `type.ts`
 - **类名**: BEM 命名法
   - Block: `.history-item`
   - Element: `.history-item__title` 或 `prefix-item`（与 prefixCls 拼接）
   - Modifier: `.history-item--selected` 或 `prefix-item--active`
   - 避免过长复合名，如 `item-min-plus-icon` 应简化为 `item--more`
-- **className 工具**: 统一使用 `import clsx from 'clsx'`。若组件存在 `classNames` 属性，使用 `import clsx from 'clsx'` 避免变量遮蔽
+- **className 工具**: 统一使用 `import classNames from 'clsx'`。若组件存在 `classNames` 属性，使用 `import classNames from 'clsx'` 避免变量遮蔽
 - **前缀变量**: 组件内获取的类名前缀统一命名为 `prefixCls`，与 Ant Design 保持一致
 
 ### 文件组织结构
@@ -220,22 +230,29 @@ ComponentName/
 
 | Property | Description | Type | Default | Version |
 | --- | --- | --- | --- | --- |
-| disabled | 是否禁用 | boolean | false | - |
-| defaultValue | 默认值 | string | - | - |
-| style | 自定义样式 | CSSProperties | - | - |
-| classNames | 自定义类名 | ComponentClassNamesType | - | - |
-| styles | 自定义内联样式 | ComponentStylesType | - | - |
+| disabled | 是否禁用 | `boolean` | `false` | - |
+| defaultValue | 默认值 | `string` | - | - |
+| style | 自定义样式 | `React.CSSProperties` | - | - |
+| classNames | 自定义类名 | `ComponentClassNamesType` | - | - |
+| styles | 自定义内联样式 | `ComponentStylesType` | - | - |
+| placement | 消息布局位置 | `'left' \| 'right'` | `'left'` | - |
+| ~~onDisLike~~ | 已废弃，请使用 `onDislike` | `(bubble: MessageBubbleData) => void` | - | 2.29.0 |
 
 #### API 文档要求
 
-- ✅ 字符串类型的默认值使用反引号包裹，如 `` `button` ``
-- ✅ 布尔类型直接使用 `true` 或 `false`
-- ✅ 数字类型直接使用数字，如 `0`、`100`
-- ✅ 函数类型使用箭头函数表达式，如 `(e: Event) => void`
-- ✅ 无默认值使用 `-`
-- ✅ 描述首字母大写，结尾无句号
-- ✅ API 按字母顺序排列
-- ✅ 新增属性需要声明可用版本号
+- ✅ **表格列顺序**：Property → Description → Type → Default → Version
+- ✅ **类型格式**：使用反引号包裹，如 `` `boolean` ``、`` `React.CSSProperties` ``
+- ✅ **联合类型**：使用 `|` 分隔，如 `` `'left' \| 'right'` ``
+- ✅ **字符串默认值**：使用反引号包裹，如 `` `'left' ``
+- ✅ **布尔默认值**：直接使用 `` `true` `` 或 `` `false` ``
+- ✅ **数字默认值**：直接使用数字，如 `0`、`100`
+- ✅ **函数类型**：使用箭头函数表达式，如 `` `(e: Event) => void` ``
+- ✅ **无默认值**：使用 `-`
+- ✅ **废弃属性**：使用删除线标记，如 `~~onDisLike~~`，并在描述中说明替代方案
+- ✅ **版本列**：新增属性标注可用版本号，废弃属性标注废弃版本，无版本限制使用 `-`
+- ✅ **描述格式**：首字母大写，结尾无句号
+- ✅ **API 排序**：按字母顺序排列
+- ✅ **分组展示**：相关属性可分组展示（如"核心属性"、"样式配置"、"交互回调"等）
 
 ---
 
@@ -318,26 +335,69 @@ enum ButtonType {
 
 ### 样式定义示例
 
-```tsx
-import { createStyles } from '@ant-design/cssinjs';
+项目使用自定义的 `useStyle` hook 来注册样式，基于 `@ant-design/cssinjs` 实现：
 
-const useStyles = createStyles(({ token }) => ({
-  container: {
-    padding: token.paddingSM,
-    backgroundColor: token.colorBgContainer,
-    borderRadius: token.borderRadius,
-    border: `1px solid ${token.colorBorder}`,
-  },
-  // 子元素
-  title: {
-    fontSize: token.fontSizeLG,
-    fontWeight: token.fontWeightStrong,
-  },
-  // 状态样式
-  '&:hover': {
-    borderColor: token.colorPrimary,
-  },
-}));
+```tsx
+import {
+  ChatTokenType,
+  CSSInterpolation,
+  resetComponent,
+  useEditorStyleRegister,
+} from '../Hooks/useStyle';
+
+const genStyle = (token: ChatTokenType) => {
+  return {
+    [token.componentCls]: {
+      '&-container': {
+        padding: token.paddingSM,
+        backgroundColor: token.colorBgContainer,
+        borderRadius: token.borderRadius,
+        border: `1px solid ${token.colorBorder}`,
+      },
+      // 子元素
+      '&-title': {
+        fontSize: token.fontSizeLG,
+        fontWeight: token.fontWeightStrong,
+      },
+      // 状态样式
+      '&:hover': {
+        borderColor: token.colorPrimary,
+      },
+    },
+  };
+};
+
+export function useStyle(prefixCls?: string) {
+  return useEditorStyleRegister('ComponentName', (token) => {
+    const componentToken = {
+      ...token,
+      componentCls: `.${prefixCls}`,
+    };
+
+    return [
+      resetComponent(componentToken),
+      genStyle(componentToken),
+    ] as CSSInterpolation[];
+  });
+}
+```
+
+在组件中使用：
+
+```tsx
+import { useStyle } from './style';
+
+const Component = () => {
+  const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
+  const prefixCls = getPrefixCls('component-name');
+  const { wrapSSR, hashId } = useStyle(prefixCls);
+
+  return wrapSSR(
+    <div className={classNames(prefixCls, hashId)}>
+      {/* 子内容 */}
+    </div>,
+  );
+};
 ```
 
 ### Token 使用
@@ -417,6 +477,15 @@ import type { RefType } from './types';
 | 测试类型   | 文件名                   | 用途                 |
 | ---------- | ------------------------ | -------------------- |
 | 主测试     | `ComponentName.test.tsx` | 组件功能测试         |
+| 分支测试   | `ComponentName.branches.test.tsx` | 分支覆盖测试（补洞） |
+| 场景测试   | `ComponentName.scenarios.test.tsx` | 场景测试             |
+| 回归测试   | `ComponentName.regression.test.tsx` | 回归测试             |
+| 属性测试   | `ComponentName.props.test.tsx` | 属性测试             |
+| 渲染测试   | `ComponentName.render.test.tsx` | 渲染测试             |
+| 高级测试   | `ComponentName.advanced.test.tsx` | 高级功能测试         |
+| 基础测试   | `ComponentName.basic.test.tsx` | 基础功能测试         |
+| SSR 测试   | `ComponentName.ssr.test.tsx` | SSR 测试             |
+| 懒加载测试 | `ComponentName.lazy.test.tsx` | 懒加载测试           |
 | E2E 测试   | `e2e/*.spec.ts`          | 端到端流程测试       |
 
 #### 运行测试
@@ -492,47 +561,74 @@ export default Demo;
 
 ### 组件开发模板
 
-#### 主组件模板
+#### 主组件模板（使用 React.memo）
+
+```tsx
+import React, { memo, useContext } from 'react';
+import { ConfigProvider } from 'antd';
+import classNames from 'clsx';
+import { useStyle } from './style';
+import type { ComponentNameProps } from './types';
+
+/**
+ * ComponentName 组件 - 组件描述
+ *
+ * @component
+ * @description 组件功能描述
+ * @param {ComponentNameProps} props - 组件属性
+ * @param {string} [props.className] - 自定义CSS类名
+ * @param {React.CSSProperties} [props.style] - 自定义样式
+ *
+ * @example
+ * ```tsx
+ * <ComponentName
+ *   className="custom-class"
+ *   style={{ margin: '16px' }}
+ * />
+ * ```
+ *
+ * @returns {React.ReactElement} 渲染的组件
+ */
+const ComponentNameComponent: React.FC<ComponentNameProps> = (props) => {
+  const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
+  const prefixCls = getPrefixCls('component-name');
+  const { wrapSSR, hashId } = useStyle(prefixCls);
+
+  return wrapSSR(
+    <div
+      className={classNames(prefixCls, hashId, props.className)}
+      style={props.style}
+    >
+      {/* 子内容 */}
+    </div>,
+  );
+};
+
+ComponentNameComponent.displayName = 'ComponentName';
+
+// 使用 React.memo 优化性能，避免不必要的重新渲染
+export const ComponentName = memo(ComponentNameComponent);
+```
+
+#### 主组件模板（使用 forwardRef）
 
 ```tsx
 import React, { forwardRef, useContext } from 'react';
-import clsx from 'clsx';
-
 import { ConfigProvider } from 'antd';
-import useStyle from './style';
+import classNames from 'clsx';
+import { useStyle } from './style';
+import type { ComponentNameProps, ComponentNameRef } from './types';
 
-export interface ComponentNameProps {
-  prefixCls?: string;
-  className?: string;
-  style?: React.CSSProperties;
-  classNames?: ComponentClassNames;
-  styles?: ComponentStyles;
-}
-
-export interface ComponentRef {
-  nativeElement: HTMLElement;
-}
-
-const InternalComponent = React.forwardRef<ComponentRef, ComponentNameProps>((props, ref) => {
-  const {
-    prefixCls: customizePrefixCls,
-    className,
-    style,
-    classNames,
-    styles,
-    ...restProps
-  } = props;
-
+const InternalComponent = React.forwardRef<ComponentNameRef, ComponentNameProps>((props, ref) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
-  const prefixCls = getPrefixCls('component-name', customizePrefixCls);
+  const prefixCls = getPrefixCls('component-name');
   const { wrapSSR, hashId } = useStyle(prefixCls);
 
   return wrapSSR(
     <div
       ref={ref}
-      className={clsx(prefixCls, hashId, className, classNames?.root)}
-      style={{ ...style, ...styles?.root }}
-      {...restProps}
+      className={classNames(prefixCls, hashId, props.className)}
+      style={props.style}
     >
       {/* 子内容 */}
     </div>,
@@ -542,6 +638,16 @@ const InternalComponent = React.forwardRef<ComponentRef, ComponentNameProps>((pr
 InternalComponent.displayName = 'ComponentName';
 
 export default InternalComponent;
+```
+
+#### 导出入口模板（index.tsx）
+
+```tsx
+export { ComponentName } from './ComponentName';
+export type {
+  ComponentNameProps,
+  ComponentNameRef,
+} from './types';
 ```
 
 ---
@@ -568,12 +674,17 @@ export default InternalComponent;
 2. **开发者视角**: 描述"对开发者的影响"，而非"具体的解决代码"
 3. **双语输出**: 同时提供中文版和英文版
 4. **PR 链接**: 尽量给出原始 PR 链接，社区提交的加上提交者链接
+5. **版本排序**: 版本号从新到旧排列
 
 #### 格式规范
 
-- **Emoji 置顶**: 每条以 Emoji 开头（🐞 💄 🆕 🌐 📖 ✅ 🛠 等）
-- **组件名**: 每条必含组件名
-- **属性名**: 使用反引号 `` ` `` 包裹
+- **版本号格式**: 使用二级标题，格式为 `## v<major>.<minor>.<patch>`，如 `## v2.30.22`
+- **组件名格式**: 使用 `-` 开头的列表项，如 `- Workspace`、`- Bubble`
+- **变更项格式**: 在组件名下使用缩进的列表项，每条以 Emoji 开头
+- **属性名**: 使用反引号 `` ` `` 包裹，如 `` `onLoadChildren` ``
+- **PR 链接格式**: `[#<pr_number>](https://github.com/ant-design/agentic-ui/pull/<pr_number>)`
+- **提交者格式**: `[@<用户名>]`，如 `[@陈帅]`、`[@qixian]`
+- **Commit 链接格式**: `([<commit_hash>](https://github.com/ant-design/agentic-ui/commit/<commit_hash>))`
 
 #### Emoji 规范
 
@@ -587,6 +698,45 @@ export default InternalComponent;
 | ✅    | 测试相关             |
 | 🛠    | 重构或工具链优化     |
 | ⚡️    | 性能提升             |
+| 📦    | 打包/发布相关        |
+
+#### Changelog 示例
+
+```markdown
+## v2.30.22
+
+- Workspace
+  - 📖 补充 `Workspace.FileTree` 懒加载文件树文档演示 `workspace-file-tree-demo`。
+  - 🐞 `FileTree`：空目录或加载失败时不再将目录误标为叶子；`onLoadChildren` 失败时 `Promise` 正确 reject 以符合 rc-tree 重试。
+  - 🛠 `FileTreeProps` 懒加载回调命名为 `onLoadChildren`，与事件回调 `on` 前缀规范一致。
+  - ⚡️ 标签栏构建时预计算 Segmented 选项、首个 `Realtime` 索引，避免 O(n²) 的 `findIndex` 重复扫描。
+
+- Bubble
+  - 🆕 新增 `useOpenAIMessageBubbleData` Hook 与 `mapOpenAIMessagesToMessageBubbleData`，支持将 OpenAI Chat Completions 风格的 `messages` 转为 `MessageBubbleData[]`。
+  - 🆕 新增 `useOpenClawMessageBubbleData`、`mapOpenClawMessagesToMessageBubbleData` 与 `normalizeOpenClawMessagesToOpenAI`，支持 OpenClaw 会话 / transcript 风格。
+  - 🆕 新增 `useOllamaMessageBubbleData`、`mapOllamaMessagesToMessageBubbleData` 与 `normalizeOllamaMessagesToOpenAI`，支持 Ollama `/api/chat` 的 `messages`。
+
+- MarkdownRenderer
+  - 🐞 修复流式 Markdown 未传 `streamingParagraphAnimation` 时段落不应用淡入动画的问题；未传时默认开启，仅 `streamingParagraphAnimation: false` 关闭。[#478](https://github.com/antdigital-ai/agentic-ui/pull/478)
+
+## v2.30.15
+
+- MarkdownInputField
+  - 🆕 新增 `onUploadError` 回调及 `removeFileOnUploadError` 配置，支持自定义上传失败处理逻辑。[#434](https://github.com/ant-design/agentic-ui/pull/434)
+  - 🆕 支持文件大小拦截与上传错误处理。[#437](https://github.com/ant-design/agentic-ui/pull/437)
+  - 🐞 统一 attachment 文件大小配置，删除 `SupportedFormat.maxSize` 字段。[#429](https://github.com/ant-design/agentic-ui/pull/429)
+
+- 🐞 修复 `data-is-unclosed` 属性与 CSS 选择器逻辑。[#438](https://github.com/ant-design/agentic-ui/pull/438)
+```
+
+#### 书写建议
+
+- **简洁明了**: 每条变更描述应简洁，避免冗长
+- **具体明确**: 说明变更的具体内容和影响
+- **组件归类**: 将变更按组件归类，便于查阅
+- **PR 关联**: 尽量关联 PR 链接，便于追溯
+- **提交者标注**: 社区贡献的 PR 应标注提交者
+
 
 ---
 

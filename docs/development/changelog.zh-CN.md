@@ -9,6 +9,160 @@ group:
 
 # Changelog
 
+## v2.31.5
+
+- 🛠 将部分导出类型从值导出改为类型导出，优化打包体积。
+- 🛠 移除未使用的 locale key 和修复 lint 错误。
+- ✅ 移除测试中不再使用的动画 mock 文件。
+- 🛠 清理 MarkdownEditor 工具函数并优化导入路径。
+
+## v2.31.4
+
+- 🐞 修正任务进行中状态的文本显示逻辑。
+- ⚡️ 优化 tree-shaking — 消除反向 barrel 引用、具名导出第三方 SDK、补充 sideEffects。
+- 🐞 修复暗色主题下代码块的样式问题。
+- 🛠 移除已废弃的 theme 国际化 key（代码块主题切换按钮已移除）。
+
+## v2.31.3
+
+- ✅ 添加 rehypeSanitizeUserHtml 插件的单元测试。
+- 🛠 代码块主题跟随全局主题，移除独立月亮图标切换。
+- 🐞 添加 rehypeSanitizeUserHtml 插件，过滤用户输入中的危险 HTML 防止页面布局错乱。
+- 🛠 将硬编码颜色值替换为 CSS 变量。
+
+## v2.31.2
+
+- ⚡️ 减包体与首屏 - Lottie 直引、只读 markdown 拆组件、Renderer 懒加载。
+
+## v2.31.1
+
+- 🛠 使用 token 变量替换硬编码颜色值以支持主题切换。
+
+## v2.31.0
+
+- 📖 添加 MarkdownInputField 组件 demo。
+- 📖 添加 Loading 组件 demo。
+- 💄 为 Loading 组件添加暗色主题支持。
+- 🛠 移除 prepublishOnly 中的 test 步骤。
+- 💄 合并下载和复制按钮样式，使用统一样式。
+- 💄 为表格和图表工具栏复制按钮添加暗色主题支持。
+
+## v2.30.35
+
+- 🛠 修复 eqeqeq 规则错误和未使用的 import。
+- 🐞 修复 FileTree 和 FilePreview 组件的多个问题。
+- 🛠 移除 Paragraph 中的 MutationObserver，改用 composition 事件监听。
+- 🐞 修复动线生成动画的多个问题。
+- ⚡️ 优化 useDetectTheme 为单例模式，避免重复 MutationObserver。
+- 🐞 图表组件支持 html[data-theme="dark"] 自动切换暗色主题。
+- ✅ 将 Robot 组件测试改为异步并添加 Lottie 加载等待逻辑。
+
+## v2.30.33
+
+- 🆕 为 ChartContainer 添加自动主题检测功能。
+- ✅ 修复 onLoadChildren 重试用例的异步时序。
+- 🆕 添加 ThreeThinkingLottie 按需加载动画组件并移除用户消息多余间距。
+
+## v2.30.32
+
+- 🆕 为多个组件添加 data-testid 属性以支持自动化测试。
+- 🛠 调整 BubbleList 代码格式与缩进。
+
+## v2.30.31
+
+- 🐞 移除 MarkdownEditor 内容区 margin 变量覆盖。[#513](https://github.com/ant-design/agentic-ui/pull/513)
+- 🐞 无 onClick 时不再阻止 ActionIconBox 事件冒泡。
+- 🆕 为 Workspace 添加 FileTree 组件，支持懒加载子节点。[#510](https://github.com/ant-design/agentic-ui/pull/510)
+- 🐞 修复 Bubble useMemo/useEffect 依赖缺失与性能问题。
+- 🐞 提升 ToolUseBarThink light 变体在 success 后的样式优先级。[#511](https://github.com/ant-design/agentic-ui/pull/511)
+- 💄 优化 TaskList 缓动曲线，demo 改为自动循环播放。
+- 💄 降低 TaskList simple 模式 demo 动效速度。
+- 💄 TaskList simple 模式 demo 支持动态变化演示。
+- 💄 移除 TaskList progress 元素，文字变化时添加模糊渐入动效。
+- 💄 TaskList Simple 模式展开收起添加 CSS 过渡动画。
+- 🐞 TaskList Simple 模式去背景色、始终显示最后任务、清理冗余。
+- 🐞 修复 MarkdownInputField 发送按钮按主题实色保障对比度。[#509](https://github.com/ant-design/agentic-ui/pull/509)
+- ⚡️ 移除 ToolUseBarThink framer-motion，全 CSS 动画 + 性能优化。
+- 🐞 修复 MarkdownInputField tools 栏固定高度与内边距冲突导致的纵向错位。[#508](https://github.com/ant-design/agentic-ui/pull/508)
+- 🆕 支持 thinking 标签作为思考块的别名。
+- ⚡️ 流式渲染性能与正确性全面改进。
+- 🛠 移除文件中的 BOM 字符。
+
+## v2.30.30
+
+- 🛠 抽取 MarkdownEditor 样式清理函数并支持自定义属性。
+- 📖 更新 bubble 示例为文件理解场景。
+
+## v2.30.29
+
+- 🛠 无重大变更。
+
+## v2.30.28
+
+- 🛠 无重大变更。
+
+## v2.30.27
+
+- 🐞 修正 Bubble 代码块选择器并改进 SendButton 无障碍。[#507](https://github.com/ant-design/agentic-ui/pull/507)
+- 🐞 流式 JSON 代码块避免 Ace 反复 setValue 闪动。[#504](https://github.com/ant-design/agentic-ui/pull/504)
+- 💄 内置 Agentic UI 业务层 CSS 覆盖。[#506](https://github.com/ant-design/agentic-ui/pull/506)
+- 🐞 规范化 redacted_thinking 别名使嵌套 JSON 保持在思考块内。[#505](https://github.com/ant-design/agentic-ui/pull/505)
+- 🐞 附件列表文件大小与错误文案单行省略显示。[#503](https://github.com/ant-design/agentic-ui/pull/503)
+- ⚡️ 减少 ThoughtChainList 流式更新时深度思考相关重渲染。[#501](https://github.com/ant-design/agentic-ui/pull/501)
+- ✅ 默认套件排除大体积目录，用例约 5000 条。[#500](https://github.com/ant-design/agentic-ui/pull/500)
+- ✅ 减少 ace 和 elements 测试中的重复 mocks。[#498](https://github.com/ant-design/agentic-ui/pull/498)
+- 🐞 图表 x/y 与表头带单位列名宽松匹配并补充 RFC。[#499](https://github.com/ant-design/agentic-ui/pull/499)
+
+## v2.30.26
+
+- 🐞 修复 MarkdownEditor IME 与根级双空段、initSchema 同步问题。
+
+## v2.30.25
+
+- 🐞 改进加载指示器并增强 Markdown 渲染。
+- 🆕 增强 Bubble Markdown 渲染，支持稳定的 fncProps 和缓存改进。
+- 🐞 懒加载行避免 display:contents 导致 LazyElement 永不显示。[#494](https://github.com/ant-design/agentic-ui/pull/494)
+- 🐞 段落可见性依据 Slate 子节点而非 React children。[#493](https://github.com/ant-design/agentic-ui/pull/493)
+- 🛠 移除 todo.md 文件。
+- 🐞 停止修改 list items 使流式更新不重新渲染所有气泡。[#492](https://github.com/ant-design/agentic-ui/pull/492)
+- 🐞 修正 Mermaid SVG 尺寸与适配画布缩放冲突导致图表过小。[#487](https://github.com/ant-design/agentic-ui/pull/487)
+- 🛠 移除 todo.md 并更新 clean-code 规则不再要求该文件。[#491](https://github.com/ant-design/agentic-ui/pull/491)
+- 🐞 空 initValue 不再重复追加段落以恢复占位符。[#490](https://github.com/ant-design/agentic-ui/pull/490)
+- 📖 rerender 演示支持左侧 Markdown 手动编辑。[#488](https://github.com/ant-design/agentic-ui/pull/488)
+- 📖 优化 MarkdownInputField demos。[#486](https://github.com/ant-design/agentic-ui/pull/486)
+- 📖 格式化组件文档中的 Props 表格。
+- 🐞 修复 MarkdownEditor 稀疏 children 导致 Slate renderLeaf 读取 undefined。[#485](https://github.com/ant-design/agentic-ui/pull/485)
+- 🛠 移除文档 BOM 头并优化 MarkdownInputField 导入顺序。
+
+## v2.30.24
+
+- 🐞 修复 MarkdownEditor 空 markdown 内容处理及 Node 方法安全调用。
+- 🐞 增强 MarkdownEditor sanitize normalizer 对抗无效 Slate trees。[#484](https://github.com/ant-design/agentic-ui/pull/484)
+
+## v2.30.23
+
+- 🐞 规范化时剔除 MarkdownEditor 非法子节点避免 Node.string 崩溃。[#483](https://github.com/ant-design/agentic-ui/pull/483)
+
+## v2.30.22
+
+- 🛠 恢复 demo 检查与报告脚本。[#482](https://github.com/ant-design/agentic-ui/pull/482)
+- 📖 优化 MarkdownInputField 文档 Demo 布局并修复示例问题。
+- 🆕 支持 Bubble OpenAI/OpenClaw/Ollama 消息格式适配器。[#481](https://github.com/ant-design/agentic-ui/pull/481)
+- 🐞 修复 MarkdownEditor 空段落退格误触全选清空。[#479](https://github.com/ant-design/agentic-ui/pull/479)
+- 🐞 流式段落动画默认开启与 E2E/单测稳定化。[#478](https://github.com/ant-design/agentic-ui/pull/478)
+- 🐞 流式文本更新结束时 ChatLayout 自动滚动到底部。[#480](https://github.com/ant-design/agentic-ui/pull/480)
+- 🐞 修复 MarkdownRenderer 流动画失效并新增流式闪烁光标。[#477](https://github.com/ant-design/agentic-ui/pull/477)
+- ✅ 添加 MarkdownEditor 过期选区处理回归用例。[#476](https://github.com/ant-design/agentic-ui/pull/476)
+- ✅ 补充 MarkdownEditor 无效选区路径回归用例。[#475](https://github.com/ant-design/agentic-ui/pull/475)
+- ✅ 添加 Mermaid 工具栏交互回归用例。[#471](https://github.com/ant-design/agentic-ui/pull/471)
+- 🛠 Slate.js 规范化使用改进 (P0-P3 全部修复 + 覆盖率达标)。[#474](https://github.com/ant-design/agentic-ui/pull/474)
+- 🐞 修复 MarkdownEditor isElement 崩溃读取 undefined.children。[#472](https://github.com/ant-design/agentic-ui/pull/472)
+- 🆕 SendButton 文件上传中禁用发送按钮，支持 sendButtonProps.disabled 外部控制。[#470](https://github.com/ant-design/agentic-ui/pull/470)
+- ✅ 添加 attachment preview 透传回归用例。[#467](https://github.com/ant-design/agentic-ui/pull/467)
+- ✅ 补充 MarkdownInputField attachment onPreview 透传与容错回归用例。[#468](https://github.com/ant-design/agentic-ui/pull/468)
+- ✅ 补充 AttachmentFileListItem 重试的单测。[#465](https://github.com/ant-design/agentic-ui/pull/465)
+- 🐞 修复不规范 Demo 代码的 Lint 错误。[#466](https://github.com/ant-design/agentic-ui/pull/466)
+
 ## v2.30.22
 
 - Workspace
