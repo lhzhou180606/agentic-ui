@@ -5,7 +5,6 @@
  * 提供完整的用户界面文本本地化。
  */
 export const cnLabels = {
-  attachmentSingleMax: '单个最大',
   table: '表格',
   column: '分栏',
   quote: '引用',
@@ -60,8 +59,6 @@ export const cnLabels = {
   'font-color': '字体颜色',
   collapse: '收起',
   fullScreen: '全屏',
-  taskFinished: '任务完成',
-  taskCost: '共耗时',
   taskComplete: '任务完成',
   taskAborted: '任务已取消',
   inProgressTask: '正在进行${taskName}任务',
@@ -468,7 +465,6 @@ export const cnLabels = {
  * 提供完整的用户界面文本本地化。
  */
 export const enLabels: typeof cnLabels = {
-  attachmentSingleMax: 'Single max',
   undo: 'Undo',
   redo: 'Redo',
   switchLanguage: 'Switch Language',
@@ -478,8 +474,6 @@ export const enLabels: typeof cnLabels = {
   clearFormatting: 'Clear Formatting',
   queryKeyWords: 'Query Keywords',
   searchResults: 'Search Results',
-  taskFinished: 'Task Finished',
-  taskCost: 'Time Used',
   taskComplete: 'Task Complete',
   taskAborted: 'Task Aborted',
   executionResult: 'Execution Result',

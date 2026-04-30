@@ -8,8 +8,8 @@ type ModalEvent<K extends keyof HookAPI> = {
 
 export const modal$ = new Subject<ModalEvent<keyof HookAPI>>();
 
-export const download = (data: Blob | Uint8Array, fileName: string) => {
-  data = data instanceof Uint8Array ? new Blob([data as BlobPart]) : data;
+export const download = (rawData: Blob | Uint8Array, fileName: string) => {
+  const data = rawData instanceof Uint8Array ? new Blob([rawData as BlobPart]) : rawData;
   const link = document.createElement('a');
   if (link.download !== undefined) {
     const url = URL.createObjectURL(data);
