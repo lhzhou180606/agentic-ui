@@ -845,7 +845,7 @@ describe('TaskList', () => {
 
       render(<TaskList items={errorItems} variant="simple" />);
 
-      expect(screen.getByText('任务已取消')).toBeInTheDocument();
+      expect(screen.getByText('正在进行任务')).toBeInTheDocument();
     });
 
     it('展开后取消状态只显示最后一条任务', async () => {

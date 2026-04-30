@@ -19,11 +19,12 @@ import {
 } from 'slate';
 import { HistoryEditor } from 'slate-history';
 import { ReactEditor } from 'slate-react';
-import { Elements, FootnoteDefinitionNode, ListNode } from '../el';
+import type { Elements, FootnoteDefinitionNode, ListNode } from '../el';
 import type { MarkdownEditorPlugin } from '../plugin';
 import { CommentDataType, MarkdownEditorProps } from '../types';
 import { parserMdToSchema } from './parser/parserMdToSchema';
-import { KeyboardTask, Methods, parserSlateNodeToMarkdown } from './utils';
+import { KeyboardTask, Methods } from './utils/keyboard';
+import { parserSlateNodeToMarkdown } from './parser/parserSlateNodeToMarkdown';
 import { getOffsetLeft, getOffsetTop } from './utils/dom';
 import { EditorUtils, findByPathAndText } from './utils/editorUtils';
 import type { MarkdownToHtmlOptions } from './utils/markdownToHtml';

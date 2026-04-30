@@ -3,10 +3,13 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import Robot from '../../../src/Components/Robot';
 
-vi.mock('../../../src/Components/Robot/lotties', () => ({
+vi.mock('../../../src/Components/Robot/lotties/DazingLottie', () => ({
   DazingLottie: ({ size }: { size?: number }) => (
     <div data-testid="dazing-lottie">Dazing {size}</div>
   ),
+}));
+
+vi.mock('../../../src/Components/Robot/lotties/ThinkingLottie', () => ({
   ThinkingLottie: ({ size }: { size?: number }) => (
     <div data-testid="thinking-lottie">Thinking {size}</div>
   ),

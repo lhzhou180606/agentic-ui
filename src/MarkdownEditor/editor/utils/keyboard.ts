@@ -8,7 +8,7 @@ import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { MarkdownEditorProps } from '../../BaseMarkdownEditor';
 import { AttachNode, MediaNode } from '../../el';
 import { useSubject } from '../../hooks/subscribe';
-import { EditorStore } from '../store';
+import type { EditorStore } from '../store';
 import {
   convertToParagraph,
   createList,

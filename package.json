@@ -11,7 +11,7 @@
     "**/*.css",
     "**/*.less",
     "**/*.scss",
-    "./dist/MarkdownEditor/editor/utils/index.js",
+    "./dist/MarkdownEditor/editor/utils/sideEffects.js",
     "./dist/Utils/proxySandbox/index.js",
     "./dist/Plugins/chart/components/index.js"
   ],
