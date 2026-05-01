@@ -6,6 +6,19 @@ import React, {
   useState,
 } from 'react';
 import { isBrowser, isTest } from '../../Utils/env';
+import {
+  ATTACHMENT_EXTRA_HEIGHT_PX,
+  BREAKPOINT_COLLAPSE_CONTAINER_PX,
+  BREAKPOINT_COLLAPSE_VIEWPORT_PX,
+  COLLAPSED_HEIGHT_BASE_PX,
+  DEFAULT_EDITOR_RIGHT_PADDING_PX,
+  ENLARGED_DEFAULT_HEIGHT_PX,
+  ENLARGED_MIN_HEIGHT_PX,
+  MIN_HEIGHT_MULTI_ROW_PX,
+  MIN_HEIGHT_SINGLE_ACTION_PX,
+  MIN_HEIGHT_WITH_ENLARGE_AND_REFINE_PX,
+  SEND_ACTIONS_FALLBACK_RIGHT_PADDING_PX,
+} from '../constants';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
 
 interface UseInputFieldGeometryParams {
@@ -79,11 +92,13 @@ export const useInputFieldGeometry = ({
   // ===== Layout 部分 =====
   const [collapseSendActions, setCollapseSendActions] = useState(() => {
     if (!isBrowser()) return false;
-    if (window.innerWidth < 460) return true;
+    if (window.innerWidth < BREAKPOINT_COLLAPSE_VIEWPORT_PX) return true;
     return false;
   });
 
-  const [rightPadding, setRightPadding] = useState(64);
+  const [rightPadding, setRightPadding] = useState(
+    DEFAULT_EDITOR_RIGHT_PADDING_PX,
+  );
   const [topRightPadding, setTopRightPadding] = useState(0);
   const [quickRightOffset, setQuickRightOffset] = useState(0);
 
@@ -111,7 +126,7 @@ export const useInputFieldGeometry = ({
     const handleResize = () => {
       if (!inputRef.current) return;
       if (isTest()) return;
-      if (inputRef.current.clientWidth < 481) {
+      if (inputRef.current.clientWidth < BREAKPOINT_COLLAPSE_CONTAINER_PX) {
         setCollapseSendActions(true);
       } else {
         setCollapseSendActions(false);
@@ -130,7 +145,9 @@ export const useInputFieldGeometry = ({
 
   // ===== Styles 部分 =====
   const computedRightPadding = useMemo(() => {
-    const bottomOverlayPadding = hasTools ? 0 : rightPadding || 52;
+    const bottomOverlayPadding = hasTools
+      ? 0
+      : rightPadding || SEND_ACTIONS_FALLBACK_RIGHT_PADDING_PX;
     const topOverlayPadding = (topRightPadding || 0) + (quickRightOffset || 0);
     return Math.max(bottomOverlayPadding, topOverlayPadding);
   }, [hasTools, rightPadding, topRightPadding, quickRightOffset]);
@@ -142,24 +159,26 @@ export const useInputFieldGeometry = ({
       typeof maxHeightValue === 'number'
         ? maxHeightValue
         : maxHeightValue
-          ? parseFloat(String(maxHeightValue)) || 114
-          : 114;
+          ? parseFloat(String(maxHeightValue)) || COLLAPSED_HEIGHT_BASE_PX
+          : COLLAPSED_HEIGHT_BASE_PX;
     return base;
   }, [maxHeight, style?.maxHeight]);
 
   const collapsedHeightPx = useMemo(() => {
-    const extra = attachment?.enable ? 90 : 0;
+    const extra = attachment?.enable ? ATTACHMENT_EXTRA_HEIGHT_PX : 0;
     return collapsedHeight + extra;
   }, [collapsedHeight, attachment?.enable]);
 
   const computedMinHeight = useMemo(() => {
     if (isEnlarged) return 'auto';
     if (style?.minHeight !== undefined) return style.minHeight;
-    // 同时存在放大按钮 + 提示词优化按钮，最小高度 140
-    if (hasEnlargeAction && hasRefineAction) return 140;
-    if (totalActionCount === 1) return 90;
+    // 同时存在放大按钮 + 提示词优化按钮
+    if (hasEnlargeAction && hasRefineAction) {
+      return MIN_HEIGHT_WITH_ENLARGE_AND_REFINE_PX;
+    }
+    if (totalActionCount === 1) return MIN_HEIGHT_SINGLE_ACTION_PX;
     // 其他多行布局
-    if (isMultiRowLayout) return 106;
+    if (isMultiRowLayout) return MIN_HEIGHT_MULTI_ROW_PX;
     return style?.minHeight || 0;
   }, [
     isEnlarged,
@@ -173,8 +192,8 @@ export const useInputFieldGeometry = ({
   const enlargedStyle = useMemo<React.CSSProperties>(() => {
     if (!isEnlarged) return {};
     return {
-      maxHeight: '980px',
-      minHeight: '280px',
+      maxHeight: `${ENLARGED_DEFAULT_HEIGHT_PX}px`,
+      minHeight: `${ENLARGED_MIN_HEIGHT_PX}px`,
     };
   }, [isEnlarged]);
 

@@ -74,7 +74,7 @@ const DEFAULT_ATTACHMENT = { enable: false } as const;
 const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   tagInputProps,
   markdownProps,
-  borderRadius = 16,
+  borderRadius = DEFAULT_BORDER_RADIUS_PX,
   onBlur,
   onFocus,
   isShowTopOperatingArea = false,
@@ -340,9 +340,9 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
             ...props.style,
             ...enlargedStyle,
             height: isEnlarged
-              ? `${props.enlargeable?.height ?? 980}px`
+              ? `${props.enlargeable?.height ?? ENLARGED_DEFAULT_HEIGHT_PX}px`
               : `min(${collapsedHeightPx}px,100%)`,
-            borderRadius: borderRadius || 12,
+            borderRadius: borderRadius || FALLBACK_BORDER_RADIUS_PX,
             minHeight: computedMinHeight,
             maxHeight: isEnlarged
               ? 'none'
@@ -352,7 +352,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   : props.maxHeight
                 : `min(${collapsedHeightPx}px,100%)`,
           }}
-          tabIndex={1}
+          tabIndex={ROOT_TAB_INDEX}
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
           onClick={handleContainerClick}
@@ -360,7 +360,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
         >
           <BorderBeamAnimation
             isVisible={isFocused && !animationComplete}
-            borderRadius={borderRadius || 16}
+            borderRadius={borderRadius || DEFAULT_BORDER_RADIUS_PX}
             onAnimationComplete={() => setAnimationComplete(true)}
           />
           <div
