@@ -16,8 +16,8 @@ const Enlargement: React.FC<EnlargementProps> = ({
 }) => {
   const locale = useLocale();
   const title = isEnlarged
-    ? locale?.shrink ?? '缩小'
-    : locale?.enlarge ?? '放大';
+    ? (locale?.shrink ?? '缩小')
+    : (locale?.enlarge ?? '放大');
   return (
     <ActionIconBox title={title} onClick={onEnlargeClick}>
       {isEnlarged ? <FoldAlt /> : <ExpandAlt />}

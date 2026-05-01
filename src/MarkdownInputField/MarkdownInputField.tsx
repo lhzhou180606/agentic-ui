@@ -6,12 +6,13 @@ import { useLocale } from '../I18n';
 import { BaseMarkdownEditor } from '../MarkdownEditor';
 import { BorderBeamAnimation } from './BorderBeamAnimation';
 import { useFileUploadManager } from './FileUploadManager';
-import { useMarkdownInputFieldActions } from './hooks/useMarkdownInputFieldActions';
-import { useMarkdownInputFieldHandlers } from './hooks/useMarkdownInputFieldHandlers';
-import { useMarkdownInputFieldLayout } from './hooks/useMarkdownInputFieldLayout';
+import { useEnlargeAndContainerHandler } from './hooks/useEnlargeAndContainerHandler';
+import { useInputFieldGeometry } from './hooks/useInputFieldGeometry';
+import { useKeyboardHandler } from './hooks/useKeyboardHandler';
 import { useMarkdownInputFieldRefs } from './hooks/useMarkdownInputFieldRefs';
 import { useMarkdownInputFieldState } from './hooks/useMarkdownInputFieldState';
-import { useMarkdownInputFieldStyles } from './hooks/useMarkdownInputFieldStyles';
+import { usePasteHandler } from './hooks/usePasteHandler';
+import { useSendHandler } from './hooks/useSendHandler';
 import { QuickActions } from './QuickActions';
 import { resolveSendDisabled } from './SendButton';
 import { SkillModeBar } from './SkillModeBar';
@@ -20,11 +21,8 @@ import { Suggestion } from './Suggestion';
 import { MARKDOWN_INPUT_FIELD_TEST_IDS } from './testIds';
 import TopOperatingArea from './TopOperatingArea';
 import type { MarkdownInputFieldProps } from './types/MarkdownInputFieldProps';
-import {
-  useAttachmentList,
-  useBeforeTools,
-  useSendActionsNode,
-} from './utils/renderHelpers';
+import { SendActions } from './SendActions';
+import { useAttachmentList, useBeforeTools } from './utils/renderHelpers';
 import { useVoiceInputManager } from './VoiceInputManager';
 
 export type { MarkdownInputFieldProps };
@@ -117,51 +115,43 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
 
-  // 布局管理
+  // 各类按钮存在性 & 计数：纯布尔运算，原 useMarkdownInputFieldActions hook
+  // 已被内联到此处，避免为 5 行计算单开 hook + 在主组件做胶水。
+  const hasEnlargeAction = !!props.enlargeable?.enable;
+  const hasRefineAction = !!props.refinePrompt?.enable;
+  const hasCustomQuickAction = !!props.quickActionRender;
+  const hasActionsRender = !!props.actionsRender;
+  const hasToolsRender = !!props.toolsRender;
+  const totalActionCount =
+    Number(hasEnlargeAction) +
+    Number(hasRefineAction) +
+    Number(hasCustomQuickAction) +
+    Number(hasActionsRender) +
+    Number(hasToolsRender);
+  const isMultiRowLayout = totalActionCount > 0;
+
+  // 几何信息：合并自原 useMarkdownInputFieldLayout + useMarkdownInputFieldStyles，
+  // 暴露的 setter 用于让 SendActions / QuickActions 在自身宽度变化时回写右内边距。
   const {
-    collapseSendActions,
-    rightPadding,
-    setRightPadding,
-    topRightPadding,
-    setTopRightPadding,
-    quickRightOffset,
-    setQuickRightOffset,
     inputRef,
-  } = useMarkdownInputFieldLayout();
-
-  // 动作计算
-  const {
-    hasEnlargeAction,
-    hasRefineAction,
-    isMultiRowLayout,
-    totalActionCount,
-  } = useMarkdownInputFieldActions({
-    enlargeable: props.enlargeable,
-    refinePrompt: props.refinePrompt,
-    quickActionRender: props.quickActionRender,
-    actionsRender: props.actionsRender,
-    toolsRender: props.toolsRender,
-  });
-
-  // 样式计算
-  const {
+    collapseSendActions,
+    setRightPadding,
+    setTopRightPadding,
+    setQuickRightOffset,
     computedRightPadding,
     collapsedHeightPx,
     computedMinHeight,
     enlargedStyle,
-  } = useMarkdownInputFieldStyles({
-    hasTools: !!props.toolsRender || !!props.actionsRender,
-    maxHeight: props.maxHeight,
-    style: props.style,
-    attachment,
+  } = useInputFieldGeometry({
     isEnlarged,
-    rightPadding,
-    topRightPadding,
-    quickRightOffset,
+    hasTools: hasToolsRender || hasActionsRender,
     hasEnlargeAction,
     hasRefineAction,
     totalActionCount,
     isMultiRowLayout,
+    maxHeight: props.maxHeight,
+    style: props.style,
+    attachment,
   });
 
   // Refs 管理
@@ -200,40 +190,48 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     onValueChange: setValue,
   });
 
-  // 事件处理
-  const {
-    handleEnlargeClick,
-    sendMessage,
-    handlePaste,
-    handleKeyDown,
-    handleContainerClick,
-    activeInput,
-  } = useMarkdownInputFieldHandlers({
+  // 事件处理（按职责拆分自原 useMarkdownInputFieldHandlers）
+  // useKeyboardHandler 依赖 useSendHandler.sendMessage，必须串行调用
+  const { sendMessage } = useSendHandler({
     props: {
       disabled: props.disabled,
       typing: props.typing,
       onChange: props.onChange,
       onSend: props.onSend,
       allowEmptySubmit: props.allowEmptySubmit,
-      markdownProps,
-      attachment,
-      triggerSendKey: props.triggerSendKey,
     },
     sendDisabled: resolveSendDisabled(props.sendButtonProps, fileUploadStatus),
     markdownEditorRef,
-    inputRef,
     isSendingRef,
     isLoading,
     setIsLoading,
     value,
     setValue,
-    fileMap,
     setFileMap,
     recording,
     stopRecording,
-    isEnlarged,
-    setIsEnlarged,
   });
+
+  const { handlePaste } = usePasteHandler({
+    props: { attachment, markdownProps },
+    fileMap,
+    setFileMap,
+  });
+
+  const { handleKeyDown } = useKeyboardHandler({
+    props: { triggerSendKey: props.triggerSendKey, onSend: props.onSend },
+    markdownEditorRef,
+    sendMessage,
+  });
+
+  const { handleEnlargeClick, handleContainerClick, activeInput } =
+    useEnlargeAndContainerHandler({
+      props: { disabled: props.disabled, typing: props.typing },
+      markdownEditorRef,
+      inputRef,
+      isEnlarged,
+      setIsEnlarged,
+    });
 
   // 渲染辅助
   const attachmentList = useAttachmentList({
@@ -253,38 +251,48 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
 
   const editorReadonly = isLoading || !!props.typing;
 
-  const sendActionsNode = useSendActionsNode({
-    props: {
-      attachment,
-      voiceRecognizer: props.voiceRecognizer,
-      value,
-      disabled: props.disabled,
-      typing: props.typing,
-      allowEmptySubmit: props.allowEmptySubmit,
-      actionsRender: props.actionsRender,
-      toolsRender: props.toolsRender,
-      sendButtonProps: props.sendButtonProps,
-      triggerSendKey: props.triggerSendKey,
-    },
-    fileMap,
-    setFileMap,
-    supportedFormat,
-    fileUploadDone,
-    fileUploadStatus,
-    fileUploadSummary,
-    recording,
-    isLoading,
-    collapseSendActions,
-    uploadImage,
-    startRecording,
-    stopRecording,
-    sendMessage,
-    setIsLoading,
-    onStop: props.onStop,
-    setRightPadding,
-    baseCls,
-    hashId,
-  });
+  // SendActions 节点。原本封装在 useSendActionsNode 中，但其 useMemo
+  // 依赖列表包含 27 项（含 attachment / sendProps 等每次渲染都会变的引用），
+  // 缓存命中率几乎为零，因此直接内联到 JSX 渲染，去除虚假的"性能优化"。
+  const sendActionsNode = (
+    <SendActions
+      attachment={{
+        ...attachment,
+        supportedFormat,
+        fileMap,
+        onFileMapChange: setFileMap,
+        upload: attachment?.upload
+          ? (file) => attachment.upload!(file, 0)
+          : undefined,
+      }}
+      voiceRecognizer={props.voiceRecognizer}
+      value={value}
+      disabled={props.disabled}
+      typing={props.typing}
+      isLoading={isLoading}
+      fileUploadDone={fileUploadDone}
+      fileUploadStatus={fileUploadStatus}
+      fileUploadSummary={fileUploadSummary}
+      recording={recording}
+      collapseSendActions={collapseSendActions}
+      allowEmptySubmit={props.allowEmptySubmit}
+      uploadImage={uploadImage}
+      onStartRecording={startRecording}
+      onStopRecording={stopRecording}
+      onSend={sendMessage}
+      onStop={() => {
+        setIsLoading(false);
+        props.onStop?.();
+      }}
+      actionsRender={props.actionsRender}
+      prefixCls={baseCls}
+      hashId={hashId}
+      hasTools={!!props.toolsRender}
+      onResize={setRightPadding}
+      sendButtonProps={props.sendButtonProps}
+      triggerSendKey={props.triggerSendKey}
+    />
+  );
 
   return wrapSSR(
     <>

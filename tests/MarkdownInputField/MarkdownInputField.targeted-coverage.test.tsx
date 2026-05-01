@@ -76,37 +76,38 @@ vi.mock('../../src/MarkdownInputField/FileUploadManager', () => ({
   }),
 }));
 
+// NOTE: useSendActionsNode 已删除并内联到 MarkdownInputField.tsx，
+// 这里改为 mock 实际的 SendActions 组件。
 vi.mock('../../src/MarkdownInputField/utils/renderHelpers', () => ({
   useAttachmentList: () => null,
   useBeforeTools: () => null,
-  useSendActionsNode: () => <div data-testid="mock-send-actions" />,
+}));
+
+vi.mock('../../src/MarkdownInputField/SendActions', () => ({
+  SendActions: () => <div data-testid="mock-send-actions" />,
+}));
+
+// useMarkdownInputFieldHandlers 已被拆分为 4 个独立 hook，
+// 这里 mock 拆出来的每个 hook，保持测试用例对原"事件被触发"的关注点。
+vi.mock('../../src/MarkdownInputField/hooks/useSendHandler', () => ({
+  useSendHandler: () => ({ sendMessage: vi.fn() }),
+}));
+
+vi.mock('../../src/MarkdownInputField/hooks/usePasteHandler', () => ({
+  usePasteHandler: () => ({ handlePaste: vi.fn() }),
+}));
+
+vi.mock('../../src/MarkdownInputField/hooks/useKeyboardHandler', () => ({
+  useKeyboardHandler: () => ({ handleKeyDown: vi.fn() }),
 }));
 
 vi.mock(
-  '../../src/MarkdownInputField/hooks/useMarkdownInputFieldHandlers',
+  '../../src/MarkdownInputField/hooks/useEnlargeAndContainerHandler',
   () => ({
-    useMarkdownInputFieldHandlers: () => ({
+    useEnlargeAndContainerHandler: () => ({
       handleEnlargeClick: vi.fn(),
-      sendMessage: vi.fn(),
-      handlePaste: vi.fn(),
-      handleKeyDown: vi.fn(),
+      handleContainerClick: vi.fn(),
       activeInput: vi.fn(),
-    }),
-  }),
-);
-
-vi.mock(
-  '../../src/MarkdownInputField/hooks/useMarkdownInputFieldLayout',
-  () => ({
-    useMarkdownInputFieldLayout: () => ({
-      collapseSendActions: false,
-      rightPadding: 0,
-      setRightPadding: vi.fn(),
-      topRightPadding: 0,
-      setTopRightPadding: vi.fn(),
-      quickRightOffset: 0,
-      setQuickRightOffset: vi.fn(),
-      inputRef: { current: null },
     }),
   }),
 );
@@ -121,29 +122,21 @@ vi.mock('../../src/MarkdownInputField/hooks/useMarkdownInputFieldRefs', () => ({
   }),
 }));
 
-vi.mock(
-  '../../src/MarkdownInputField/hooks/useMarkdownInputFieldActions',
-  () => ({
-    useMarkdownInputFieldActions: () => ({
-      hasEnlargeAction: false,
-      hasRefineAction: false,
-      isMultiRowLayout: false,
-      totalActionCount: 0,
-    }),
+// 合并自原 useMarkdownInputFieldLayout + useMarkdownInputFieldStyles。
+// 原 useMarkdownInputFieldActions 已被内联到 MarkdownInputField，无需单独 mock。
+vi.mock('../../src/MarkdownInputField/hooks/useInputFieldGeometry', () => ({
+  useInputFieldGeometry: () => ({
+    inputRef: { current: null },
+    collapseSendActions: false,
+    setRightPadding: vi.fn(),
+    setTopRightPadding: vi.fn(),
+    setQuickRightOffset: vi.fn(),
+    computedRightPadding: 16,
+    collapsedHeightPx: 200,
+    computedMinHeight: '48px',
+    enlargedStyle: {},
   }),
-);
-
-vi.mock(
-  '../../src/MarkdownInputField/hooks/useMarkdownInputFieldStyles',
-  () => ({
-    useMarkdownInputFieldStyles: () => ({
-      computedRightPadding: '16px',
-      collapsedHeightPx: 200,
-      computedMinHeight: '48px',
-      enlargedStyle: {},
-    }),
-  }),
-);
+}));
 
 vi.mock(
   '../../src/MarkdownInputField/hooks/useMarkdownInputFieldState',
