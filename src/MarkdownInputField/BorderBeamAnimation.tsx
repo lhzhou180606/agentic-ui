@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
+import { isTest } from '../Utils/env';
 
 export interface BorderBeamAnimationProps {
   /** 是否显示动画 */
@@ -71,7 +72,7 @@ export const BorderBeamAnimation: React.FC<BorderBeamAnimationProps> = ({
   // 使用 ResizeObserver 监听容器尺寸变化
   useEffect(() => {
     if (!containerRef.current) return;
-    if (process.env.NODE_ENV === 'test') return;
+    if (isTest()) return;
 
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {

@@ -1,4 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { isBrowser, isTest } from '../../Utils/env';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
 
 interface UseInputFieldGeometryParams {
@@ -29,13 +36,17 @@ interface UseInputFieldGeometryReturn {
   collapseSendActions: boolean;
 
   /**
-   * 以下 setter 由 SendActions / QuickActions 在自身宽度变化时回调写入，
-   * 进而参与 computedRightPadding 计算。
-   * NOTE: 暂时仍以 setter 形式向主组件透出，下一步重构再收进 hook 内部。
+   * SendActions 宽度变化回调。直接传给 `<SendActions onResize={...} />`，
+   * 内部会自动写入 rightPadding state，进而参与 computedRightPadding 计算。
+   * 引用稳定（useCallback），不会引发下游不必要的 re-render。
    */
-  setRightPadding: React.Dispatch<React.SetStateAction<number>>;
-  setTopRightPadding: React.Dispatch<React.SetStateAction<number>>;
-  setQuickRightOffset: React.Dispatch<React.SetStateAction<number>>;
+  onSendActionsResize: (width: number) => void;
+  /**
+   * QuickActions 宽度 + rightOffset 变化回调。直接传给 `<QuickActions onResize={...} />`，
+   * 内部会同时写入 topRightPadding 与 quickRightOffset。
+   * 引用稳定（useCallback），不会引发下游不必要的 re-render。
+   */
+  onQuickActionsResize: (width: number, rightOffset: number) => void;
 
   /** 编辑器 contentStyle.paddingRight 实际取值 */
   computedRightPadding: number;
@@ -67,7 +78,7 @@ export const useInputFieldGeometry = ({
 }: UseInputFieldGeometryParams): UseInputFieldGeometryReturn => {
   // ===== Layout 部分 =====
   const [collapseSendActions, setCollapseSendActions] = useState(() => {
-    if (typeof window === 'undefined') return false;
+    if (!isBrowser()) return false;
     if (window.innerWidth < 460) return true;
     return false;
   });
@@ -76,18 +87,30 @@ export const useInputFieldGeometry = ({
   const [topRightPadding, setTopRightPadding] = useState(0);
   const [quickRightOffset, setQuickRightOffset] = useState(0);
 
+  // 对外只暴露稳定的回调，避免主组件再当胶水把 setter 接到子组件 onResize 上。
+  const onSendActionsResize = useCallback((width: number) => {
+    setRightPadding(width);
+  }, []);
+  const onQuickActionsResize = useCallback(
+    (width: number, rightOffset: number) => {
+      setTopRightPadding(width);
+      setQuickRightOffset(rightOffset);
+    },
+    [],
+  );
+
   const inputRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!inputRef.current) return;
-    if (process.env.NODE_ENV === 'test') return;
+    if (isTest()) return;
 
     // 容器宽度小于 481 时折叠发送区按钮；observe() 会触发一次初始回调，无需手动初始化。
     // NOTE: 旧实现还维护了一份 `dimensions` state 和 `setCollapseSendActions` 对外 setter，
     // 但代码库中均无消费者（仅旧单测访问），合并到 useInputFieldGeometry 时一并移除。
     const handleResize = () => {
       if (!inputRef.current) return;
-      if (process.env.NODE_ENV === 'test') return;
+      if (isTest()) return;
       if (inputRef.current.clientWidth < 481) {
         setCollapseSendActions(true);
       } else {
@@ -158,9 +181,8 @@ export const useInputFieldGeometry = ({
   return {
     inputRef,
     collapseSendActions,
-    setRightPadding,
-    setTopRightPadding,
-    setQuickRightOffset,
+    onSendActionsResize,
+    onQuickActionsResize,
     computedRightPadding,
     collapsedHeightPx,
     computedMinHeight,

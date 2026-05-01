@@ -17,6 +17,15 @@ export type ActionItemContainerProps = {
 
 type ChildEntry = { key: React.Key | null; node: React.ReactNode };
 
+/**
+ * 把 `key: React.Key | null` 收敛为 React 可接受的 key 类型。
+ *
+ * `null` 在 React key 位上等价于「未提供 key」；这里做一次集中转换，
+ * 同时去除调用点对 `as any` 的依赖。
+ */
+const toReactKey = (key: React.Key | null): React.Key | undefined =>
+  key ?? undefined;
+
 // 常量提取
 const INTERACTIVE_SELECTOR =
   'button, a, input, textarea, select, [role="button"], [contenteditable="true"], [data-no-pan]';
@@ -89,7 +98,7 @@ const DraggablePopupItem: React.FC<{
 
   return (
     <div
-      key={entry.key as any}
+      key={toReactKey(entry.key)}
       className={classNames(
         `${basePrefixCls}-overflow-container-popup-item`,
         hashId,
@@ -152,7 +161,11 @@ export const ActionItemContainer = (props: ActionItemContainerProps) => {
   // 辅助函数：将子节点转换为条目数组
   const toEntries = useRefFunction((nodes: React.ReactNode): ChildEntry[] => {
     const array = React.Children.toArray(nodes);
-    return array.map((node) => ({ key: (node as any)?.key ?? null, node }));
+    return array.map((node) => {
+      // React.Children.toArray 返回 ReactChild[]，但其中 ReactElement 才有 key
+      const key = React.isValidElement(node) ? node.key : null;
+      return { key, node };
+    });
   });
 
   const [ordered, setOrdered] = useState<ChildEntry[]>(() =>
@@ -162,7 +175,7 @@ export const ActionItemContainer = (props: ActionItemContainerProps) => {
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') return;
     let hasMissingKey = false;
-    React.Children.forEach(props.children as any, (child) => {
+    React.Children.forEach(props.children, (child) => {
       if (!React.isValidElement(child)) return;
       if (child.key === null) {
         hasMissingKey = true;
@@ -391,7 +404,9 @@ export const ActionItemContainer = (props: ActionItemContainerProps) => {
         style={SCROLL_STYLE}
       >
         {ordered.map((entry) => (
-          <React.Fragment key={entry.key as any}>{entry.node}</React.Fragment>
+          <React.Fragment key={toReactKey(entry.key)}>
+            {entry.node}
+          </React.Fragment>
         ))}
       </div>
       {props.showMenu !== false && (
@@ -432,7 +447,7 @@ export const ActionItemContainer = (props: ActionItemContainerProps) => {
                 >
                   {ordered.map((entry, index) => (
                     <DraggablePopupItem
-                      key={entry.key as any}
+                      key={toReactKey(entry.key)}
                       entry={entry}
                       index={index}
                       basePrefixCls={basePrefixCls}

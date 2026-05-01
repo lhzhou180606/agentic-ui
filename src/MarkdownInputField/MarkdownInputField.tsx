@@ -130,14 +130,14 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     Number(hasToolsRender);
   const isMultiRowLayout = totalActionCount > 0;
 
-  // 几何信息：合并自原 useMarkdownInputFieldLayout + useMarkdownInputFieldStyles，
-  // 暴露的 setter 用于让 SendActions / QuickActions 在自身宽度变化时回写右内边距。
+  // 几何信息：合并自原 useMarkdownInputFieldLayout + useMarkdownInputFieldStyles。
+  // SendActions / QuickActions 的尺寸回调直接交回 hook 内部消化，
+  // 主组件不再充当 setter 胶水。
   const {
     inputRef,
     collapseSendActions,
-    setRightPadding,
-    setTopRightPadding,
-    setQuickRightOffset,
+    onSendActionsResize,
+    onQuickActionsResize,
     computedRightPadding,
     collapsedHeightPx,
     computedMinHeight,
@@ -288,7 +288,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
       prefixCls={baseCls}
       hashId={hashId}
       hasTools={!!props.toolsRender}
-      onResize={setRightPadding}
+      onResize={onSendActionsResize}
       sendButtonProps={props.sendButtonProps}
       triggerSendKey={props.triggerSendKey}
     />
@@ -502,16 +502,13 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                       setValue(text);
                       props.onChange?.(text);
                     }}
-                    quickActionRender={props.quickActionRender as any}
+                    quickActionRender={props.quickActionRender}
                     prefixCls={baseCls}
                     hashId={hashId}
                     enlargeable={!!props.enlargeable?.enable}
                     isEnlarged={isEnlarged}
                     onEnlargeClick={handleEnlargeClick}
-                    onResize={(width, rightOffset) => {
-                      setTopRightPadding(width);
-                      setQuickRightOffset(rightOffset);
-                    }}
+                    onResize={onQuickActionsResize}
                   />
                 ) : null}
               </BaseMarkdownEditor>

@@ -277,8 +277,8 @@ export const FileMapViewItem: React.FC<{
                 )}
               >
                 {typeof props.customSlot === 'function'
-                  ? (props.customSlot(file) as any)
-                  : (props.customSlot as any)}
+                  ? props.customSlot(file)
+                  : props.customSlot}
               </ActionIconBox>
             ) : (
               <>
