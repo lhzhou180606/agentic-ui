@@ -155,12 +155,24 @@ export { ToolUseBarThink, type ToolUseBarThinkProps } from './ToolUseBarThink';
 
 // ─── 任务相关 ────────────────────────────────────────────────────────────────
 export {
-  type TaskRunningVariant,
-  type TaskRunningActionsRender,
-  type TaskRunningProps,
-  TASK_STATUS,
+  AgentRunBar,
   TASK_RUNNING_STATUS,
+  TASK_STATUS,
+  TaskRunningStatusList,
+  TaskStatusList,
+  /** @deprecated 请使用 `AgentRunBar` */
   TaskRunning,
+} from './AgentRunBar';
+export type {
+  AgentRunBarActionsRender,
+  AgentRunBarProps,
+  AgentRunBarVariant,
+  TaskRunningActionsRender,
+  TaskRunningProps,
+  TaskRunningVariant,
+  // 重命名导出，避免与 ./TaskList 中同名 TaskStatus 冲突
+  TaskStatus as AgentTaskStatus,
+  TaskRunningStatus as AgentTaskRunningStatus,
 } from './AgentRunBar';
 export {
   TaskList,

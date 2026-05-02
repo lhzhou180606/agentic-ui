@@ -284,11 +284,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * ```
  */
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('task-running', (token) => {
-    const taskRunningToken = {
+  return useEditorStyleRegister('agent-run-bar', (token) => {
+    const agentRunBarToken = {
       ...token,
       componentCls: `.${prefixCls}`,
     };
-    return [genStyle(taskRunningToken)];
+    return [genStyle(agentRunBarToken)];
   });
 }

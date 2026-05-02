@@ -17,59 +17,129 @@ import { useStyle } from './style';
 export * from './Robot';
 
 /**
- * 任务状态枚举
- * @enum {string}
+ * 任务状态可选值列表
+ *
+ * @remarks
+ * - `running`：任务正在运行中
+ * - `success`：任务已成功完成
+ * - `error`：任务执行出错
+ * - `pause`：任务已暂停
+ * - `stopped`：任务已停止
+ * - `cancelled`：任务已取消
  */
-export enum TASK_STATUS {
-  /** 任务正在运行中 */
-  RUNNING = 'running',
-  /** 任务已成功完成 */
-  SUCCESS = 'success',
-  /** 任务执行出错 */
-  ERROR = 'error',
-  /** 任务已暂停 */
-  PAUSE = 'pause',
-  /** 任务已停止 */
-  STOPPED = 'stopped',
-  /** 任务已取消 */
-  CANCELLED = 'cancelled',
-}
+export const TaskStatusList = [
+  'running',
+  'success',
+  'error',
+  'pause',
+  'stopped',
+  'cancelled',
+] as const;
 
 /**
- * 任务运行状态枚举
- * @enum {string}
+ * 任务状态联合类型
+ *
+ * 表示一个任务的"宏观状态"（终态或主流程态）。
+ * 与 {@link TaskRunningStatus} 的区别：
+ * - `TaskStatus` 偏"宏观结果"（成功/失败/取消/已停止/暂停/运行中）
+ * - `TaskRunningStatus` 偏"运行过程态"（运行中/已完成/已暂停）
+ *
+ * 在判断 UI 状态时通常需要两者组合，例如 `taskStatus='running' && taskRunningStatus='pause'`
+ * 表示"任务整体在运行中、当前被用户暂停"。
  */
-export enum TASK_RUNNING_STATUS {
-  /** 正在运行中 */
-  RUNNING = 'running',
-  /** 已完成 */
-  COMPLETE = 'complete',
-  /** 已暂停 */
-  PAUSE = 'pause',
-}
+export type TaskStatus = (typeof TaskStatusList)[number];
+
+/**
+ * 任务运行状态可选值列表
+ *
+ * @remarks
+ * - `running`：正在运行中
+ * - `complete`：已完成
+ * - `pause`：已暂停
+ */
+export const TaskRunningStatusList = ['running', 'complete', 'pause'] as const;
+
+/**
+ * 任务运行状态联合类型
+ *
+ * 表示任务运行过程中的"过程态"，详见 {@link TaskStatus} 的对比说明。
+ */
+export type TaskRunningStatus = (typeof TaskRunningStatusList)[number];
+
+/**
+ * 任务状态常量对象（向后兼容）
+ *
+ * 推荐直接使用字符串字面量（如 `'running'`），可获得更好的 tree-shaking 与类型推导。
+ * 该对象保留以兼容旧代码 `TASK_STATUS.RUNNING` 的写法。
+ */
+export const TASK_STATUS = {
+  RUNNING: 'running',
+  SUCCESS: 'success',
+  ERROR: 'error',
+  PAUSE: 'pause',
+  STOPPED: 'stopped',
+  CANCELLED: 'cancelled',
+} as const satisfies Record<string, TaskStatus>;
+
+/**
+ * 任务状态常量对象的类型（向后兼容）
+ *
+ * @deprecated 请直接使用 {@link TaskStatus} 联合类型
+ */
+export type TASK_STATUS = TaskStatus;
+
+/**
+ * 任务运行状态常量对象（向后兼容）
+ *
+ * 推荐直接使用字符串字面量（如 `'running'`），可获得更好的 tree-shaking 与类型推导。
+ * 该对象保留以兼容旧代码 `TASK_RUNNING_STATUS.RUNNING` 的写法。
+ */
+export const TASK_RUNNING_STATUS = {
+  RUNNING: 'running',
+  COMPLETE: 'complete',
+  PAUSE: 'pause',
+} as const satisfies Record<string, TaskRunningStatus>;
+
+/**
+ * 任务运行状态常量对象的类型（向后兼容）
+ *
+ * @deprecated 请直接使用 {@link TaskRunningStatus} 联合类型
+ */
+export type TASK_RUNNING_STATUS = TaskRunningStatus;
 
 /**
  * 主题样式变体
  */
-export type TaskRunningVariant = 'simple' | 'default';
+export type AgentRunBarVariant = 'simple' | 'default';
+
+/**
+ * @deprecated 请使用 {@link AgentRunBarVariant}
+ */
+export type TaskRunningVariant = AgentRunBarVariant;
 
 /**
  * 任务操作按钮渲染函数
  */
-export type TaskRunningActionsRender = (props: {
-  status?: TASK_STATUS;
-  runningStatus?: TASK_RUNNING_STATUS;
+export type AgentRunBarActionsRender = (props: {
+  status?: TaskStatus;
+  runningStatus?: TaskRunningStatus;
 }) => React.ReactNode;
 
 /**
- * TaskRunning组件的属性接口
- * @interface TaskRunningProps
+ * @deprecated 请使用 {@link AgentRunBarActionsRender}
  */
-export interface TaskRunningProps {
-  /** 任务状态 */
-  taskStatus: TASK_STATUS;
-  /** 任务运行状态 */
-  taskRunningStatus: TASK_RUNNING_STATUS;
+export type TaskRunningActionsRender = AgentRunBarActionsRender;
+
+/**
+ * AgentRunBar 组件的属性接口
+ *
+ * @interface AgentRunBarProps
+ */
+export interface AgentRunBarProps {
+  /** 任务状态（宏观/终态），详见 {@link TaskStatus} */
+  taskStatus: TaskStatus;
+  /** 任务运行状态（过程态），详见 {@link TaskRunningStatus} */
+  taskRunningStatus: TaskRunningStatus;
   /** 创建新任务的回调函数 */
   onCreateNewTask?: () => void;
   /** 暂停任务的回调函数 */
@@ -93,9 +163,9 @@ export interface TaskRunningProps {
   /** 描述文案 */
   description?: string;
   /** 自定义操作按钮 */
-  actionsRender?: TaskRunningActionsRender | false;
+  actionsRender?: AgentRunBarActionsRender | false;
   /** 主题样式变体 */
-  variant?: TaskRunningVariant;
+  variant?: AgentRunBarVariant;
   /** 国际化配置 */
   locale?: {
     agentRunBar?: {
@@ -111,16 +181,13 @@ export interface TaskRunningProps {
 }
 
 /**
+ * @deprecated 请使用 {@link AgentRunBarProps}
+ */
+export type TaskRunningProps = AgentRunBarProps;
+
+/**
  * 渲染按钮组的函数
  * 使用提前返回优化代码可读性
- *
- * @param status 任务状态
- * @param runningStatus 运行状态
- * @param callbacks 回调函数对象
- * @param baseCls 基础类名
- * @param hashId 哈希ID
- * @param locale 国际化配置
- * @returns 按钮组JSX
  */
 const renderButtonGroup = ({
   taskStatus,
@@ -137,7 +204,7 @@ const renderButtonGroup = ({
   onStop,
   variant,
 }: Pick<
-  TaskRunningProps,
+  AgentRunBarProps,
   | 'taskStatus'
   | 'taskRunningStatus'
   | 'onCreateNewTask'
@@ -408,59 +475,32 @@ const renderButtonGroup = ({
 };
 
 /**
- * TaskRunning 组件 - 任务运行状态组件
+ * AgentRunBar 组件 - 智能体任务运行状态条
  *
- * 该组件显示AI任务运行的状态信息，包括运行时间、状态指示、操作按钮等。
- * 支持多种任务状态：运行中、暂停、完成、重播等，提供完整的任务管理功能。
+ * 该组件以一条横向状态条的形式展示 AI 智能体任务的执行状态，包括运行中 /
+ * 已暂停 / 已完成 / 出错等多种状态，并提供对应的操作按钮（暂停、继续、停止、
+ * 重试、查看结果、新建任务等）。
  *
  * @component
- * @description 任务运行状态组件，显示AI任务运行信息和操作按钮
- * @param {TaskRunningProps} props - 组件属性
- * @param {string} [props.className] - 自定义CSS类名
- * @param {React.CSSProperties} [props.style] - 自定义样式
- * @param {TASK_RUNNING_STATUS} [props.taskRunningStatus] - 任务运行状态
- * @param {TASK_STATUS} [props.taskStatus] - 任务状态
- * @param {() => void} [props.onPause] - 暂停任务回调
- * @param {() => void} [props.onResume] - 继续任务回调
- * @param {() => void} [props.onStop] - 停止任务回调
- * @param {() => void} [props.onCreateNewTask] - 创建新任务回调
- * @param {() => void} [props.onViewResult] - 查看结果回调
- * @param {() => void} [props.onReplay] - 重播任务回调
- * @param {string} [props.title] - 标题文案
- * @param {string} [props.description] - 描述文案
- * @param {React.ReactNode} [props.icon] - 自定义图标
- * @param {string} [props.iconTooltip] - 图标提示文案
- * @param {TaskRunningActionsRender | false} [props.actionsRender] - 自定义操作按钮
- * @param {TaskRunningVariant} [props.variant] - 样式变体
+ * @param {AgentRunBarProps} props - 组件属性
  *
  * @example
  * ```tsx
- * <TaskRunning
+ * <AgentRunBar
  *   title="正在运行中"
  *   description="任务执行中..."
- *   taskStatus={TASK_STATUS.RUNNING}
- *   taskRunningStatus={TASK_RUNNING_STATUS.RUNNING}
- *   onCreateNewTask={() => {}}
+ *   taskStatus="running"
+ *   taskRunningStatus="running"
  *   onPause={() => {}}
  *   onResume={() => {}}
  *   onStop={() => {}}
  *   onReplay={() => {}}
  *   onViewResult={() => {}}
- *   icon="https://example.com/icon.png"
- *   iconTooltip="AI助手图标"
+ *   onCreateNewTask={() => {}}
  * />
  * ```
- *
- * @returns {React.ReactElement} 渲染的任务运行状态组件
- *
- * @remarks
- * - 支持多种任务状态显示
- * - 提供任务操作按钮（暂停、继续、停止、重播、查看结果等）
- * - 支持自定义标题和描述文案
- * - 支持自定义图标和图标提示
- * - 提供机器人状态动画
  */
-const TaskRunningComponent: React.FC<TaskRunningProps> = (rest) => {
+const AgentRunBarComponent: React.FC<AgentRunBarProps> = (rest) => {
   const {
     className,
     taskRunningStatus,
@@ -480,7 +520,7 @@ const TaskRunningComponent: React.FC<TaskRunningProps> = (rest) => {
   } = rest;
 
   const context = useContext(ConfigProvider.ConfigContext);
-  const baseCls = context?.getPrefixCls('task-running');
+  const baseCls = context?.getPrefixCls('agent-run-bar');
   const { wrapSSR, hashId } = useStyle(baseCls);
 
   // 从context获取国际化配置
@@ -574,5 +614,14 @@ const TaskRunningComponent: React.FC<TaskRunningProps> = (rest) => {
   );
 };
 
-// 使用 React.memo 优化性能，避免不必要的重新渲染
-export const TaskRunning = memo(TaskRunningComponent);
+/**
+ * AgentRunBar - 智能体任务运行状态条
+ *
+ * 使用 React.memo 优化性能，避免不必要的重新渲染。
+ */
+export const AgentRunBar = memo(AgentRunBarComponent);
+
+/**
+ * @deprecated 请使用 {@link AgentRunBar}。该别名保留以兼容旧代码，将在未来版本移除。
+ */
+export const TaskRunning = AgentRunBar;
