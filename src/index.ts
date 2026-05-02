@@ -155,6 +155,7 @@ export { ToolUseBarThink, type ToolUseBarThinkProps } from './ToolUseBarThink';
 
 // ─── 任务相关 ────────────────────────────────────────────────────────────────
 export {
+  AGENT_RUN_BAR_TEST_ID,
   AgentRunBar,
   TASK_RUNNING_STATUS,
   TASK_STATUS,

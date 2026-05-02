@@ -14,7 +14,16 @@ import {
 } from './icons';
 import Robot from './Robot';
 import { useStyle } from './style';
+import { AGENT_RUN_BAR_TEST_ID } from './testIds';
 export * from './Robot';
+export { AGENT_RUN_BAR_TEST_ID } from './testIds';
+
+/**
+ * 控制按钮 Tooltip 的展示延迟（秒）。
+ * 抽出为模块级常量，避免在多处复用 magic number；如需全局调整悬浮提示
+ * 灵敏度，仅修改此常量即可。
+ */
+const TOOLTIP_DELAY_SECONDS = 0.3;
 
 /**
  * 任务状态可选值列表
@@ -162,7 +171,14 @@ export interface AgentRunBarProps {
   title?: string;
   /** 描述文案 */
   description?: string;
-  /** 自定义操作按钮 */
+  /**
+   * 自定义操作按钮（actionNode 部分；不影响 stop/pause/resume 控制按钮）
+   *
+   * 三态语义：
+   * - `undefined`：使用内置默认 actionNode（依据 `taskStatus` / `taskRunningStatus` 自动选择）
+   * - `false`：不渲染任何自定义 actionNode；停止 / 暂停 / 继续控制按钮仍按状态显示
+   * - 函数：调用并将其返回值作为 actionNode 渲染（返回 `false` / `null` 等同于不渲染该 actionNode）
+   */
   actionsRender?: AgentRunBarActionsRender | false;
   /** 主题样式变体 */
   variant?: AgentRunBarVariant;
@@ -185,10 +201,190 @@ export interface AgentRunBarProps {
  */
 export type TaskRunningProps = AgentRunBarProps;
 
+/* -------------------------------------------------------------------------- */
+/*  控制按钮（停止 / 暂停 / 继续）                                              */
+/* -------------------------------------------------------------------------- */
+
+interface ControlIconButtonProps {
+  /** 按钮语义类型，决定 className 后缀（pause/play）与 aria-label 默认归属 */
+  kind: 'pause' | 'play';
+  /** Tooltip 与 aria-label 文案 */
+  title?: string;
+  /** 鼠标点击回调 */
+  onClick?: () => void;
+  /** 内部图标 */
+  icon: React.ReactNode;
+  /** 与样式系统拼接所需的 prefixCls */
+  baseCls: string;
+  /** cssinjs 注入产生的 hashId */
+  hashId: string;
+}
+
 /**
- * 渲染按钮组的函数
- * 使用提前返回优化代码可读性
+ * 圆形控制按钮（停止 / 暂停 / 继续）。
+ * 抽出以避免在「自定义 actionsRender 分支」与「默认分支」中重复 3 套 Tooltip+div 结构。
  */
+const ControlIconButton: React.FC<ControlIconButtonProps> = ({
+  kind,
+  title,
+  onClick,
+  icon,
+  baseCls,
+  hashId,
+}) => (
+  <Tooltip title={title} mouseEnterDelay={TOOLTIP_DELAY_SECONDS}>
+    <div
+      className={classNames(`${baseCls}-${kind}`, hashId)}
+      role="button"
+      tabIndex={0}
+      aria-label={title}
+      onClick={onClick}
+    >
+      {icon}
+    </div>
+  </Tooltip>
+);
+
+interface ControlButtonsProps {
+  isRunning: boolean;
+  isPause: boolean;
+  variant: AgentRunBarVariant;
+  onStop?: () => void;
+  onPause?: () => void;
+  onResume?: () => void;
+  locale?: AgentRunBarProps['locale'];
+  baseCls: string;
+  hashId: string;
+}
+
+/**
+ * 控制按钮组：根据当前是否运行 / 是否暂停状态以及各回调可用性，
+ * 决定渲染「停止 / 暂停 / 继续」三个圆形控制按钮的子集。
+ */
+const ControlButtons: React.FC<ControlButtonsProps> = ({
+  isRunning,
+  isPause,
+  variant,
+  onStop,
+  onPause,
+  onResume,
+  locale,
+  baseCls,
+  hashId,
+}) => {
+  const isSimple = variant === 'simple';
+  return (
+    <>
+      {(isRunning || isPause) && onStop && (
+        <ControlIconButton
+          kind="pause"
+          title={locale?.agentRunBar?.stop}
+          onClick={onStop}
+          icon={isSimple ? <SimpleStopIcon /> : <StopIcon />}
+          baseCls={baseCls}
+          hashId={hashId}
+        />
+      )}
+      {isRunning && onPause && (
+        <ControlIconButton
+          kind="pause"
+          title={locale?.agentRunBar?.pause}
+          onClick={onPause}
+          icon={isSimple ? <SimplePauseIcon /> : <PauseIcon />}
+          baseCls={baseCls}
+          hashId={hashId}
+        />
+      )}
+      {isPause && onResume && (
+        <ControlIconButton
+          kind="play"
+          title={locale?.agentRunBar?.play}
+          onClick={onResume}
+          icon={isSimple ? <SimplePlayIcon /> : <PlayIcon />}
+          baseCls={baseCls}
+          hashId={hashId}
+        />
+      )}
+    </>
+  );
+};
+
+/* -------------------------------------------------------------------------- */
+/*  状态 → action 配置表                                                       */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * 单个 action 的配置。
+ *
+ * - `kind`：决定使用哪个回调与默认 button 样式
+ * - `localeKey`：使用 `locale.agentRunBar` 中的哪个文案
+ * - `primary?`：是否使用 antd `type="primary"`（仅 createNewTask 在 stopped/cancelled 用到）
+ */
+interface ActionConfig {
+  kind: 'replay' | 'viewResult' | 'createNewTask';
+  localeKey: 'replayTask' | 'submitTask' | 'newTask' | 'createNewTask';
+  primary?: boolean;
+}
+
+/**
+ * 「actionNode 部分」的状态机配置表。
+ *
+ * key 为状态匹配名（与下面 {@link resolveActionsKey} 中的判定保持一致），
+ * value 为该状态下的按钮列表，按顺序渲染。
+ *
+ * 注意：本表只决定 actionNode（左侧业务按钮组），不包含 stop/pause/resume 控制按钮。
+ */
+const STATE_ACTION_CONFIG: Record<string, ActionConfig[]> = {
+  pause: [{ kind: 'createNewTask', localeKey: 'newTask' }],
+  stopped: [
+    { kind: 'viewResult', localeKey: 'submitTask' },
+    { kind: 'createNewTask', localeKey: 'createNewTask', primary: true },
+  ],
+  successComplete: [
+    { kind: 'replay', localeKey: 'replayTask' },
+    { kind: 'viewResult', localeKey: 'submitTask' },
+    { kind: 'createNewTask', localeKey: 'newTask' },
+  ],
+  error: [
+    { kind: 'replay', localeKey: 'replayTask' },
+    { kind: 'viewResult', localeKey: 'submitTask' },
+    { kind: 'createNewTask', localeKey: 'newTask' },
+  ],
+  default: [{ kind: 'createNewTask', localeKey: 'createNewTask' }],
+};
+
+/**
+ * 把 (taskStatus, taskRunningStatus, isRunning, isPause) 映射到
+ * {@link STATE_ACTION_CONFIG} 的 key。
+ */
+const resolveActionsKey = (
+  taskStatus: TaskStatus,
+  taskRunningStatus: TaskRunningStatus,
+  isRunning: boolean,
+  isPause: boolean,
+): keyof typeof STATE_ACTION_CONFIG | null => {
+  if (isPause) return 'pause';
+  if (
+    taskStatus === TASK_STATUS.STOPPED ||
+    taskStatus === TASK_STATUS.CANCELLED
+  ) {
+    return 'stopped';
+  }
+  if (
+    taskStatus === TASK_STATUS.SUCCESS &&
+    taskRunningStatus === TASK_RUNNING_STATUS.COMPLETE
+  ) {
+    return 'successComplete';
+  }
+  if (taskStatus === TASK_STATUS.ERROR) return 'error';
+  if (!isRunning && !isPause) return 'default';
+  return null;
+};
+
+/* -------------------------------------------------------------------------- */
+/*  渲染按钮组                                                                  */
+/* -------------------------------------------------------------------------- */
+
 const renderButtonGroup = ({
   taskStatus,
   taskRunningStatus,
@@ -219,7 +415,9 @@ const renderButtonGroup = ({
 > & {
   baseCls: string;
   hashId: string;
-}) => {
+}): React.ReactElement => {
+  const resolvedVariant: AgentRunBarVariant = variant ?? 'default';
+
   // 任务运行中状态
   const isRunning =
     taskStatus === TASK_STATUS.RUNNING &&
@@ -231,7 +429,22 @@ const renderButtonGroup = ({
     (taskStatus === TASK_STATUS.RUNNING &&
       taskRunningStatus === TASK_RUNNING_STATUS.PAUSE);
 
-  // 处理自定义操作按钮（提前返回）
+  // 控制按钮组（停止 / 暂停 / 继续），actionsRender 与默认分支共用
+  const controls = (
+    <ControlButtons
+      isRunning={isRunning}
+      isPause={isPause}
+      variant={resolvedVariant}
+      onStop={onStop}
+      onPause={onPause}
+      onResume={onResume}
+      locale={locale}
+      baseCls={baseCls}
+      hashId={hashId}
+    />
+  );
+
+  // ── 分支 1：调用方自定义 actionsRender（含 false 显式禁用）──────────────────
   if (actionsRender !== undefined) {
     const actionNode =
       typeof actionsRender === 'function'
@@ -244,232 +457,52 @@ const renderButtonGroup = ({
     return (
       <div className={classNames(`${baseCls}-button-wrapper`, hashId)}>
         {actionNode}
-        {/* 控制按钮（停止、暂停、继续） */}
-        {(isRunning || isPause) && onStop && (
-          <Tooltip mouseEnterDelay={0.3} title={locale?.agentRunBar?.stop}>
-            <div
-              className={classNames(`${baseCls}-pause`, hashId)}
-              role="button"
-              tabIndex={0}
-              aria-label={locale?.agentRunBar?.stop}
-              onClick={onStop}
-            >
-              {variant === 'simple' ? <SimpleStopIcon /> : <StopIcon />}
-            </div>
-          </Tooltip>
-        )}
-        {isRunning && onPause && (
-          <Tooltip title={locale?.agentRunBar?.pause} mouseEnterDelay={0.3}>
-            <div
-              className={classNames(`${baseCls}-pause`, hashId)}
-              role="button"
-              tabIndex={0}
-              aria-label={locale?.agentRunBar?.pause}
-              onClick={onPause}
-            >
-              {variant === 'simple' ? <SimplePauseIcon /> : <PauseIcon />}
-            </div>
-          </Tooltip>
-        )}
-        {isPause && onResume && (
-          <Tooltip title={locale?.agentRunBar?.play} mouseEnterDelay={0.3}>
-            <div
-              className={classNames(`${baseCls}-play`, hashId)}
-              role="button"
-              tabIndex={0}
-              aria-label={locale?.agentRunBar?.play}
-              onClick={onResume}
-            >
-              {variant === 'simple' ? <SimplePlayIcon /> : <PlayIcon />}
-            </div>
-          </Tooltip>
-        )}
+        {controls}
       </div>
     );
   }
 
-  // 根据任务状态渲染不同的操作按钮
-  let actionNode: React.ReactNode = null;
+  // ── 分支 2：默认逻辑，按状态映射配置表渲染 ─────────────────────────────────
+  const callbackMap: Record<ActionConfig['kind'], (() => void) | undefined> = {
+    replay: onReplay,
+    viewResult: onViewResult,
+    createNewTask: onCreateNewTask,
+  };
 
-  // 任务已暂停状态
-  if (isPause) {
-    if (onCreateNewTask) {
-      actionNode = (
+  const actionsKey = resolveActionsKey(
+    taskStatus,
+    taskRunningStatus,
+    isRunning,
+    isPause,
+  );
+  const actionConfigs = actionsKey ? STATE_ACTION_CONFIG[actionsKey] : [];
+
+  const actionNode = actionConfigs
+    .map((cfg) => {
+      const callback = callbackMap[cfg.kind];
+      if (!callback) return null;
+      const label = locale?.agentRunBar?.[cfg.localeKey];
+      const isCreateNew = cfg.kind === 'createNewTask';
+      return (
         <Button
-          onClick={onCreateNewTask}
-          icon={<PlusOutlined />}
+          key={cfg.kind}
+          {...(cfg.primary ? { type: 'primary' as const } : null)}
+          onClick={callback}
+          icon={isCreateNew ? <PlusOutlined /> : undefined}
           color="default"
           variant="solid"
+          autoInsertSpace={isCreateNew ? undefined : false}
         >
-          {locale?.agentRunBar?.newTask}
+          {label}
         </Button>
       );
-    }
-  }
-  // 任务已停止状态
-  else if (
-    taskStatus === TASK_STATUS.STOPPED ||
-    taskStatus === TASK_STATUS.CANCELLED
-  ) {
-    actionNode = (
-      <>
-        {onViewResult && (
-          <Button
-            onClick={onViewResult}
-            color="default"
-            variant="solid"
-            autoInsertSpace={false}
-          >
-            {locale?.agentRunBar?.submitTask}
-          </Button>
-        )}
-        {onCreateNewTask && (
-          <Button
-            type="primary"
-            onClick={onCreateNewTask}
-            icon={<PlusOutlined />}
-            color="default"
-            variant="solid"
-          >
-            {locale?.agentRunBar?.createNewTask}
-          </Button>
-        )}
-      </>
-    );
-  }
-  // 任务已完成状态
-  else if (
-    taskStatus === TASK_STATUS.SUCCESS &&
-    taskRunningStatus === TASK_RUNNING_STATUS.COMPLETE
-  ) {
-    actionNode = (
-      <>
-        {onReplay && (
-          <Button onClick={onReplay} variant="solid" autoInsertSpace={false}>
-            {locale?.agentRunBar?.replayTask}
-          </Button>
-        )}
-        {onViewResult && (
-          <Button
-            onClick={onViewResult}
-            color="default"
-            variant="solid"
-            autoInsertSpace={false}
-          >
-            {locale?.agentRunBar?.submitTask}
-          </Button>
-        )}
-        {onCreateNewTask && (
-          <Button
-            onClick={onCreateNewTask}
-            icon={<PlusOutlined />}
-            color="default"
-            variant="solid"
-          >
-            {locale?.agentRunBar?.newTask}
-          </Button>
-        )}
-      </>
-    );
-  }
-  // 任务出错状态
-  else if (taskStatus === TASK_STATUS.ERROR) {
-    actionNode = (
-      <>
-        {onReplay && (
-          <Button onClick={onReplay} variant="solid" autoInsertSpace={false}>
-            {locale?.agentRunBar?.replayTask}
-          </Button>
-        )}
-        {onViewResult && (
-          <Button
-            onClick={onViewResult}
-            color="default"
-            variant="solid"
-            autoInsertSpace={false}
-          >
-            {locale?.agentRunBar?.submitTask}
-          </Button>
-        )}
-        {onCreateNewTask && (
-          <Button
-            onClick={onCreateNewTask}
-            icon={<PlusOutlined />}
-            color="default"
-            variant="solid"
-          >
-            {locale?.agentRunBar?.newTask}
-          </Button>
-        )}
-      </>
-    );
-  }
-  // 默认状态（非运行中且非暂停）
-  else if (!isRunning && !isPause) {
-    if (onCreateNewTask) {
-      actionNode = (
-        <Button
-          onClick={onCreateNewTask}
-          icon={<PlusOutlined />}
-          color="default"
-          variant="solid"
-        >
-          {locale?.agentRunBar?.createNewTask}
-        </Button>
-      );
-    }
-  }
-
-  const stopTitle = locale?.agentRunBar?.stop;
-  const pauseTitle = locale?.agentRunBar?.pause;
-  const playTitle = locale?.agentRunBar?.play;
+    })
+    .filter(Boolean);
 
   return (
     <div className={classNames(`${baseCls}-button-wrapper`, hashId)}>
       {actionNode}
-
-      {/* 停止按钮 */}
-      {(isRunning || isPause) && onStop && (
-        <Tooltip mouseEnterDelay={0.3} title={stopTitle}>
-          <div
-            className={classNames(`${baseCls}-pause`, hashId)}
-            role="button"
-            tabIndex={0}
-            aria-label={stopTitle}
-            onClick={onStop}
-          >
-            {variant === 'simple' ? <SimpleStopIcon /> : <StopIcon />}
-          </div>
-        </Tooltip>
-      )}
-      {/* 暂停按钮 */}
-      {isRunning && onPause && (
-        <Tooltip title={pauseTitle} mouseEnterDelay={0.3}>
-          <div
-            className={classNames(`${baseCls}-pause`, hashId)}
-            role="button"
-            tabIndex={0}
-            aria-label={pauseTitle}
-            onClick={onPause}
-          >
-            {variant === 'simple' ? <SimplePauseIcon /> : <PauseIcon />}
-          </div>
-        </Tooltip>
-      )}
-      {/* 继续按钮 */}
-      {isPause && onResume && (
-        <Tooltip title={playTitle} mouseEnterDelay={0.3}>
-          <div
-            className={classNames(`${baseCls}-play`, hashId)}
-            role="button"
-            tabIndex={0}
-            aria-label={playTitle}
-            onClick={onResume}
-          >
-            {variant === 'simple' ? <SimplePlayIcon /> : <PlayIcon />}
-          </div>
-        </Tooltip>
-      )}
+      {controls}
     </div>
   );
 };
@@ -546,6 +579,16 @@ const AgentRunBarComponent: React.FC<AgentRunBarProps> = (rest) => {
     return 'thinking';
   }, [taskRunningStatus, taskStatus]);
 
+  // 这里使用 framer-motion 的 `motion.div` + `layout="size"` 是为了在 AgentRunBar
+  // 切换状态（如运行 → 暂停 → 完成）导致按钮组个数变化、整体宽高随之改变时，提供
+  // 自动测量并补间宽高的过渡动画。
+  //
+  // 该能力难以用纯 CSS transition 等价实现：CSS transition 不支持从 `auto` 到具体
+  // 像素值之间的过渡，必须先取得元素当前尺寸再设回固定值，等价于自行实现一遍
+  // `useLayoutEffect + ResizeObserver + requestAnimationFrame`。
+  //
+  // 因此当前版本保留 framer-motion 依赖。如未来组件库整体去 framer-motion 化，
+  // 可以替换为基于 ResizeObserver 的自定义 hook，逻辑等价但实现成本更高。
   return wrapSSR(
     <motion.div
       className={classNames(
@@ -558,7 +601,7 @@ const AgentRunBarComponent: React.FC<AgentRunBarProps> = (rest) => {
           [`${baseCls}-status-${robotStatus}`]: robotStatus,
         },
       )}
-      data-testid={baseCls}
+      data-testid={AGENT_RUN_BAR_TEST_ID}
       layout="size"
       transition={{ duration: 0.25, ease: 'easeOut' }}
       style={rest.style}
