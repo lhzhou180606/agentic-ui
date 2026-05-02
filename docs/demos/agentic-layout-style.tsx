@@ -2,6 +2,9 @@ import { AgenticLayout, ChatLayout } from '@ant-design/agentic-ui';
 import { Segmented, Tag } from 'antd';
 import React, { useState } from 'react';
 
+// 通过外部 style 控制根容器 minHeight，AgenticLayout 不再内置 minHeight prop。
+// 这里演示如何借助 style.minHeight 实现等价能力。
+
 const SidebarPanel = ({ label, bg }: { label: string; bg: string }) => (
   <div
     style={{
@@ -72,7 +75,7 @@ const StyleDemo = () => {
           }}
         >
           <AgenticLayout
-            minHeight={minHeight}
+            style={{ minHeight }}
             left={<SidebarPanel label="左侧" bg="#f6ffed" />}
             center={<CenterContent />}
             right={<SidebarPanel label="右侧" bg="#fff7e6" />}

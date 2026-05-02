@@ -8,13 +8,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
+      flexDirection: 'column',
       height: '100%',
-      minHeight: '600px',
+      minHeight: 600,
       backgroundColor: 'transparent',
       overflow: 'hidden',
       border: 'none',
       boxSizing: 'border-box',
-      margin: 2,
+      margin: token.marginXXS,
       '*': {
         boxSizing: 'border-box',
       },
@@ -22,85 +23,69 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       [`${token.componentCls}-body`]: {
         display: 'flex',
         flex: 1,
-        boxShadow: 'var(--shadow-card-base)',
-        borderRadius: 'var(--radius-modal-base)',
+        boxShadow: token.boxShadowTertiary,
+        borderRadius: token.borderRadiusLG,
         overflow: 'hidden',
-        border: '1px solid rgba(140, 171, 255, 0.12)',
+        border: `1px solid ${token.colorBorderSecondary}`,
       },
 
-      // 侧边栏基础样式
+      // 左侧栏基础样式（宽度/padding 由 inline style 控制，避免与 class 打架）
       [`${token.componentCls}-sidebar-left`]: {
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: 'var(--color-gray-bg-page-light)',
-        borderRight: `1px solid var(--color-gray-border-light)`,
+        backgroundColor: token.colorBgLayout,
+        borderInlineEnd: `1px solid ${token.colorBorderSecondary}`,
         overflow: 'hidden',
         boxSizing: 'border-box',
-        padding: '12px',
-      },
-      [`${token.componentCls}-sidebar-left-collapsed`]: {
-        padding: '0 !important',
-        width: '0 !important',
-        minWidth: '0 !important',
-        maxWidth: '0 !important',
-        border: 'none !important',
       },
 
-      // 右侧边栏包装器
-      [`&-sidebar-wrapper-right`]: {
+      // 右侧栏包装器
+      [`${token.componentCls}-sidebar-wrapper-right`]: {
         display: 'flex',
         alignItems: 'stretch',
         height: '100%',
       },
 
-      // 右侧边栏特殊样式
-      [`&-sidebar-right`]: {
-        borderRight: 'none',
+      // 右侧栏（宽度/padding/opacity 同样交由 inline style 控制）
+      [`${token.componentCls}-sidebar-right`]: {
+        borderInlineEnd: 'none',
         height: '100%',
       },
 
-      // 折叠状态样式
-      [`&-sidebar-right-collapsed`]: {
-        width: '0 !important',
-        minWidth: '0 !important',
-        maxWidth: '0 !important',
-        padding: '0 !important',
-        opacity: 0,
-        overflow: 'hidden',
-
+      // 折叠态：仅保留无法用 inline style 表达的子元素隐藏（避免折叠瞬间内容溢出）
+      [`${token.componentCls}-sidebar-right-collapsed`]: {
         [`${token.componentCls}-sidebar-content`]: {
           display: 'none',
         },
       },
 
-      // 拖拽手柄样式
-      [`&-resize-handle`]: {
-        width: '6px',
+      // 拖拽手柄
+      [`${token.componentCls}-resize-handle`]: {
+        width: 6,
         cursor: 'col-resize',
         backgroundColor: 'transparent',
         position: 'relative',
         zIndex: 10,
         flexShrink: 0,
-        marginLeft: '1px',
-        marginRight: '1px',
+        marginInline: 1,
         '&::before': {
           content: '""',
           position: 'absolute',
-          left: '50%',
+          insetInlineStart: '50%',
           top: 0,
           bottom: 0,
-          width: '6px',
+          width: 6,
           backgroundColor: 'transparent',
           transform: 'translateX(-50%)',
-          transition: 'background-color 0.2s ease',
+          transition: `background-color ${token.motionDurationMid} ${token.motionEaseInOut}`,
         },
         '&:hover::before': {
-          backgroundColor: 'var(--color-primary-control-fill-primary)',
+          backgroundColor: token.colorPrimaryBorderHover,
         },
       },
 
       // 侧边栏内容
-      [`&-sidebar-content`]: {
+      [`${token.componentCls}-sidebar-content`]: {
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
@@ -109,17 +94,21 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         height: '100%',
       },
 
-      // 主内容区域
-      [`&-main`]: {
+      // 主内容区域：用 flex 自适应分配 LayoutHeader 与正文，
+      // 避免历史上 height: calc(100% - 48px) 在没有 header 时少 48px 的问题。
+      [`${token.componentCls}-main`]: {
         flex: 1,
         minWidth: 0,
-        backgroundColor: 'var(--color-gray-bg-page-light)',
-        borderTopRightRadius: 'var(--radius-modal-base)',
-        borderBottomRightRadius: 'var(--radius-modal-base)',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: token.colorBgLayout,
+        borderStartEndRadius: token.borderRadiusLG,
+        borderEndEndRadius: token.borderRadiusLG,
         overflow: 'hidden',
-        '&-content': {
+        [`${token.componentCls}-main-content`]: {
           flex: 1,
-          height: 'calc(100% - 48px)',
+          minHeight: 0,
+          overflow: 'auto',
         },
       },
     },

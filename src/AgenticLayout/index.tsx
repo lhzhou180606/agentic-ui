@@ -32,11 +32,15 @@ export interface AgenticLayoutProps {
   leftWidth?: number;
   /** 右侧宽度 */
   rightWidth?: number;
-  /** 最小高度 */
-  minHeight?: string | number;
-  /** 子元素（用于兼容性，实际内容应使用 center 属性） */
-  children?: ReactNode;
 }
+
+/**
+ * 用于 e2e / 单元测试稳定定位组件根节点。
+ * 历史上曾使用 prefixCls 当 testid，但 prefixCls 是与 ConfigProvider
+ * 联动的样式前缀，把它当作测试标识会导致同页面多实例 testid 冲突，
+ * 这里改用语义化常量。
+ */
+export const AGENTIC_LAYOUT_TEST_ID = 'agentic-layout';
 
 /**
  * AgenticLayout 组件 - 智能体布局组件
@@ -55,7 +59,6 @@ export interface AgenticLayoutProps {
  * @param {string} [props.className] - 自定义CSS类名
  * @param {number} [props.leftWidth=256] - 左侧宽度
  * @param {number} [props.rightWidth=540] - 右侧宽度
- * @param {string | number} [props.minHeight='600px'] - 最小高度
  *
  * @example
  * ```tsx
@@ -81,14 +84,20 @@ export interface AgenticLayoutProps {
  * - 支持左右侧栏的独立折叠控制
  * - 中间区域自适应剩余宽度
  * - 提供响应式布局适配
- * - 支持自定义宽度和高度
+ * - 支持自定义宽度
  * - 集成 Ant Design 主题系统
  */
 // 常量定义
+/** 右侧栏拖拽允许的最小宽度。 */
 const MIN_RIGHT_WIDTH = 400;
+/** 中间区域必须保留的最小宽度，防止被左右栏挤没。 */
+const MIN_CENTER_WIDTH = 320;
+/** 右侧栏最大宽度占视口宽度的比例。 */
 const MAX_RIGHT_WIDTH_RATIO = 0.7;
 const DEFAULT_LEFT_WIDTH = 256;
 const DEFAULT_RIGHT_WIDTH = 540;
+/** 左侧栏内边距（折叠态需归零）。 */
+const SIDEBAR_LEFT_PADDING = 12;
 
 const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
   left,
@@ -142,40 +151,13 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
     };
   }, [currentRightWidth, getMaxRightWidth]);
 
-  // 处理拖拽过程
-  const handleResizeMove = useCallback(
-    (e: MouseEvent) => {
-      if (!isResizingRef.current) return;
+  // 持有最近一次注册到 document 的 listener 引用，用于卸载时清理。
+  // 不放入依赖数组，避免拖拽过程中 callback 引用变化引发 effect 反复 re-bind。
+  const boundMoveHandlerRef = useRef<((e: MouseEvent) => void) | null>(null);
+  const boundUpHandlerRef = useRef<(() => void) | null>(null);
 
-      // 向左拖拽（扩大右侧边栏）时 deltaX 为正，向右拖拽（缩小）时 deltaX 为负
-      const deltaX = resizeStartX.current - e.clientX;
-      const newWidth = resizeStartWidth.current + deltaX;
-      const maxWidth = getMaxRightWidth();
-
-      // 限制宽度范围
-      const clampedWidth = Math.max(
-        MIN_RIGHT_WIDTH,
-        Math.min(newWidth, maxWidth),
-      );
-
-      setCurrentRightWidth(clampedWidth);
-    },
-    [getMaxRightWidth],
-  );
-
-  // 处理拖拽结束
-  const handleResizeEnd = useCallback(
-    function handleMouseUp() {
-      isResizingRef.current = false;
-      document.removeEventListener('mousemove', handleResizeMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    },
-    [handleResizeMove],
-  );
-
-  // 处理拖拽开始
+  // 处理拖拽开始：捕获本次拖拽的初始状态，并把 mousemove/mouseup 直接绑定到 document。
+  // listener 通过 ref 持有，使得卸载/单次拖拽结束都能精确移除。
   const handleResizeStart = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
@@ -183,33 +165,70 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
       isResizingRef.current = true;
       resizeStartX.current = e.clientX;
       resizeStartWidth.current = currentRightWidth;
-      document.addEventListener('mousemove', handleResizeMove);
-      document.addEventListener('mouseup', handleResizeEnd);
+
+      const onMove = (event: MouseEvent) => {
+        if (!isResizingRef.current) return;
+        // 向左拖拽（扩大右侧边栏）时 deltaX 为正，向右拖拽（缩小）时 deltaX 为负
+        const deltaX = resizeStartX.current - event.clientX;
+        const newWidth = resizeStartWidth.current + deltaX;
+        const maxWidth = getMaxRightWidth();
+        const clampedWidth = Math.max(
+          MIN_RIGHT_WIDTH,
+          Math.min(newWidth, maxWidth),
+        );
+        setCurrentRightWidth(clampedWidth);
+      };
+
+      const onUp = () => {
+        isResizingRef.current = false;
+        if (boundMoveHandlerRef.current) {
+          document.removeEventListener('mousemove', boundMoveHandlerRef.current);
+          boundMoveHandlerRef.current = null;
+        }
+        if (boundUpHandlerRef.current) {
+          document.removeEventListener('mouseup', boundUpHandlerRef.current);
+          boundUpHandlerRef.current = null;
+        }
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      };
+
+      boundMoveHandlerRef.current = onMove;
+      boundUpHandlerRef.current = onUp;
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
       document.body.style.cursor = 'col-resize';
       document.body.style.userSelect = 'none';
     },
-    [currentRightWidth, handleResizeMove, handleResizeEnd],
+    [currentRightWidth, getMaxRightWidth],
   );
 
-  // 清理事件监听器
+  // 仅在卸载时执行一次清理：移除可能残留的 document 级 listener、复位 body 样式。
+  // 依赖数组留空，避免拖拽过程中 setCurrentRightWidth 引发的 rerender 反复重跑此 effect。
   useEffect(() => {
     return () => {
-      document.removeEventListener('mousemove', handleResizeMove);
-      document.removeEventListener('mouseup', handleResizeEnd);
+      if (boundMoveHandlerRef.current) {
+        document.removeEventListener('mousemove', boundMoveHandlerRef.current);
+        boundMoveHandlerRef.current = null;
+      }
+      if (boundUpHandlerRef.current) {
+        document.removeEventListener('mouseup', boundUpHandlerRef.current);
+        boundUpHandlerRef.current = null;
+      }
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     };
-  }, [handleResizeMove, handleResizeEnd]);
+  }, []);
 
   return wrapSSR(
     <div
       className={classNames(prefixCls, className, hashId)}
-      data-testid={prefixCls}
+      data-testid={AGENTIC_LAYOUT_TEST_ID}
       style={style}
     >
       {/* 主体内容区域 */}
       <div
-        className={`${prefixCls}-body ${hashId}`}
+        className={classNames(`${prefixCls}-body`, hashId)}
         style={{ display: 'flex', flex: 1 }}
       >
         {/* 左侧边栏 */}
@@ -223,10 +242,13 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
               },
               hashId,
             )}
+            // 宽度与 padding 完全由 inline style 控制，确保折叠态不依赖 !important。
             style={{
               width: leftCollapsed ? 0 : leftWidth,
               minWidth: leftCollapsed ? 0 : leftWidth,
               maxWidth: leftCollapsed ? 0 : leftWidth,
+              padding: leftCollapsed ? 0 : SIDEBAR_LEFT_PADDING,
+              border: leftCollapsed ? 'none' : undefined,
             }}
           >
             <div className={classNames(`${prefixCls}-sidebar-content`, hashId)}>
@@ -237,10 +259,11 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
 
         {/* 中间内容区域 */}
         <div
-          className={`${prefixCls}-main ${hashId}`}
+          className={classNames(`${prefixCls}-main`, hashId)}
           style={{
             flex: 1,
-            minWidth: MIN_RIGHT_WIDTH,
+            // 用专属常量防止与右栏最小宽度耦合误读。
+            minWidth: MIN_CENTER_WIDTH,
           }}
         >
           {header && (
@@ -285,10 +308,14 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
               },
               hashId,
             )}
+            // 宽度由 inline style 单一来源控制，避免与 class 打架。
             style={{
               width: rightCollapsed ? 0 : currentRightWidth,
               minWidth: rightCollapsed ? 0 : currentRightWidth,
               maxWidth: rightCollapsed ? 0 : currentRightWidth,
+              padding: rightCollapsed ? 0 : undefined,
+              opacity: rightCollapsed ? 0 : undefined,
+              overflow: rightCollapsed ? 'hidden' : undefined,
             }}
           >
             <div className={classNames(`${prefixCls}-sidebar-content`, hashId)}>

@@ -477,10 +477,10 @@ describe('AgenticLayout', () => {
     expect(resizeHandle).not.toBeInTheDocument();
   });
 
-  it('cleans up event listeners on unmount', () => {
+  it('cleans up event listeners on unmount when a drag is in progress', () => {
     const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener');
 
-    const { unmount } = render(
+    const { container, unmount } = render(
       <AgenticLayout
         center={<div>Center content</div>}
         right={<div>Right content</div>}
@@ -488,9 +488,24 @@ describe('AgenticLayout', () => {
       />,
     );
 
+    // 先触发拖拽以真实注册 mousemove/mouseup listener；
+    // 实现仅在确实注册过 listener 时才在卸载阶段调用 removeEventListener，
+    // 避免无意义的全局事件操作。
+    const resizeHandle = container.querySelector(
+      '.ant-agentic-layout-resize-handle-right',
+    ) as HTMLElement;
+    act(() => {
+      const mouseDownEvent = new MouseEvent('mousedown', {
+        clientX: 100,
+        bubbles: true,
+        cancelable: true,
+      });
+      resizeHandle.dispatchEvent(mouseDownEvent);
+    });
+
     unmount();
 
-    // 验证事件监听器被移除
+    // 验证拖拽期间注册的事件监听器在卸载时被精确移除
     expect(removeEventListenerSpy).toHaveBeenCalledWith(
       'mousemove',
       expect.any(Function),
