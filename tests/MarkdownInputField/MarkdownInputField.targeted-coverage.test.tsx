@@ -112,14 +112,26 @@ vi.mock(
   }),
 );
 
-vi.mock('../../src/MarkdownInputField/hooks/useMarkdownInputFieldRefs', () => ({
-  useMarkdownInputFieldRefs: () => ({
-    markdownEditorRef: { current: { store: { setMDContent: vi.fn() } } },
-    quickActionsRef: { current: null },
-    actionsRef: { current: null },
-    isSendingRef: { current: false },
+vi.mock(
+  '../../src/MarkdownInputField/hooks/useInputFieldRefContainer',
+  () => ({
+    useInputFieldRefContainer: () => ({
+      markdownEditorRef: { current: { store: { setMDContent: vi.fn() } } },
+      quickActionsRef: { current: null },
+      actionsRef: { current: null },
+      isSendingRef: { current: false },
+    }),
+  }),
+);
+
+vi.mock('../../src/MarkdownInputField/hooks/useEditorValueSync', () => ({
+  useEditorValueSync: () => ({
     onEditorChange: vi.fn(),
   }),
+}));
+
+vi.mock('../../src/MarkdownInputField/hooks/useExposeInputRef', () => ({
+  useExposeInputRef: () => undefined,
 }));
 
 // 合并自原 useMarkdownInputFieldLayout + useMarkdownInputFieldStyles。

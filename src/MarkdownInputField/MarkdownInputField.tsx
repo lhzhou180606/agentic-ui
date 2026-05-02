@@ -12,10 +12,12 @@ import {
   ROOT_TAB_INDEX,
 } from './constants';
 import { useFileUploadManager } from './FileUploadManager';
+import { useEditorValueSync } from './hooks/useEditorValueSync';
 import { useEnlargeAndContainerHandler } from './hooks/useEnlargeAndContainerHandler';
+import { useExposeInputRef } from './hooks/useExposeInputRef';
 import { useInputFieldGeometry } from './hooks/useInputFieldGeometry';
+import { useInputFieldRefContainer } from './hooks/useInputFieldRefContainer';
 import { useKeyboardHandler } from './hooks/useKeyboardHandler';
-import { useMarkdownInputFieldRefs } from './hooks/useMarkdownInputFieldRefs';
 import { useMarkdownInputFieldState } from './hooks/useMarkdownInputFieldState';
 import { usePasteHandler } from './hooks/usePasteHandler';
 import { useSendHandler } from './hooks/useSendHandler';
@@ -162,16 +164,19 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     attachment,
   });
 
-  // Refs 管理
-  const {
-    markdownEditorRef,
-    quickActionsRef,
-    actionsRef,
-    isSendingRef,
-    onEditorChange,
-  } = useMarkdownInputFieldRefs({
-    inputRef: props.inputRef,
+  // Refs 管理 — 拆分为三个单一职责 hook：
+  // 1) 持有 ref 容器  2) 同步外部 value → 编辑器  3) 透出 inputRef 给调用方
+  const { markdownEditorRef, quickActionsRef, actionsRef, isSendingRef } =
+    useInputFieldRefContainer();
+
+  const { onEditorChange } = useEditorValueSync({
     value: props.value,
+    markdownEditorRef,
+  });
+
+  useExposeInputRef({
+    inputRef: props.inputRef,
+    markdownEditorRef,
     setValue,
   });
 
