@@ -27,11 +27,11 @@ type SuggestionMenuItem = {
  * @property {function} [setOpen] - 设置建议面板开关状态的函数
  * @example
  * // 在消费组件中使用此上下文
- * const { open, setOpen } = useContext(SuggestionConnext);
+ * const { open, setOpen } = useContext(SuggestionContext);
  * // 打开建议面板
  * setOpen?.(true);
  */
-export const SuggestionConnext = React.createContext<{
+export const SuggestionContext = React.createContext<{
   open?: boolean;
   setOpen?: (open: boolean) => void;
   isRender: true;
@@ -48,6 +48,12 @@ export const SuggestionConnext = React.createContext<{
 }>({
   isRender: true,
 });
+
+/**
+ * @deprecated 拼写错误的旧名，请使用 `SuggestionContext`。
+ * 保留作为向后兼容别名，将在下一个大版本移除。
+ */
+export const SuggestionConnext = SuggestionContext;
 
 /**
  * Suggestion 组件 - 自动完成建议组件
@@ -238,7 +244,7 @@ export const Suggestion: React.FC<{
   );
 
   return (
-    <SuggestionConnext.Provider
+    <SuggestionContext.Provider
       value={{
         open,
         setOpen,
@@ -274,6 +280,6 @@ export const Suggestion: React.FC<{
       >
         {props.children}
       </Dropdown>
-    </SuggestionConnext.Provider>
+    </SuggestionContext.Provider>
   );
 };

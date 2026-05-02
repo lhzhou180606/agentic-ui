@@ -9,6 +9,13 @@ group:
 
 # Changelog
 
+## v2.32.0
+
+- MarkdownInputField
+  - 💥 **Breaking change**: `actionsRender` / `toolsRender` / `quickActionRender` / `beforeToolsRender` arg type narrowed from the god-object `MarkdownInputFieldProps & MarkdownInputFieldProps['attachment'] & {...}` to the stable derived type `SlotRenderState` (`actionsRender` uses `ActionsSlotState` which adds `collapseSendActions`). New arg fields: `value` / `isHover` / `isLoading` / `fileMap` / `onFileMapChange` / `fileUploadStatus` / `fileUploadSummary` / `attachment` / `disabled` / `typing`. **Migration**: change `props.upload` and other attachment fields to `state.attachment?.upload`; rename `props` to `state` for the rest.
+  - 🛠 `MarkdownInputFieldProps['attachment']` switched from the inline shape `{ enable?: boolean } & AttachmentButtonProps` to the named type `AttachmentConfig`. Behaviour is identical.
+  - 🆕 New public type exports: `SlotRenderState`, `ActionsSlotState`, for typing custom slot implementations.
+
 ## v2.31.5
 
 - 🛠 Change some exported types from value exports to type exports, optimize bundle size.

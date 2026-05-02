@@ -1,8 +1,9 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import { AttachmentFileList } from '../AttachmentButton/AttachmentFileList';
 import type { AttachmentFile } from '../AttachmentButton/types';
 import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
+import type { FileUploadStatus, FileUploadSummary } from '../types/shared';
 
 interface UseAttachmentListParams {
   attachment?: MarkdownInputFieldProps['attachment'];
@@ -50,43 +51,73 @@ export const useAttachmentList = ({
 
 interface UseBeforeToolsParams {
   beforeToolsRender?: MarkdownInputFieldProps['beforeToolsRender'];
-  /**
-   * 透传给 beforeToolsRender 的组件 props 全集。
-   *
-   * 注意：beforeToolsRender 的入参类型 `MarkdownInputFieldProps & { isHover, isLoading }`
-   * 是公开 API，必须保持。这里通过 ref 持有最新值，使 useMemo 依赖只挂稳定字段，
-   * 避免主组件每次渲染产生的新 props 对象触发无效重算。
-   */
-  props: MarkdownInputFieldProps;
+  /** 当前 attachment 配置（透传到 SlotRenderState.attachment） */
+  attachment?: MarkdownInputFieldProps['attachment'];
+  /** 当前编辑器值 */
+  value?: string;
+  /** 当前附件文件映射 */
+  fileMap?: Map<string, AttachmentFile>;
+  /** 修改附件文件映射的回调 */
+  onFileMapChange?: (fileMap?: Map<string, AttachmentFile>) => void;
+  /** 文件上传状态 */
+  fileUploadStatus: FileUploadStatus;
+  /** 文件上传统计 */
+  fileUploadSummary?: FileUploadSummary;
+  /** 是否禁用 */
+  disabled?: boolean;
+  /** 是否 typing 中 */
+  typing?: boolean;
+  /** 鼠标悬停状态 */
   isHover: boolean;
+  /** 发送加载状态 */
   isLoading: boolean;
 }
 
 /**
  * BeforeTools 渲染 Hook
  *
- * 行为契约：当 `beforeToolsRender` / `isHover` / `isLoading` 变化时重新渲染；
- * `props` 仅作为透传载体（其内部状态变更通常会同时引起 isHover/isLoading
- * 或 beforeToolsRender 引用变化），不参与 useMemo 依赖比较。
+ * 行为契约：依赖列表中任何字段变化都会触发重新渲染。`beforeToolsRender` 入参
+ * 类型已收敛为 `SlotRenderState`，不再需要 ref 透传完整 `props` 对象。
  */
 export const useBeforeTools = ({
   beforeToolsRender,
-  props,
+  attachment,
+  value,
+  fileMap,
+  onFileMapChange,
+  fileUploadStatus,
+  fileUploadSummary,
+  disabled,
+  typing,
   isHover,
   isLoading,
 }: UseBeforeToolsParams): React.ReactNode => {
-  // 用 ref 持有最新 props，避免把整个 props 对象挂进 useMemo 依赖
-  // （挂进去等价于不缓存，因为主组件每次渲染都会构造新的 props 引用）。
-  const propsRef = useRef(props);
-  propsRef.current = props;
-
   return useMemo(() => {
     if (!beforeToolsRender) return null;
     return beforeToolsRender({
-      ...propsRef.current,
+      attachment,
+      value,
+      fileMap,
+      onFileMapChange,
+      fileUploadStatus,
+      fileUploadSummary,
+      disabled,
+      typing,
       isHover,
       isLoading,
     });
-  }, [beforeToolsRender, isHover, isLoading]);
+  }, [
+    beforeToolsRender,
+    attachment,
+    value,
+    fileMap,
+    onFileMapChange,
+    fileUploadStatus,
+    fileUploadSummary,
+    disabled,
+    typing,
+    isHover,
+    isLoading,
+  ]);
 };
 

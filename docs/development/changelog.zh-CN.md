@@ -9,6 +9,13 @@ group:
 
 # Changelog
 
+## v2.32.0
+
+- MarkdownInputField
+  - 💥 **Breaking change**：`actionsRender` / `toolsRender` / `quickActionRender` / `beforeToolsRender` 入参类型由「上帝接口」`MarkdownInputFieldProps & MarkdownInputFieldProps['attachment'] & {...}` 收敛为稳定派生类型 `SlotRenderState`（`actionsRender` 用 `ActionsSlotState` 含 `collapseSendActions`）。新入参字段：`value` / `isHover` / `isLoading` / `fileMap` / `onFileMapChange` / `fileUploadStatus` / `fileUploadSummary` / `attachment` / `disabled` / `typing`。**迁移**：将 `props.upload` 等附件字段访问改为 `state.attachment?.upload`；其他字段改名 `props` → `state` 即可。
+  - 🛠 `MarkdownInputFieldProps['attachment']` 由内联结构 `{ enable?: boolean } & AttachmentButtonProps` 改为命名类型 `AttachmentConfig`，行为完全等价。
+  - 🆕 新增对外类型导出：`SlotRenderState`、`ActionsSlotState`，便于在自定义 slot 实现中获得类型提示。
+
 ## v2.31.5
 
 - 🛠 将部分导出类型从值导出改为类型导出，优化打包体积。

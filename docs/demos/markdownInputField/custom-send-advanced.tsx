@@ -1,4 +1,7 @@
-import { MarkdownInputField } from '@ant-design/agentic-ui';
+import {
+  MarkdownInputField,
+  type ActionsSlotState,
+} from '@ant-design/agentic-ui';
 import {
   CloudUploadOutlined,
   HeartOutlined,
@@ -28,8 +31,8 @@ const CustomSendAdvancedDemo: React.FC = () => {
   const [value3, setValue3] = useState('这是简洁版自定义按钮...');
   const { loading, handleSend } = useSendHandler();
 
-  const fullyCustomRender = (props: any) => {
-    const { isHover, isLoading, disabled } = props;
+  const fullyCustomRender = (state: ActionsSlotState) => {
+    const { isHover, isLoading, disabled } = state;
     return [
       <Tooltip key="settings" title="设置">
         <Button
@@ -71,7 +74,7 @@ const CustomSendAdvancedDemo: React.FC = () => {
   };
 
   const mergeDefaultsRender = (
-    props: any,
+    state: ActionsSlotState,
     defaultActions: React.ReactNode[],
   ) => [
     <Tooltip key="like" title="点赞">
@@ -81,7 +84,7 @@ const CustomSendAdvancedDemo: React.FC = () => {
         icon={<HeartOutlined />}
         onClick={() => console.log('点赞')}
         style={{
-          color: props.isHover ? '#ff4d4f' : '#666',
+          color: state.isHover ? '#ff4d4f' : '#666',
           transition: 'color 0.2s',
         }}
       />
@@ -89,8 +92,8 @@ const CustomSendAdvancedDemo: React.FC = () => {
     ...defaultActions,
   ];
 
-  const compactRender = (props: any) => {
-    const { isLoading, disabled } = props;
+  const compactRender = (state: ActionsSlotState) => {
+    const { isLoading, disabled } = state;
     return [
       <Button
         key="simple-send"

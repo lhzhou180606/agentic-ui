@@ -1,4 +1,7 @@
-import { MarkdownInputField } from '@ant-design/agentic-ui';
+import {
+  MarkdownInputField,
+  type ActionsSlotState,
+} from '@ant-design/agentic-ui';
 import { SendOutlined, SettingOutlined } from '@ant-design/icons';
 import { Button, Space, Tooltip } from 'antd';
 import React, { useState } from 'react';
@@ -25,8 +28,8 @@ const CustomSendButtonDemo: React.FC = () => {
   };
 
   // 自定义操作按钮渲染函数
-  const customActionsRender = (props: any) => {
-    const { isHover, isLoading, disabled } = props;
+  const customActionsRender = (state: ActionsSlotState) => {
+    const { isHover, isLoading, disabled } = state;
 
     return [
       // 添加设置按钮

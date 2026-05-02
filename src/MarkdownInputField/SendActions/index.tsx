@@ -11,6 +11,7 @@ import type { AttachmentFile } from '../AttachmentButton/types';
 import type { SendButtonCustomizationProps } from '../SendButton';
 import { SendButton, resolveSendDisabled } from '../SendButton';
 import type { FileUploadStatus, FileUploadSummary } from '../types/shared';
+import type { ActionsSlotState } from '../types/slots';
 import type { CreateRecognizer } from '../VoiceInput';
 import { VoiceInputButton } from '../VoiceInput';
 import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
@@ -74,9 +75,14 @@ export interface SendActionsProps {
   /** 停止操作回调 */
   onStop?: () => void;
 
-  /** 自定义渲染函数 */
+  /**
+   * 自定义渲染函数
+   *
+   * 入参为 {@link ActionsSlotState}（与公开 API
+   * `MarkdownInputFieldProps.actionsRender` 同签名）。
+   */
   actionsRender?: (
-    props: any,
+    state: ActionsSlotState,
     defaultActions: React.ReactNode[],
   ) => React.ReactNode[];
 
@@ -221,23 +227,19 @@ export const SendActions: React.FC<SendActionsProps> = ({
   const actionsList = actionsRender
     ? actionsRender(
         {
-          attachment,
-          voiceRecognizer,
+          // SlotRenderState 公共字段
           value,
-          disabled,
-          typing,
-          isLoading,
-          fileUploadDone,
-          recording,
-          collapseSendActions,
-          allowEmptySubmit,
-          uploadImage,
-          onStartRecording,
-          onStopRecording,
-          onSend,
-          onStop,
+          isHover: false,
+          isLoading: !!isLoading,
+          fileMap,
+          onFileMapChange: attachment?.onFileMapChange,
           fileUploadStatus,
           fileUploadSummary,
+          attachment,
+          disabled,
+          typing,
+          // ActionsSlotState 专属
+          collapseSendActions,
         },
         defaultActions,
       )

@@ -426,7 +426,12 @@ export {
 } from './MarkdownInputField/AttachmentButton/utils';
 export { ActionItemContainer } from './MarkdownInputField/BeforeToolContainer/BeforeToolContainer';
 export { FileMapView, type FileMapViewProps } from './MarkdownInputField/FileMapView';
-export { type MarkdownInputFieldProps, MarkdownInputField } from './MarkdownInputField/MarkdownInputField';
+export {
+  MarkdownInputField,
+  type ActionsSlotState,
+  type MarkdownInputFieldProps,
+  type SlotRenderState,
+} from './MarkdownInputField/MarkdownInputField';
 export { MARKDOWN_INPUT_FIELD_TEST_IDS } from './MarkdownInputField/testIds';
 export { VoiceInputButton, type VoiceRecognizer, type CreateRecognizer } from './MarkdownInputField/VoiceInput';
 
