@@ -2,18 +2,8 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { AILabel } from '../../src/AILabel';
-
-vi.mock('framer-motion', () => ({
-  motion: {
-    sup: ({ children, className, style, ...props }: React.ComponentProps<'sup'>) => (
-      <sup className={className} style={style} {...props}>
-        {children}
-      </sup>
-    ),
-  },
-}));
 
 const renderWithAntd = (ui: React.ReactElement) =>
   render(<ConfigProvider>{ui}</ConfigProvider>);
