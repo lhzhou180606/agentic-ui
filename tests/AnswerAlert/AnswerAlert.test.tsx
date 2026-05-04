@@ -1,8 +1,12 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { AnswerAlert } from '../../src/AnswerAlert';
+import {
+  ANSWER_ALERT_TYPES,
+  AnswerAlert,
+  type AnswerAlertType,
+} from '../../src/AnswerAlert';
 
 describe('AnswerAlert 组件', () => {
   it('应该渲染基本的提示信息', () => {
@@ -122,9 +126,9 @@ describe('AnswerAlert 组件', () => {
     expect(closeButton).toBeInTheDocument();
   });
 
-  it('应该在点击关闭按钮后隐藏组件', () => {
+  it('应该在点击关闭按钮后隐藏组件（motion=false 立即卸载）', () => {
     const { container } = render(
-      <AnswerAlert message="可关闭的提示" closable />,
+      <AnswerAlert message="可关闭的提示" closable motion={false} />,
     );
 
     const closeButton = container.querySelector(
@@ -140,7 +144,12 @@ describe('AnswerAlert 组件', () => {
   it('应该在关闭时触发 onClose 回调', () => {
     const handleClose = vi.fn();
     const { container } = render(
-      <AnswerAlert message="可关闭的提示" closable onClose={handleClose} />,
+      <AnswerAlert
+        message="可关闭的提示"
+        closable
+        motion={false}
+        onClose={handleClose}
+      />,
     );
 
     const closeButton = container.querySelector(
@@ -255,10 +264,15 @@ describe('AnswerAlert 组件', () => {
     expect(closeButton).toHaveAttribute('tabIndex', '0');
   });
 
-  it('应该处理快速连续点击关闭按钮', () => {
+  it('应该处理快速连续点击关闭按钮（motion=false）', () => {
     const handleClose = vi.fn();
     const { container } = render(
-      <AnswerAlert message="快速点击测试" closable onClose={handleClose} />,
+      <AnswerAlert
+        message="快速点击测试"
+        closable
+        motion={false}
+        onClose={handleClose}
+      />,
     );
 
     const closeButton = container.querySelector(
@@ -292,6 +306,149 @@ describe('AnswerAlert 组件', () => {
     const icon = screen.getByTestId('cloned-icon');
     expect(icon).toHaveClass('original-class');
     expect(icon).toHaveClass('ant-answer-alert-icon');
+  });
+
+  // ============== Review/动画相关补充用例 ==============
+
+  it('description 为空时不应渲染描述容器', () => {
+    const { container } = render(<AnswerAlert message="只有标题" />);
+    const desc = container.querySelector('.ant-answer-alert-description');
+    expect(desc).not.toBeInTheDocument();
+  });
+
+  it('description 存在时才渲染描述容器', () => {
+    const { container } = render(
+      <AnswerAlert message="标题" description="描述" />,
+    );
+    const desc = container.querySelector('.ant-answer-alert-description');
+    expect(desc).toBeInTheDocument();
+  });
+
+  it('关闭按钮应有 aria-label="Close"', () => {
+    const { container } = render(<AnswerAlert message="x" closable />);
+    const closeButton = container.querySelector(
+      '.ant-answer-alert-close-icon',
+    ) as HTMLElement;
+    expect(closeButton).toHaveAttribute('aria-label', 'Close');
+  });
+
+  it('error/warning 类型应使用 role="alert" 和 aria-live="assertive"', () => {
+    const { container, rerender } = render(
+      <AnswerAlert type="error" message="err" />,
+    );
+    let alert = container.querySelector('.ant-answer-alert');
+    expect(alert).toHaveAttribute('role', 'alert');
+    expect(alert).toHaveAttribute('aria-live', 'assertive');
+
+    rerender(<AnswerAlert type="warning" message="warn" />);
+    alert = container.querySelector('.ant-answer-alert');
+    expect(alert).toHaveAttribute('role', 'alert');
+    expect(alert).toHaveAttribute('aria-live', 'assertive');
+  });
+
+  it('success/info/gray 类型应使用 role="status" 和 aria-live="polite"', () => {
+    (['success', 'info', 'gray'] as const).forEach((type) => {
+      const { container, unmount } = render(
+        <AnswerAlert type={type} message={`${type} msg`} />,
+      );
+      const alert = container.querySelector('.ant-answer-alert');
+      expect(alert).toHaveAttribute('role', 'status');
+      expect(alert).toHaveAttribute('aria-live', 'polite');
+      unmount();
+    });
+  });
+
+  it('未指定 type 时不应有 role 属性', () => {
+    const { container } = render(<AnswerAlert message="无类型" />);
+    const alert = container.querySelector('.ant-answer-alert');
+    expect(alert).not.toHaveAttribute('role');
+  });
+
+  it('motion=true（默认）：mount 时容器应带 motion class', () => {
+    const { container } = render(<AnswerAlert message="动画" />);
+    const alert = container.querySelector('.ant-answer-alert');
+    expect(alert).toHaveClass('ant-answer-alert-motion');
+    expect(alert).not.toHaveClass('ant-answer-alert-closing');
+  });
+
+  it('motion=false：不应带 motion class', () => {
+    const { container } = render(
+      <AnswerAlert message="无动画" motion={false} />,
+    );
+    const alert = container.querySelector('.ant-answer-alert');
+    expect(alert).not.toHaveClass('ant-answer-alert-motion');
+  });
+
+  it('motion=true：点击关闭后先进入 closing 态，触发 animationend 后才真正卸载', () => {
+    const handleClose = vi.fn();
+    const { container } = render(
+      <AnswerAlert message="退出动画" closable onClose={handleClose} />,
+    );
+
+    const closeButton = container.querySelector(
+      '.ant-answer-alert-close-icon',
+    ) as HTMLElement;
+
+    fireEvent.click(closeButton);
+
+    // 此刻 onClose 已经触发，但节点应仍在 DOM 中（处于 closing 态）
+    expect(handleClose).toHaveBeenCalledTimes(1);
+    const alertEl = container.querySelector('.ant-answer-alert');
+    expect(alertEl).toBeInTheDocument();
+    expect(alertEl).toHaveClass('ant-answer-alert-closing');
+
+    // 多次点击不应再次触发 onClose
+    fireEvent.click(closeButton);
+    fireEvent.click(closeButton);
+    expect(handleClose).toHaveBeenCalledTimes(1);
+
+    // 模拟动画结束 → 节点卸载
+    act(() => {
+      alertEl!.dispatchEvent(
+        new Event('animationend', { bubbles: true }),
+      );
+    });
+
+    expect(container.querySelector('.ant-answer-alert')).not.toBeInTheDocument();
+  });
+
+  it('motion=true：动画 fallback 超时也应保证卸载', () => {
+    vi.useFakeTimers();
+    try {
+      const { container } = render(
+        <AnswerAlert message="兜底卸载" closable />,
+      );
+      const closeButton = container.querySelector(
+        '.ant-answer-alert-close-icon',
+      ) as HTMLElement;
+
+      fireEvent.click(closeButton);
+      expect(container.querySelector('.ant-answer-alert')).toBeInTheDocument();
+
+      // 推进 fallback 超时（>400ms）
+      act(() => {
+        vi.advanceTimersByTime(450);
+      });
+
+      expect(
+        container.querySelector('.ant-answer-alert'),
+      ).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('ANSWER_ALERT_TYPES 应导出全部支持的类型字面量', () => {
+    expect([...ANSWER_ALERT_TYPES]).toEqual([
+      'success',
+      'error',
+      'warning',
+      'info',
+      'gray',
+    ]);
+    // 类型派生检查：保留赋值以确保 AnswerAlertType 派生正确
+    const t: AnswerAlertType = 'success';
+    expect(ANSWER_ALERT_TYPES).toContain(t);
   });
 });
 
