@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
-import AbstractLottie, { AbstractLottieProps } from '../Abstract';
-import { useAsyncLottieData } from '../../useAsyncLottieData';
+import React from 'react';
+import { AbstractLottieProps } from '../Abstract';
+import { createBubbleActionLottie } from '../createBubbleActionLottie';
 
 export type DislikeLottieProps = Omit<AbstractLottieProps, 'animationData'>;
 
@@ -43,13 +43,9 @@ export type DislikeLottieProps = Omit<AbstractLottieProps, 'animationData'>;
  * @param props.size - 动画尺寸（宽度和高度），默认为 '1em'
  * @returns 渲染的取消点赞操作动画组件
  */
-export const DislikeLottie: React.FC<DislikeLottieProps> = (props) => {
-  const loadJson = useMemo(() => () => import('./lottie.json'), []);
-  const animationData = useAsyncLottieData(loadJson);
-  if (animationData === null) {
-    return null;
-  }
-  return <AbstractLottie {...props} animationData={animationData} />;
-};
+export const DislikeLottie: React.FC<DislikeLottieProps> = createBubbleActionLottie({
+  loadJson: () => import('./lottie.json'),
+  displayName: 'DislikeLottie',
+});
 
 export default DislikeLottie;

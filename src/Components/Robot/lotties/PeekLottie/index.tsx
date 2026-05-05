@@ -1,7 +1,5 @@
-import Lottie from 'lottie-react';
-import React, { useMemo } from 'react';
-
-import { useAsyncLottieData } from '../../../lotties/useAsyncLottieData';
+import React from 'react';
+import { createLottieComponent } from '../../../lotties/createLottieComponent';
 
 export interface PeekLottieProps {
   /**
@@ -59,39 +57,10 @@ export interface PeekLottieProps {
  * - 支持播放控制
  * - 支持自定义样式
  */
-export const PeekLottie: React.FC<PeekLottieProps> = ({
-  autoplay = true,
-  loop = true,
-  className,
-  style,
-  size = 32,
-}) => {
-  const loadJson = useMemo(() => () => import('./lottie.json'), []);
-  const animationData = useAsyncLottieData(loadJson);
-
-  const containerStyle: React.CSSProperties = {
-    width: size,
-    height: size,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...style,
-  };
-
-  if (animationData === null) {
-    return <div style={containerStyle} className={className} aria-hidden />;
-  }
-
-  return (
-    <Lottie
-      style={containerStyle}
-      className={className}
-      aria-hidden="true"
-      animationData={animationData}
-      loop={loop}
-      autoplay={autoplay}
-    />
-  );
-};
+export const PeekLottie: React.FC<PeekLottieProps> = createLottieComponent({
+  loadJson: () => import('./lottie.json'),
+  defaultSize: 32,
+  displayName: 'PeekLottie',
+});
 
 export default PeekLottie;

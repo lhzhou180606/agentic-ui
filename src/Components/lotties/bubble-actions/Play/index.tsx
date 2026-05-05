@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
-import AbstractLottie, { AbstractLottieProps } from '../Abstract';
-import { useAsyncLottieData } from '../../useAsyncLottieData';
+import React from 'react';
+import { AbstractLottieProps } from '../Abstract';
+import { createBubbleActionLottie } from '../createBubbleActionLottie';
 
 export type PlayLottieProps = Omit<AbstractLottieProps, 'animationData'>;
 
@@ -43,13 +43,9 @@ export type PlayLottieProps = Omit<AbstractLottieProps, 'animationData'>;
  * @param props.size - 动画尺寸（宽度和高度），默认为 '1em'
  * @returns 渲染的播放操作动画组件
  */
-export const PlayLottie: React.FC<PlayLottieProps> = (props) => {
-  const loadJson = useMemo(() => () => import('./lottie.json'), []);
-  const animationData = useAsyncLottieData(loadJson);
-  if (animationData === null) {
-    return null;
-  }
-  return <AbstractLottie {...props} animationData={animationData} />;
-};
+export const PlayLottie: React.FC<PlayLottieProps> = createBubbleActionLottie({
+  loadJson: () => import('./lottie.json'),
+  displayName: 'PlayLottie',
+});
 
 export default PlayLottie;

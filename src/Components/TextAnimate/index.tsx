@@ -3,7 +3,7 @@ import classNames from 'clsx';
 import { AnimatePresence, motion, MotionProps, Variants } from 'framer-motion';
 import { isNumber, isObject, isString } from 'lodash-es';
 import toArray from 'rc-util/lib/Children/toArray';
-import React, { ElementType, memo, useContext } from 'react';
+import React, { ElementType, memo, useContext, useMemo } from 'react';
 import { useTextAnimateStyle } from './style';
 
 type AnimationType = 'text' | 'word' | 'character' | 'line' | 'mix';
@@ -353,7 +353,9 @@ const TextAnimateBase = ({
   const prefixCls = getPrefixCls('text-animate');
   const { wrapSSR, hashId } = useTextAnimateStyle(prefixCls);
 
-  const MotionComponent = motion(Component);
+  // 缓存 motion(Component) 结果。motion() 每次调用都会返回一个新组件类型，
+  // 直接在 render 中调用会导致 React 把整棵子树视为不同组件、每次卸载重建。
+  const MotionComponent = useMemo(() => motion(Component), [Component]);
 
   const segments = resolveSegments(children, by);
 

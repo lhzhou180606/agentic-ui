@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import React, { useContext, useEffect } from 'react';
 import { useStyle } from './style';
 
-export type ActionItemBoxProps = {
+export interface ActionItemBoxProps {
   onClick: () => void;
   icon?: string;
   title: React.ReactNode;
@@ -18,7 +18,7 @@ export type ActionItemBoxProps = {
   compact?: boolean;
   hoverBg?: boolean;
   disabled?: boolean;
-};
+}
 
 export const ActionItemBox = (props: ActionItemBoxProps) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
@@ -27,6 +27,8 @@ export const ActionItemBox = (props: ActionItemBoxProps) => {
 
   useEffect(() => {
     props?.onInit?.();
+    // onInit 仅在挂载时触发一次，刻意不依赖 props.onInit
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return wrapSSR(

@@ -3,19 +3,22 @@ import { ConfigProvider, Popover } from 'antd';
 import classNames from 'clsx';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
-import { useStyle } from '../ActionItemBox';
+import { useStyle } from './style';
 
 type KeyedElement = React.ReactElement & { key: React.Key };
 
-export type ActionItemContainerProps = {
+export interface ActionItemContainerProps {
   children: KeyedElement | KeyedElement[];
   size?: 'small' | 'large' | 'default';
   style?: React.CSSProperties;
   showMenu?: boolean;
   menuDisabled?: boolean;
-};
+}
 
-type ChildEntry = { key: React.Key | null; node: React.ReactNode };
+interface ChildEntry {
+  key: React.Key | null;
+  node: React.ReactNode;
+}
 
 /**
  * 把 `key: React.Key | null` 收敛为 React 可接受的 key 类型。
@@ -190,7 +193,10 @@ export const ActionItemContainer = (props: ActionItemContainerProps) => {
       }
     });
     if (hasMissingKey) {
-      throw new Error(
+      // 仅开发环境提示，不再 throw —— 抛错会令使用方整个 React 树崩溃，
+      // 而 key 缺失通常是用户疏忽，控制台错误已足以引起注意。
+      // eslint-disable-next-line no-console
+      console.error(
         'ActionItemContainer: all children must include an explicit `key` prop.',
       );
     }
@@ -199,24 +205,27 @@ export const ActionItemContainer = (props: ActionItemContainerProps) => {
   // keep ordered list in sync when children change; preserve existing order by key when possible
   useEffect(() => {
     const incoming = toEntries(props.children);
+    // 用 Map<key, node> 避免下方双重 find 带来的 O(n²) 复杂度
+    const incomingByKey = new Map<React.Key | null, React.ReactNode>();
+    for (const entry of incoming) {
+      incomingByKey.set(entry.key, entry.node);
+    }
     const existingKeys = new Set(ordered.map((e) => e.key));
-    // map existing order
+
     const merged: ChildEntry[] = [];
-    // keep items in previous order for keys that still exist
+    // 保留已有顺序（同时用最新 node 替换以反映 props 变化）
     for (const e of ordered) {
-      if (incoming.find((i) => i.key === e.key)) {
-        // replace node to reflect latest props while keeping position
-        const updated = incoming.find((i) => i.key === e.key)!;
-        merged.push({ key: e.key, node: updated.node });
+      if (incomingByKey.has(e.key)) {
+        merged.push({ key: e.key, node: incomingByKey.get(e.key) });
       }
     }
-    // append any new items not seen before
+    // 追加新增项
     for (const e of incoming) {
       if (!existingKeys.has(e.key)) {
         merged.push(e);
       }
     }
-    // if counts don't match (e.g., many changes), fallback to incoming order
+    // 数量对不上（例如批量替换）时直接采用 incoming
     setOrdered(merged.length === incoming.length ? merged : incoming);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.children]);

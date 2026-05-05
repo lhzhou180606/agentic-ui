@@ -1,7 +1,5 @@
-import Lottie from 'lottie-react';
-import React, { useMemo } from 'react';
-
-import { useAsyncLottieData } from '../useAsyncLottieData';
+import React from 'react';
+import { createLottieComponent } from '../createLottieComponent';
 
 export interface ThreeThinkingLottieProps {
   /**
@@ -69,51 +67,10 @@ export interface ThreeThinkingLottieProps {
  * - 支持自定义加载占位符
  * - 支持自定义尺寸和样式
  */
-export const ThreeThinkingLottie: React.FC<ThreeThinkingLottieProps> = ({
-  autoplay = true,
-  loop = true,
-  className,
-  style,
-  size = 32,
-  fallback,
-}) => {
-  const loadJson = useMemo(() => () => import('./three-thinking.json'), []);
-  const animationData = useAsyncLottieData(loadJson);
-
-  const containerStyle: React.CSSProperties = {
-    width: size,
-    height: size,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...style,
-  };
-
-  // 默认占位符
-  const defaultFallback = (
-    <div style={containerStyle} className={className}>
-      <span style={{ opacity: 0.3 }}>...</span>
-    </div>
-  );
-
-  if (!animationData) {
-    return fallback !== undefined ? (
-      <>{fallback}</>
-    ) : (
-      defaultFallback
-    );
-  }
-
-  return (
-    <Lottie
-      style={containerStyle}
-      className={className}
-      aria-hidden="true"
-      animationData={animationData}
-      loop={loop}
-      autoplay={autoplay}
-    />
-  );
-};
+export const ThreeThinkingLottie: React.FC<ThreeThinkingLottieProps> = createLottieComponent({
+  loadJson: () => import('./three-thinking.json'),
+  defaultSize: 32,
+  displayName: 'ThreeThinkingLottie',
+});
 
 export default ThreeThinkingLottie;

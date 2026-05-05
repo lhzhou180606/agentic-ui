@@ -160,7 +160,7 @@ export const Loading = ({
   const baseCls = context?.getPrefixCls(prefixCls);
   const { wrapSSR, hashId } = useStyle(baseCls);
 
-  const isNestedPattern = React.useMemo<boolean>(() => !!children, [children]);
+  const isNestedPattern = !!children;
 
   const mergedSize = size ?? (isNestedPattern ? 32 : '1em');
 

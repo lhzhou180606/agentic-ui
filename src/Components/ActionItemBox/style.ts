@@ -5,7 +5,15 @@ import {
   useEditorStyleRegister,
 } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+/**
+ * ActionItemBox 与 ActionItemContainer 共享的样式生成函数。
+ *
+ * 两个组件使用同一个 prefixCls（`agentic-chat-action-item-box`），
+ * 因此样式生成函数也共享一份。ActionItemContainer 通过自己的
+ * `useStyle` 入口（`ActionItemContainer/style.ts`）以独立的 styleKey
+ * 注册同一份 genStyle，避免直接跨组件导入 ActionItemBox 的 useStyle。
+ */
+export const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     [token.componentCls]: {
       borderRadius: '11px',

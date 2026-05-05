@@ -47,9 +47,12 @@ const TypingAnimationBase = ({
   cursorStyle = 'line',
   ...props
 }: TypingAnimationProps) => {
-  const MotionComponent = motion(Component, {
-    forwardMotionProps: true,
-  });
+  // 缓存 motion(Component) 结果。motion() 每次调用都会返回一个新组件类型，
+  // 直接在 render 中调用会导致 React 把整棵子树视为不同组件、每次卸载重建。
+  const MotionComponent = useMemo(
+    () => motion(Component, { forwardMotionProps: true }),
+    [Component],
+  );
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('typing-animation');
