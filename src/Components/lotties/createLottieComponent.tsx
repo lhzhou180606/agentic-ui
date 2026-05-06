@@ -25,8 +25,17 @@ interface CreateLottieComponentOptions {
   loadJson: () => Promise<unknown>;
   /** 默认尺寸（覆盖 BaseLottieProps.size 的默认值） */
   defaultSize?: number | string;
-  /** Lottie DOM 上额外的 data-testid */
+  /**
+   * Lottie DOM 上的 data-testid。
+   * 默认 `'lottie-mock'`，与外部测试中常用的 `vi.mock('lottie-react')` mock testid 对齐；
+   * 显式传入此项可覆盖默认值（例如 `'lottie-animation'`）。
+   */
   dataTestId?: string;
+  /**
+   * 加载阶段的默认占位元素（当 props.fallback 未提供时使用）。
+   * 例如 `<span>...</span>`，用于在动态 import 完成前给出可见的占位符。
+   */
+  defaultFallback?: React.ReactNode;
   /** 组件 displayName，便于 React DevTools 与 React.memo 兼容 */
   displayName?: string;
 }
@@ -43,7 +52,8 @@ export function createLottieComponent<P extends BaseLottieProps = BaseLottieProp
   const {
     loadJson,
     defaultSize,
-    dataTestId,
+    dataTestId = 'lottie-mock',
+    defaultFallback,
     displayName,
   } = options;
 
@@ -73,6 +83,9 @@ export function createLottieComponent<P extends BaseLottieProps = BaseLottieProp
     if (animationData === null || animationData === undefined) {
       if (fallback !== undefined) {
         return <>{fallback}</>;
+      }
+      if (defaultFallback !== undefined) {
+        return <>{defaultFallback}</>;
       }
       return <div style={containerStyle} className={className} aria-hidden />;
     }

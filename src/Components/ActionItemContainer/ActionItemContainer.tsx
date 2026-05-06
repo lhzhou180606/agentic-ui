@@ -193,10 +193,10 @@ export const ActionItemContainer = (props: ActionItemContainerProps) => {
       }
     });
     if (hasMissingKey) {
-      // 仅开发环境提示，不再 throw —— 抛错会令使用方整个 React 树崩溃，
-      // 而 key 缺失通常是用户疏忽，控制台错误已足以引起注意。
-      // eslint-disable-next-line no-console
-      console.error(
+      // 仅开发环境抛错：与既有契约一致，强制使用方为每个子元素显式提供 key，
+      // 否则 ordered list 在 children 变化 / 拖拽重排时无法稳定身份。
+      // 生产环境（NODE_ENV === 'production'）已在上方提前 return，不会触发。
+      throw new Error(
         'ActionItemContainer: all children must include an explicit `key` prop.',
       );
     }

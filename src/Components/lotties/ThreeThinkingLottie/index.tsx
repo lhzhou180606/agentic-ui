@@ -70,6 +70,8 @@ export interface ThreeThinkingLottieProps {
 export const ThreeThinkingLottie: React.FC<ThreeThinkingLottieProps> = createLottieComponent({
   loadJson: () => import('./three-thinking.json'),
   defaultSize: 32,
+  // 加载阶段默认占位"..."（可被 props.fallback 覆盖）
+  defaultFallback: <span>...</span>,
   displayName: 'ThreeThinkingLottie',
 });
 
