@@ -64,10 +64,11 @@ export interface CreativeSparkLottieProps {
  * @param props.size - 动画尺寸（宽度和高度）
  * @returns 渲染的创意生成中火花组件
  */
-export const CreativeSparkLottie: React.FC<CreativeSparkLottieProps> = createLottieComponent({
-  loadJson: () => import('./creativeSpark.json'),
-  dataTestId: 'lottie-animation',
-  displayName: 'CreativeSparkLottie',
-});
+export const CreativeSparkLottie: React.FC<CreativeSparkLottieProps> =
+  createLottieComponent({
+    loadJson: () => import('./creativeSpark.json'),
+    dataTestId: 'lottie-animation',
+    displayName: 'CreativeSparkLottie',
+  });
 
 export default CreativeSparkLottie;

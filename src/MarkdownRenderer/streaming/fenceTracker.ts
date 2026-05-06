@@ -26,7 +26,11 @@ export const updateFenceStateForLine = (
     return { inFenced: true, fenceChar: char, fenceLen: len };
   }
 
-  if (char === state.fenceChar && len >= state.fenceLen && /^\s*$/.test(after)) {
+  if (
+    char === state.fenceChar &&
+    len >= state.fenceLen &&
+    /^\s*$/.test(after)
+  ) {
     return { inFenced: false, fenceChar: '', fenceLen: 0 };
   }
 

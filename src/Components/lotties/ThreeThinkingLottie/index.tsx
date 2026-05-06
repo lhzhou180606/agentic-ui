@@ -67,12 +67,13 @@ export interface ThreeThinkingLottieProps {
  * - 支持自定义加载占位符
  * - 支持自定义尺寸和样式
  */
-export const ThreeThinkingLottie: React.FC<ThreeThinkingLottieProps> = createLottieComponent({
-  loadJson: () => import('./three-thinking.json'),
-  defaultSize: 32,
-  // 加载阶段默认占位"..."（可被 props.fallback 覆盖）
-  defaultFallback: <span>...</span>,
-  displayName: 'ThreeThinkingLottie',
-});
+export const ThreeThinkingLottie: React.FC<ThreeThinkingLottieProps> =
+  createLottieComponent({
+    loadJson: () => import('./three-thinking.json'),
+    defaultSize: 32,
+    // 加载阶段默认占位"..."（可被 props.fallback 覆盖）
+    defaultFallback: <span>...</span>,
+    displayName: 'ThreeThinkingLottie',
+  });
 
 export default ThreeThinkingLottie;

@@ -76,10 +76,7 @@ const calculateBrightness = (color: string): number | null => {
 /**
  * 检测背景色是否为暗色
  */
-const isDarkBackground = (
-  color: string,
-  threshold: number = 145,
-): boolean => {
+const isDarkBackground = (color: string, threshold: number = 145): boolean => {
   const brightness = calculateBrightness(color);
   if (brightness === null) return false;
   return brightness < threshold;
@@ -148,10 +145,16 @@ function subscribeTheme(listener: () => void): () => void {
 
   // 第一个订阅者时初始化全局监听器
   if (refCount === 1 && typeof window !== 'undefined') {
-    currentTheme = detectTheme(DEFAULT_CSS_VARIABLE, DEFAULT_DARKNESS_THRESHOLD);
+    currentTheme = detectTheme(
+      DEFAULT_CSS_VARIABLE,
+      DEFAULT_DARKNESS_THRESHOLD,
+    );
 
     const updateTheme = () => {
-      const next = detectTheme(DEFAULT_CSS_VARIABLE, DEFAULT_DARKNESS_THRESHOLD);
+      const next = detectTheme(
+        DEFAULT_CSS_VARIABLE,
+        DEFAULT_DARKNESS_THRESHOLD,
+      );
       if (next !== currentTheme) {
         currentTheme = next;
         listeners.forEach((fn) => fn());

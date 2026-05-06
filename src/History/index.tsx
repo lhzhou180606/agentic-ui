@@ -2,8 +2,8 @@ import { HistoryOutlined } from '@ant-design/icons';
 import { ConfigProvider, Popover } from 'antd';
 import classNames from 'clsx';
 import React, { memo, useContext, useMemo, useRef } from 'react';
-import useClickAway from '../Hooks/useClickAway';
 import { ActionIconBox } from '../Components/ActionIconBox';
+import useClickAway from '../Hooks/useClickAway';
 import { I18nContext } from '../I18n';
 import {
   HistoryEmpty,
@@ -80,6 +80,19 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
     setOpen(false);
   }, containerRef);
 
+  // 聚合 loading 状态：isLoading 是新名字，loading 已废弃但仍兼容；优先取 isLoading
+  const mergedLoading = props.isLoading ?? props.loading;
+
+  // generateHistoryItems 是普通函数，无法读 React Context；这里把 i18n 文案打包传入
+  const formatTimeLocale = useMemo(
+    () => ({
+      today: locale?.['chat.history.time.today'],
+      yesterday: locale?.['chat.history.time.yesterday'],
+      withinWeek: locale?.['chat.history.time.withinWeek'],
+    }),
+    [locale],
+  );
+
   const items = generateHistoryItems({
     filteredList,
     selectedIds,
@@ -106,11 +119,12 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
     sessionSort: props.sessionSort,
     type: props.type,
     runningId: props.agent?.runningId,
+    formatTimeLocale,
   });
 
   // 使用 useMemo 优化空组件渲染
   // 注意：只有在 items 为空时才需要渲染空组件
-  const shouldShowEmpty = items?.length === 0 && !props.loading;
+  const shouldShowEmpty = items?.length === 0 && !mergedLoading;
   const EmptyComponent = useMemo(() => {
     if (!shouldShowEmpty) {
       return null;
@@ -131,7 +145,7 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
     }
 
     const shouldRender =
-      props.agent?.enabled && !!props.agent?.onLoadMore && !props.loading;
+      props.agent?.enabled && !!props.agent?.onLoadMore && !mergedLoading;
 
     if (!shouldRender) {
       return null;
@@ -150,7 +164,7 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
     props.loadMoreRender,
     props.agent?.enabled,
     props.agent?.onLoadMore,
-    props.loading,
+    mergedLoading,
     handleLoadMore,
     props.type,
     menuPrefixCls,
@@ -206,7 +220,7 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
                 inlineIndent={20}
                 items={items}
                 className={menuPrefixCls}
-                loading={props.loading}
+                loading={mergedLoading}
               />
               {LoadMoreComponent}
             </>
@@ -240,7 +254,7 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
               inlineIndent={20}
               items={items}
               className={menuPrefixCls}
-              loading={props.loading}
+              loading={mergedLoading}
             />
           )}
           {LoadMoreComponent}

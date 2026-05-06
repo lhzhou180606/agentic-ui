@@ -9,8 +9,8 @@ import type {
   MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
 import type { MarkdownEditorProps } from '../MarkdownEditor/types';
-import { debugInfo } from '../Utils/debugUtils';
 import { ToolUseBarThink } from '../ToolUseBarThink';
+import { debugInfo } from '../Utils/debugUtils';
 import {
   FncRefForMarkdown,
   extractFootnoteRefFromSupChildren,

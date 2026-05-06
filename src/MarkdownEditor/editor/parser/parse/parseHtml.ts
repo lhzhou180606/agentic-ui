@@ -11,10 +11,8 @@ const THINK_TAG_CANONICAL_OPEN = '<think>';
 const THINK_TAG_CANONICAL_CLOSE = '</think>';
 
 /** 部分模型输出的外壳别名；拼接避免与规范标签在源码中混淆 */
-const REDACTED_THINKING_ALIAS_OPEN =
-  '<' + 'redacted_' + 'thinking' + '>';
-const REDACTED_THINKING_ALIAS_CLOSE =
-  '</' + 'redacted_' + 'thinking' + '>';
+const REDACTED_THINKING_ALIAS_OPEN = '<' + 'redacted_' + 'thinking' + '>';
+const REDACTED_THINKING_ALIAS_CLOSE = '</' + 'redacted_' + 'thinking' + '>';
 
 const THINKING_ALIAS_OPEN = '<' + 'thinking' + '>';
 const THINKING_ALIAS_CLOSE = '</' + 'thinking' + '>';
@@ -60,14 +58,16 @@ export function normalizeThinkTagAliases(markdown: string): string {
 
   let result = markdown;
   if (result.indexOf(REDACTED_THINKING_ALIAS_OPEN) !== -1) {
-    result = result.replace(REDACTED_THINKING_ALIAS_PAIR_REGEX, replaceToCanonical);
+    result = result.replace(
+      REDACTED_THINKING_ALIAS_PAIR_REGEX,
+      replaceToCanonical,
+    );
   }
   if (result.indexOf(THINKING_ALIAS_OPEN) !== -1) {
     result = result.replace(THINKING_ALIAS_PAIR_REGEX, replaceToCanonical);
   }
   return result;
 }
-
 
 /**
  * 解码 URI 组件，处理错误情况

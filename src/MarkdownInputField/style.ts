@@ -157,8 +157,7 @@ const genStyle: GenerateStyle<
         height: '100%',
         overflowY: 'visible',
         cursor: 'text',
-        scrollbarColor:
-          'var(--color-gray-text-secondary) transparent',
+        scrollbarColor: 'var(--color-gray-text-secondary) transparent',
         scrollbarWidth: 'thin',
         '&&-disabled': {
           backgroundColor: 'rgba(0,0,0,0.04)',
@@ -175,8 +174,7 @@ const genStyle: GenerateStyle<
         minHeight: `${DEFAULT_INPUT_CODE_BLOCK_HEIGHT}px !important`,
       },
       '& [data-be="code"]': {
-        background:
-          'var(--color-gray-bg-card-light) !important',
+        background: 'var(--color-gray-bg-card-light) !important',
         color:
           'var(--color-gray-text-default, rgba(20, 22, 28, 0.88)) !important',
       },

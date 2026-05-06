@@ -1,8 +1,8 @@
 import { Star, StarFill, Trash2 } from '@sofa-design/icons';
 import { ConfigProvider, Popconfirm, Space } from 'antd';
 import React, { useContext, useState } from 'react';
-import { I18nContext } from '../../I18n';
 import { ActionIconBox } from '../../Components/ActionIconBox';
+import { I18nContext } from '../../I18n';
 import { HistoryActionsBoxProps } from '../types';
 
 /**
@@ -144,15 +144,9 @@ export const HistoryActionsBox: React.FC<HistoryActionsBoxProps> = (props) => {
               onOpenChange={(visible) => {
                 setOpen(visible);
               }}
-              getPopupContainer={() =>
-                (document.getElementsByClassName(
-                  `${prefixCls}-agent-chat-history-menu`,
-                )[0] as HTMLDivElement) ||
-                (document.getElementsByClassName(
-                  `${prefixCls}-agent-chat`,
-                )[0] as HTMLDivElement) ||
-                document.body
-              }
+              // 之前硬编码 `agent-chat` / `agent-chat-history-menu` 业务容器查找，
+              // 在其它容器中使用 History 时会失效。这里直接交给 antd 默认行为
+              // (挂到 document.body)，避免反向耦合外层业务类名。
               placement="left"
               title={
                 i18nLocale?.['chat.history.delete.popconfirm'] ||

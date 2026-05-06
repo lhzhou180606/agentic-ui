@@ -3,9 +3,9 @@ import { ConfigProvider, Popover, Tooltip, Typography } from 'antd';
 import classNames from 'clsx';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 import { MarkdownEditor } from '../../MarkdownEditor';
-import { useRefFunction } from '../../Hooks/useRefFunction';
 import { Chunk, WhiteBoxProcessInterface } from '../../ThoughtChainList/types';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
 import { BubbleProps, MessageBubbleData } from '../type';
@@ -90,9 +90,12 @@ export const BubbleMessageDisplay: React.FC<
     return node;
   });
 
-  const handleFootnoteDefinitionChange = useCallback((list: typeof nodeList) => {
-    setNodeList(list);
-  }, []);
+  const handleFootnoteDefinitionChange = useCallback(
+    (list: typeof nodeList) => {
+      setNodeList(list);
+    },
+    [],
+  );
 
   const typing = useMemo(() => {
     return (
@@ -163,7 +166,9 @@ export const BubbleMessageDisplay: React.FC<
                   title={locale?.['chat.message.viewOriginal'] || '查看原文'}
                   tooltipProps={props?.customConfig?.TooltipProps}
                   onClick={() => {
-                    if (props.markdownRenderConfig?.fncProps?.onOriginUrlClick) {
+                    if (
+                      props.markdownRenderConfig?.fncProps?.onOriginUrlClick
+                    ) {
                       props.markdownRenderConfig.fncProps.onOriginUrlClick(
                         item.origin_url,
                       );

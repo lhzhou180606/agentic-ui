@@ -11,21 +11,40 @@
 
 /** 应完全移除（含子节点）的危险 HTML 标签 */
 const STRIP_ELEMENTS = new Set([
-  'script', 'noscript', 'style',
-  'meta', 'title', 'link', 'base',
-  'object', 'embed', 'applet', 'frame', 'frameset',
+  'script',
+  'noscript',
+  'style',
+  'meta',
+  'title',
+  'link',
+  'base',
+  'object',
+  'embed',
+  'applet',
+  'frame',
+  'frameset',
 ]);
 
 /** 应解包（移除标签但保留子节点）的结构性/表单 HTML 标签 */
 const UNWRAP_ELEMENTS = new Set([
-  'html', 'head', 'body',
-  'form', 'button', 'select', 'textarea',
-  'option', 'optgroup', 'fieldset', 'legend',
+  'html',
+  'head',
+  'body',
+  'form',
+  'button',
+  'select',
+  'textarea',
+  'option',
+  'optgroup',
+  'fieldset',
+  'legend',
 ]);
 
 const DANGEROUS_URL_SCHEMES = ['javascript:', 'vbscript:'];
 
-const sanitizeElementProperties = (properties: Record<string, unknown>): void => {
+const sanitizeElementProperties = (
+  properties: Record<string, unknown>,
+): void => {
   if (!properties) return;
   for (const key of Object.keys(properties)) {
     if (key.startsWith('on')) {

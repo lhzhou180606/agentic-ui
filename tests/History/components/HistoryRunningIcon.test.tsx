@@ -118,31 +118,54 @@ describe('HistoryRunningIcon', () => {
     expect(svg).toHaveAttribute('aria-label', 'Loading icon');
   });
 
-  it('应该在测试环境中不注入style标签', async () => {
+  it('animated=true 时不应在组件 container 内注入 <style>（已改为模块级注入到 document.head）', async () => {
     let container: HTMLElement;
     await act(async () => {
       const result = render(<HistoryRunningIcon animated={true} />);
       container = result.container;
     });
-    const style = container!.querySelector('style');
-    expect(style).not.toBeInTheDocument();
+    // 组件容器内不应有 <style>，避免重复 DOM 插入
+    expect(container!.querySelector('style')).not.toBeInTheDocument();
   });
 
-  it('NODE_ENV 非 test 时注入旋转动画 style', async () => {
-    const prev = process.env.NODE_ENV;
-    try {
-      process.env.NODE_ENV = 'development';
+  it('animated=true 时 keyframes 应被注入到 document.head 且同名只注入一次', async () => {
+    // 清理上次测试残留
+    document
+      .querySelectorAll('style[data-history-running-icon]')
+      .forEach((el) => el.remove());
 
-      let container: HTMLElement;
-      await act(async () => {
-        const result = render(<HistoryRunningIcon animated />);
-        container = result.container;
-      });
+    await act(async () => {
+      render(<HistoryRunningIcon animated />);
+    });
+    const firstCount = document.querySelectorAll(
+      'style[data-history-running-icon]',
+    ).length;
+    expect(firstCount).toBeGreaterThan(0);
 
-      expect(container!.querySelector('style')).toBeInTheDocument();
-    } finally {
-      process.env.NODE_ENV = prev;
-    }
+    // 渲染第二个实例：应得到不同的 animationId，所以新增一份 keyframes
+    await act(async () => {
+      render(<HistoryRunningIcon animated />);
+    });
+    const afterSecondCount = document.querySelectorAll(
+      'style[data-history-running-icon]',
+    ).length;
+    expect(afterSecondCount).toBe(firstCount + 1);
+
+    // 同名 keyframes 在 ensureKeyframesInjected 内被去重，重复触发不会再次插入
+    const styleEls = document.querySelectorAll(
+      'style[data-history-running-icon]',
+    );
+    const dupName = styleEls[0].getAttribute('data-history-running-icon')!;
+    // 直接调用一次 createElement 注入同名 keyframes 不会被重复注入逻辑屏蔽，
+    // 但渲染同 id 的实例（不可能，counter 永远递增）也不会撞 — 这里我们断言「至少没有重复同名标签」
+    const namesSeen = new Set<string>();
+    styleEls.forEach((el) => {
+      const name = el.getAttribute('data-history-running-icon');
+      expect(name).not.toBeNull();
+      expect(namesSeen.has(name!)).toBe(false);
+      namesSeen.add(name!);
+    });
+    expect(dupName).toMatch(/^history-running-\d+$/);
   });
 });
 

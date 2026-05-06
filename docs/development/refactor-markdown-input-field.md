@@ -11,13 +11,13 @@
 
 ## 概览
 
-| 维度 | 数据 |
-|---|---|
-| 主组件 | `MarkdownInputField.tsx` 548 行 |
-| Props 接口 | `MarkdownInputFieldProps` 531 行 / 30+ 顶层字段 |
-| 子目录 | 22 个 |
-| 单体最大 | `BeforeToolContainer.tsx` 476、`AttachmentButton/index.tsx` 447、`FileMapView/index.tsx` 461 |
-| 拆分出的 hooks | 6 个（State / Refs / Layout / Styles / Actions / Handlers） |
+| 维度           | 数据                                                                                         |
+| -------------- | -------------------------------------------------------------------------------------------- |
+| 主组件         | `MarkdownInputField.tsx` 548 行                                                              |
+| Props 接口     | `MarkdownInputFieldProps` 531 行 / 30+ 顶层字段                                              |
+| 子目录         | 22 个                                                                                        |
+| 单体最大       | `BeforeToolContainer.tsx` 476、`AttachmentButton/index.tsx` 447、`FileMapView/index.tsx` 461 |
+| 拆分出的 hooks | 6 个（State / Refs / Layout / Styles / Actions / Handlers）                                  |
 
 ---
 
@@ -176,6 +176,7 @@ FileUploadManager/index.tsx
 **现状**
 
 `useMarkdownInputFieldRefs` 同时干三件事：
+
 1. 创建 4 个 ref；
 2. 用 effect 同步外部 `value` → 编辑器（带焦点 + lastEditorValueRef 双重门禁）；
 3. `useImperativeHandle` 用 Proxy 包 `editor.store`。
@@ -229,6 +230,7 @@ FileUploadManager/index.tsx
 **现状**
 
 476 行的 `BeforeToolContainer`：
+
 - 自己实现了拖拽排序、Popover 溢出、横向滚动、阈值判定（`PAN_THRESHOLD`）；
 - 内部还拆出 `DraggablePopupItem` 子组件 + `React.memo`；
 - 导出名为 `ActionItemContainer`（**不叫 BeforeToolContainer**），命名和文件名不一致；
@@ -276,10 +278,12 @@ FileUploadManager/index.tsx
 ## P2 / 各模块小问题（top 收录）
 
 ### `SendButton`
+
 - `useEffect(() => { props.onInit?.() }, [])` 用 `eslint-disable` 静默掉依赖告警，可改成 `useMountEffect`。
 - SSR 检测放在所有 hook 之后才 `return null`，目前安全但只要后续在 if 后面加 hook 就崩。
 
 ### `AttachmentButton`
+
 - `upLoadFileToServer`（业务）+ UI 按钮 + Popover 三合一文件 447 行，应当拆分（见 #5）。
 - `processFile` 链路里直接 mutate 同一个 `file` 对象的 `status`/`url`/`errorMessage`，无 immutability。
 - `notifyChange = (m) => onFileMapChange?.(new Map(m))` 是为对抗「调用方直接传 setState」的 workaround，应该写在文档而非源码。
@@ -287,54 +291,64 @@ FileUploadManager/index.tsx
 - `${maxSize}` 模板替换走 `replace`，应该统一走 `compileTemplate`。
 
 ### `FileUploadManager`
+
 - 与 `AttachmentButton` 的 `upLoadFileToServer` 重复实现了一份单文件上传逻辑（在 `handleFileRetry` 里复刻），违反 DRY。
 - `getAcceptValue` 把「微信 > vivo/oppo > 移动 > 默认」判断写死，没有 prop 可覆盖；微信/vivo/oppo 三个分支都返回 `'*'`，可合并。
 - `MOBILE_DEFAULT_ACCEPT` ~250 字符常量需要命名 + 注释来源。
 
 ### `VoiceInputManager`
+
 - `pendingRef` 和 `recording` 状态分管「瞬时锁」和「UI 状态」，但 `stopRecording` 在 `recording=false` 直接 return —— 如果 `start` 还在 `await voiceRecognizer({...})` 里、`recording` 还没 true，外部的 `stopRecording` 就停不掉，会泄漏 recognizer。
 - `updateCurrentSentence` 依赖「`sentenceStartIndexRef.current` 一直是有效 index」，用户在录音中手动编辑文本时 index 错位 → 幻觉文本。
 - `onError` 里直接 `setRecording(false)` 没有把 error 透给外部。
 
 ### `SkillModeBar`
+
 - 见 #4 的 `skipNextCallbackRef` 反模式。
 - `<SkillModeBar />` → `<SkillModeBarInner />` 的拆分可合并（hooks 写在 early return 之前即可）。
 
 ### `Suggestion`
+
 - `SuggestionConnext` 拼写错误（导出 API，改名是 breaking）。
 - `useEffect(() => { loadingData() }, [open])` 依赖只有 `[open]`，`items` 函数变了不重新加载。
 - `selectedItems` 初值通过 `useState(() => items.map(...))` 计算，但没有 effect 监听 `items` 静态数组变化。
 
 ### `QuickActions`
+
 - `onResize?.(e.offsetWidth, rightOffset)` 通过 `getComputedStyle` 读 `right` 像素值再回传给父组件做 padding 计算，强耦合反模式。
 
 ### `BorderBeamAnimation`
+
 - 自己装一遍 ResizeObserver，与 `Layout` 重复，可共享 `useElementSize`。
 - `React.useId` 用对了，渐变 ID 不会冲突。✅
 
 ### `RefinePromptButton`
+
 - `isBrowserEnv()` 自己又封了一遍，复用统一的 `isBrowser`。
 
 ### `TopOperatingArea`
+
 - `targetRef ? () => targetRef.current || window : undefined` inline 函数每次 render 新建，BackTo 子组件可能因此每次都 reattach 监听器（待确认）。
 
 ### `Enlargement`
+
 - 标题 `'放大' / '缩小'` 中文硬编码，没走 i18n。
 
 ### `FilePaste`
+
 - `processEntry` 的 `dirReader.readEntries` 在条目超过 100 时只返回前 100 个（浏览器 API 限制），这里没有循环调用 readEntries 直到为空，会丢文件。
 
 ---
 
 ## 跨模块 API 一致性问题
 
-| 类别 | 不一致 |
-|---|---|
-| `defaultXxx` | `enlargeable`、`isFocused`、`isEnlarged`、`recording` 都没提供受控+非受控，违反 `AGENTS.md` Props 命名规范 |
-| `enable` 字段 | `attachment.enable`、`refinePrompt.enable`、`enlargeable.enable`、`skillMode.enable`、`voiceRecognizer`（直接传函数判 enable）—— 五种「开关」各不相同 |
-| render 函数签名 | `actionsRender(props, defaultActions)` vs `toolsRender(props)` vs `quickActionRender(props)` vs `beforeToolsRender(props)` —— 有的有 default 有的没有 |
-| i18n 落地 | `Enlargement` 硬编码 `'放大' / '缩小'`；`AttachmentButton/utils.ts` 设备品牌名用中文；`SendActions` fallback 用中文 `'文件上传'`；`SkillModeBar` `aria-label="技能模式"` 硬编码 |
-| prefixCls | `getPrefixCls('agentic-md-input-field')` vs `getPrefixCls('agentic-skill-mode')` vs `getPrefixCls('agentic-md-editor-attachment-button')`（附件其实属于 input-field 但用 editor 前缀） |
+| 类别            | 不一致                                                                                                                                                                                 |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `defaultXxx`    | `enlargeable`、`isFocused`、`isEnlarged`、`recording` 都没提供受控+非受控，违反 `AGENTS.md` Props 命名规范                                                                             |
+| `enable` 字段   | `attachment.enable`、`refinePrompt.enable`、`enlargeable.enable`、`skillMode.enable`、`voiceRecognizer`（直接传函数判 enable）—— 五种「开关」各不相同                                  |
+| render 函数签名 | `actionsRender(props, defaultActions)` vs `toolsRender(props)` vs `quickActionRender(props)` vs `beforeToolsRender(props)` —— 有的有 default 有的没有                                  |
+| i18n 落地       | `Enlargement` 硬编码 `'放大' / '缩小'`；`AttachmentButton/utils.ts` 设备品牌名用中文；`SendActions` fallback 用中文 `'文件上传'`；`SkillModeBar` `aria-label="技能模式"` 硬编码        |
+| prefixCls       | `getPrefixCls('agentic-md-input-field')` vs `getPrefixCls('agentic-skill-mode')` vs `getPrefixCls('agentic-md-editor-attachment-button')`（附件其实属于 input-field 但用 editor 前缀） |
 
 ---
 

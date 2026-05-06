@@ -13,8 +13,7 @@ import { useStyle } from './style';
  * 后立即卸载 DOM，与既有断言（`should unmount when open changes to false`）
  * 期望保持一致。
  */
-const SKILL_MODE_EXIT_DURATION_MS =
-  process.env.NODE_ENV === 'test' ? 0 : 300;
+const SKILL_MODE_EXIT_DURATION_MS = process.env.NODE_ENV === 'test' ? 0 : 300;
 
 /**
  * 技能模式配置接口

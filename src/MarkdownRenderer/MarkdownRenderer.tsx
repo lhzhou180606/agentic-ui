@@ -12,8 +12,8 @@ import React, {
 import { useStyle as useContentStyle } from '../MarkdownEditor/editor/style';
 import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
 import { useStyle as useEditorStyle } from '../MarkdownEditor/style';
-import { DefaultCodeRouter } from './DefaultCodeRouter';
 import { CharacterQueue } from './CharacterQueue';
+import { DefaultCodeRouter } from './DefaultCodeRouter';
 import { extractFootnoteDefinitionsFromMarkdown } from './extractFootnoteDefinitions';
 import { useRendererVarStyle } from './style';
 import type {

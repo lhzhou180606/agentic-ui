@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { handleDefinition } from '../parse/parseElements';
+import { normalizeThinkTagAliases } from '../parse/parseHtml';
 import { handleMath, shouldTreatInlineMathAsText } from '../parse/parseMath';
 import { handleAttachmentLink, handleImage } from '../parse/parseMedia';
-import { normalizeThinkTagAliases } from '../parse/parseHtml';
 import {
   clearParseCache,
   parserMarkdownToSlateNode,

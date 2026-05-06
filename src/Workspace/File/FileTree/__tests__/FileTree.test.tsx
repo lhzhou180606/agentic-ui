@@ -118,7 +118,8 @@ describe('Workspace.FileTree', () => {
     await waitFor(() => expect(onLoadChildren).toHaveBeenCalledTimes(1));
     // 须等首帧 load 的 Promise reject 完成，否则在 loadingKeys 未清理时再次点击会阻止 loadData，或
     // `.ant-tree-treenode-loading` 尚未出现导致 waitFor 误过前序断言与 rc-tree 的 reject 时序
-    const firstChildLoad = onLoadChildren.mock.results[0]?.value as Promise<unknown>;
+    const firstChildLoad = onLoadChildren.mock.results[0]
+      ?.value as Promise<unknown>;
     await expect(firstChildLoad).rejects.toThrow('network');
     await act(async () => {
       await Promise.resolve();

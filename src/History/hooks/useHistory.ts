@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { HistoryProps } from '../types';
 import { HistoryDataType } from '../types/HistoryData';
@@ -22,28 +22,76 @@ function filterListByKeyword(
 }
 
 /**
+ * 浅比较两个历史列表是否在「展示语义」上完全一致。
+ *
+ * 用于 loadHistory 后判断是否真的需要 setChatList：
+ * 当 actionRef.reload() 拉到的新列表与现有列表内容相同（同 sessionId / gmtCreate / 收藏态）时，
+ * 跳过 setState 即可保留 chatList 的引用稳定性，避免下游 useMemo / React.memo 大面积失效，
+ * GroupMenu 不必白白重渲一遍。
+ *
+ * 注意：故意只比较少量「会影响渲染」的字段，而不是 deep equal —— 整体 deep equal 在长列表下成本过高，
+ * 收益却很小（同一 sessionId 的 displayTitle 等字段更新本来就该触发 re-render）。
+ */
+function isHistoryListVisuallyEqual(
+  prev: HistoryDataType[],
+  next: HistoryDataType[],
+): boolean {
+  if (prev === next) return true;
+  if (prev.length !== next.length) return false;
+  for (let i = 0; i < prev.length; i += 1) {
+    const a = prev[i];
+    const b = next[i];
+    if (
+      a.sessionId !== b.sessionId ||
+      a.gmtCreate !== b.gmtCreate ||
+      a.isFavorite !== b.isFavorite ||
+      a.sessionTitle !== b.sessionTitle ||
+      a.status !== b.status
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
  * 历史记录状态管理 Hook
  */
 export const useHistory = (props: HistoryProps) => {
   const [open, setOpen] = useState(false);
-  const chatListRef = useRef<HistoryDataType[]>([]);
-  const [listVersion, setListVersion] = useState(0);
+  // 直接使用 state 管理列表，避免 ref + 哨兵 state 的反模式：
+  // 之前用 chatListRef + listVersion 是为了「绕过 useMemo 依赖检查」，但 ref 改动并不会驱动子组件重渲染，
+  // 实际渲染依赖的依然是 setListVersion。改为真正的 state 后，依赖关系显式且可被 lint 校验。
+  const [chatList, setChatList] = useState<HistoryDataType[]>([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const filteredList = useMemo(
-    () => filterListByKeyword(chatListRef.current, searchKeyword),
-    [searchKeyword, listVersion],
+    () => filterListByKeyword(chatList, searchKeyword),
+    [chatList, searchKeyword],
   );
 
   const loadHistory = useRefFunction(async () => {
-    const msg = (await props
-      ?.request?.({
-        agentId: props.agentId,
-      })
-      .then((m) => m)) as HistoryDataType[];
-    chatListRef.current = msg || [];
-    setListVersion((v) => v + 1);
+    // 防御 props.request 为 undefined：之前 `props?.request?.(...).then(...)` 在 request 缺失时会
+    // 对 undefined 调用 .then 抛 TypeError，再被 `as HistoryDataType[]` 强行掩盖。
+    if (!props.request) return;
+    try {
+      const list = await props.request({ agentId: props.agentId });
+      const safeList = Array.isArray(list) ? list : [];
+      // referential equality 优化：当新列表在展示语义上与旧列表完全一致时，
+      // 用函数式 setState 返回旧引用，让 React 的 bail-out 跳过下游所有重渲。
+      // 之前每次 reload 都无脑 setChatList(list)，会让 GroupMenu / useMemo 全量失效。
+      setChatList((prev) =>
+        isHistoryListVisuallyEqual(prev, safeList) ? prev : safeList,
+      );
+    } catch (error) {
+      // 失败时回退为空列表，并把错误打到控制台，避免在 React 树中抛出未捕获 Promise。
+      // 不直接 throw，保证 actionRef.reload() 调用方不需要也包 try/catch。
+      // 同样用函数式 setState 走 bail-out，避免空 → 空也触发重渲。
+      // eslint-disable-next-line no-console
+      console.error('[History] loadHistory failed:', error);
+      setChatList((prev) => (prev.length === 0 ? prev : []));
+    }
   });
 
   // 暴露 reload 方法给 actionRef
@@ -55,6 +103,9 @@ export const useHistory = (props: HistoryProps) => {
     }
   }, [props.actionRef, loadHistory]);
 
+  // 仅在挂载时触发 onInit / onShow，故意不把它们放进依赖数组：
+  // 这两个回调表达「组件首次出现」的语义，重复触发会破坏调用方的副作用。
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     props.onInit?.();
     props.onShow?.();
@@ -62,8 +113,9 @@ export const useHistory = (props: HistoryProps) => {
 
   // 当 sessionId 或 request 改变时重新加载数据
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    props.sessionId && setSelectedIds([props.sessionId]);
+    if (props.sessionId) {
+      setSelectedIds([props.sessionId]);
+    }
     loadHistory();
   }, [props.sessionId, props.request, loadHistory]);
 
@@ -71,22 +123,24 @@ export const useHistory = (props: HistoryProps) => {
   const handleFavorite = useRefFunction(
     async (sessionId: string, isFavorite: boolean) => {
       await props.agent?.onFavorite?.(sessionId, isFavorite);
-      chatListRef.current = chatListRef.current.map((item) =>
-        item.sessionId === sessionId ? { ...item, isFavorite } : item,
+      setChatList((prev) =>
+        prev.map((item) =>
+          item.sessionId === sessionId ? { ...item, isFavorite } : item,
+        ),
       );
-      setListVersion((v) => v + 1);
     },
   );
 
-  // 处理多选
+  // 处理多选 —— 用函数式 setState 避免闭包陈旧
   const handleSelectionChange = useRefFunction(
     (sessionId: string, checked: boolean) => {
-      const newSelectedIds = checked
-        ? [...selectedIds, sessionId]
-        : selectedIds.filter((id) => id !== sessionId);
-
-      setSelectedIds(newSelectedIds);
-      props.agent?.onSelectionChange?.(newSelectedIds);
+      setSelectedIds((prev) => {
+        const next = checked
+          ? [...prev, sessionId]
+          : prev.filter((id) => id !== sessionId);
+        props.agent?.onSelectionChange?.(next);
+        return next;
+      });
     },
   );
 
@@ -110,7 +164,7 @@ export const useHistory = (props: HistoryProps) => {
   return {
     open,
     setOpen,
-    chatList: chatListRef.current,
+    chatList,
     searchKeyword,
     selectedIds,
     filteredList,

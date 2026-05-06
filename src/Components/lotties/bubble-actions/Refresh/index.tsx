@@ -43,9 +43,10 @@ export type RefreshLottieProps = Omit<AbstractLottieProps, 'animationData'>;
  * @param props.size - 动画尺寸（宽度和高度），默认为 '1em'
  * @returns 渲染的刷新操作动画组件
  */
-export const RefreshLottie: React.FC<RefreshLottieProps> = createBubbleActionLottie({
-  loadJson: () => import('./lottie.json'),
-  displayName: 'RefreshLottie',
-});
+export const RefreshLottie: React.FC<RefreshLottieProps> =
+  createBubbleActionLottie({
+    loadJson: () => import('./lottie.json'),
+    displayName: 'RefreshLottie',
+  });
 
 export default RefreshLottie;

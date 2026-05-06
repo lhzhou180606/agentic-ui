@@ -1,5 +1,5 @@
-import type { MarkdownEditorProps } from '../MarkdownEditor/types';
 import React, { lazy, Suspense, useMemo } from 'react';
+import type { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { extractBlockTextContent } from './extractBlockTextContent';
 import type { FileMapConfig, RendererBlockProps } from './types';
 
@@ -158,13 +158,7 @@ export const DefaultCodeRouter: React.FC<DefaultCodeRouterProps> = (props) => {
   if (language === 'agentic-ui-filemap') {
     if (pluginComponents['agentic-ui-filemap']) {
       const C = pluginComponents['agentic-ui-filemap'];
-      return (
-        <C
-          {...rest}
-          language={language}
-          fileMapConfig={fileMapConfig}
-        />
-      );
+      return <C {...rest} language={language} fileMapConfig={fileMapConfig} />;
     }
     return (
       <Suspense

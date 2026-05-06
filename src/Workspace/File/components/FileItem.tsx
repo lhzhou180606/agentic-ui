@@ -8,7 +8,11 @@ import { Typography } from 'antd';
 import classNames from 'clsx';
 import React, { type FC } from 'react';
 import { ActionIconBox } from '../../../Components/ActionIconBox';
-import type { FileBuiltinActions, FileNode, FileRenderContext } from '../../types';
+import type {
+  FileBuiltinActions,
+  FileNode,
+  FileRenderContext,
+} from '../../types';
 import { formatFileSize, formatLastModified } from '../../utils';
 import { fileTypeProcessor, isImageFile } from '../FileTypeProcessor';
 import {

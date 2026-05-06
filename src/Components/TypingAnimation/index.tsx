@@ -19,8 +19,10 @@ import { useTypingAnimationStyle } from './style';
  * 原生 HTML 属性子集（仅保留实际使用的 className/style 等），并允许任意
  * 透传到底层元素，避免破坏外部调用。
  */
-export interface TypingAnimationProps
-  extends Omit<React.HTMLAttributes<HTMLElement>, 'children'> {
+export interface TypingAnimationProps extends Omit<
+  React.HTMLAttributes<HTMLElement>,
+  'children'
+> {
   children?: React.ReactNode;
   words?: string[];
   className?: string;
@@ -46,10 +48,7 @@ export interface TypingAnimationProps
  * - SSR/无 IntersectionObserver 环境下默认返回 true（与原行为兼容，
  *   避免在测试或老旧环境中动画永不开始）
  */
-function useInViewOnce(
-  ref: React.RefObject<Element>,
-  amount: number,
-): boolean {
+function useInViewOnce(ref: React.RefObject<Element>, amount: number): boolean {
   const [inView, setInView] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true;
     if (typeof IntersectionObserver === 'undefined') return true;

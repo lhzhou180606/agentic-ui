@@ -65,7 +65,9 @@ export const handleDefaultShare = async (file: FileNode) => {
 /**
  * 确保节点拥有唯一 ID（不可变更新）
  */
-export const ensureNodeWithId = <T extends FileNode | GroupNode>(node: T): T => ({
+export const ensureNodeWithId = <T extends FileNode | GroupNode>(
+  node: T,
+): T => ({
   ...node,
   id: node.id || generateUniqueId(node),
 });

@@ -1,8 +1,8 @@
 import { ConfigProvider, theme as antdTheme } from 'antd';
 import classNames from 'clsx';
 import React from 'react';
-import type { ChartClassNames, ChartStyles } from '../../types/classNames';
 import { useDetectTheme } from '../../hooks';
+import type { ChartClassNames, ChartStyles } from '../../types/classNames';
 import {
   ChartDarkAntdProvidedContext,
   useChartDarkAntdProvided,

@@ -8,6 +8,8 @@ import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import React, { useContext } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
+import { getMaskStyle } from '../constants';
+import { useTextOverflow } from '../hooks/useTextOverflow';
 import { useStyle } from '../style';
 import {
   HistoryDataType,
@@ -18,44 +20,27 @@ import { formatTime } from '../utils';
 import { HistoryActionsBox } from './HistoryActionsBox';
 import { HistoryRunningIcon } from './HistoryRunningIcon';
 
-const TaskIconMap: (
-  prefixCls: string,
-  hashId: string,
-) => Partial<Record<TaskStatusEnum, React.ReactNode>> = (
-  prefixCls: string,
-  hashId: string,
-) => {
-  return {
-    success: (
-      <div className={`${prefixCls}-task-icon ${hashId}`}>
-        <FileCheckFill />
-      </div>
-    ),
-    error: (
-      <div className={`${prefixCls}-task-icon ${hashId}`}>
-        <WarningFill />
-      </div>
-    ),
-    cancel: (
-      <div className={`${prefixCls}-task-icon ${hashId}`}>
-        <CloseCircleFill />
-      </div>
-    ),
-  };
+/**
+ * 任务状态对应的图标（模块级常量，仅创建一次）。
+ * 之前 TaskIconMap 是工厂函数，每次渲染都会重建 3 个 React Element，破坏 React.memo 的引用稳定性。
+ * 现在仅缓存图标本体，外层 `<div className="-task-icon">` 由调用点按需包裹，避免重复创建。
+ */
+const TASK_STATUS_ICON: Partial<Record<TaskStatusEnum, React.ReactNode>> = {
+  success: <FileCheckFill />,
+  error: <WarningFill />,
+  cancel: <CloseCircleFill />,
 };
 
-const FADE_OUT_GRADIENT = 'linear-gradient(to left, transparent, black 20%)';
-
-const getMaskStyle = (isOverflow: boolean) => ({
-  WebkitMaskImage: isOverflow ? FADE_OUT_GRADIENT : 'none',
-  maskImage: isOverflow ? FADE_OUT_GRADIENT : 'none',
-});
-
-/**
- * 文本溢出检测的额外滚动偏移量，用于确保文本滚动动画的平滑过渡
- * 当文本滚动到末尾时，这个偏移量会让文本多滚动一段距离，使其看起来更自然
- */
-const EXTRA_SCROLL_OFFSET = 100;
+/** 把状态图标包到带样式的容器里，className 由调用点决定 */
+const renderTaskStatusIcon = (
+  status: TaskStatusEnum | undefined,
+  containerClassName: string,
+): React.ReactNode => {
+  if (!status) return null;
+  const icon = TASK_STATUS_ICON[status];
+  if (!icon) return null;
+  return <div className={containerClassName}>{icon}</div>;
+};
 
 /**
  * 检查自定义操作区域是否有效
@@ -72,40 +57,6 @@ const isValidCustomOperation = (extra: React.ReactNode): boolean => {
   )
     return true;
   return false;
-};
-
-/**
- * 自定义 hook，用于检测文本溢出并设置相关样式
- * @param text - 需要检测溢出的文本内容
- * @returns 包含文本溢出状态和 ref 的对象
- */
-const useTextOverflow = (text: React.ReactNode) => {
-  const textRef = React.useRef<HTMLDivElement>(null);
-  const [isTextOverflow, setIsTextOverflow] = React.useState(false);
-
-  React.useLayoutEffect(() => {
-    const el = textRef.current;
-    if (!el) return;
-
-    const isOverflow = el.scrollWidth > el.clientWidth;
-    // 仅在 isOverflow 状态变化时更新，避免不必要的渲染
-    setIsTextOverflow((prev) => (prev === isOverflow ? prev : isOverflow));
-    el.setAttribute('data-overflow', String(isOverflow));
-
-    if (isOverflow) {
-      const scrollDistance = -(
-        el.scrollWidth -
-        el.clientWidth +
-        EXTRA_SCROLL_OFFSET
-      );
-      el.style.setProperty('--scroll-width', `${scrollDistance}px`);
-      // 根据滚动距离动态计算动画时长，保持恒定滚动速度（每 100px 约 1.5s）
-      const duration = Math.max(2, (Math.abs(scrollDistance) / 100) * 1.5);
-      el.style.setProperty('--scroll-duration', `${duration}s`);
-    }
-  }, [text]); // 仅在文本内容变化时重新计算
-
-  return { textRef, isTextOverflow };
 };
 
 /**
@@ -185,6 +136,16 @@ const HistoryItemSingle = React.memo<HistoryItemProps>(
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const prefixCls = getPrefixCls('agentic-chat-history-menu');
     const { hashId } = useStyle(prefixCls);
+    const { locale } = React.useContext(I18nContext);
+    // 组装传给 formatTime 的 i18n 文案，优先取 i18n key，缺失时回落到 hard-coded 中文
+    const formatTimeLocale = React.useMemo(
+      () => ({
+        today: locale?.['chat.history.time.today'],
+        yesterday: locale?.['chat.history.time.yesterday'],
+        withinWeek: locale?.['chat.history.time.withinWeek'],
+      }),
+      [locale],
+    );
     const displayText = React.useMemo(
       () => item.displayTitle || item.sessionTitle,
       [item.displayTitle, item.sessionTitle],
@@ -324,7 +285,7 @@ const HistoryItemSingle = React.memo<HistoryItemProps>(
           >
             {itemDateFormatter
               ? itemDateFormatter(item.gmtCreate as number)
-              : formatTime(item.gmtCreate)}
+              : formatTime(item.gmtCreate, formatTimeLocale)}
           </HistoryActionsBox>
           {isValidCustomOperation(customOperationExtra) && (
             <div className={`${prefixCls}-extra-actions ${hashId}`}>
@@ -384,6 +345,15 @@ const HistoryItemMulti = React.memo<HistoryItemProps>(
     const { textRef, isTextOverflow } = useTextOverflow(displayText);
     const isTask = React.useMemo(() => type === 'task', [type]);
     const { locale } = React.useContext(I18nContext);
+    // 组装传给 formatTime 的 i18n 文案，优先取 i18n key，缺失时回落到 hard-coded 中文
+    const formatTimeLocale = React.useMemo(
+      () => ({
+        today: locale?.['chat.history.time.today'],
+        yesterday: locale?.['chat.history.time.yesterday'],
+        withinWeek: locale?.['chat.history.time.withinWeek'],
+      }),
+      [locale],
+    );
     const shouldShowIcon = React.useMemo(
       () => isTask && (!!item.icon || TaskStatusData.includes(item.status!)),
       [isTask, item.icon, item.status],
@@ -478,11 +448,17 @@ const HistoryItemMulti = React.memo<HistoryItemProps>(
               <div className={`${prefixCls}-task-icon ${hashId}`}>
                 {item.icon ||
                   (isTask
-                    ? TaskIconMap(prefixCls, hashId)[item.status!]
+                    ? renderTaskStatusIcon(
+                        item.status,
+                        `${prefixCls}-task-icon ${hashId}`,
+                      )
                     : '📄')}
               </div>
             ) : (
-              TaskIconMap(prefixCls, hashId)[item.status!]
+              renderTaskStatusIcon(
+                item.status,
+                `${prefixCls}-task-icon ${hashId}`,
+              )
             )}
           </div>
         )}
@@ -571,7 +547,7 @@ const HistoryItemMulti = React.memo<HistoryItemProps>(
                   <span style={{ minWidth: 26 }}>
                     {itemDateFormatter
                       ? itemDateFormatter(item.gmtCreate as number)
-                      : formatTime(item.gmtCreate)}
+                      : formatTime(item.gmtCreate, formatTimeLocale)}
                   </span>
                 </div>
               </Tooltip>
@@ -595,7 +571,7 @@ const HistoryItemMulti = React.memo<HistoryItemProps>(
           >
             {itemDateFormatter
               ? itemDateFormatter(item.gmtCreate as number)
-              : formatTime(item.gmtCreate)}
+              : formatTime(item.gmtCreate, formatTimeLocale)}
           </HistoryActionsBox>
           {isValidCustomOperation(customOperationExtra) && (
             <div className={`${prefixCls}-extra-actions ${hashId}`}>

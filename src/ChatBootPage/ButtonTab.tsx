@@ -36,7 +36,10 @@ const ButtonTabComponent: React.FC<ButtonTabProps> = ({
   // P0-4：走 ConfigProvider 体系，并将默认前缀从 'md-editor-button-tab' 改为
   // 'agentic-chatboot-button-tab'，使其归属于 ChatBootPage 命名空间，避免冒充
   // markdown-editor 的命名空间；同时支持外层 ConfigProvider 自定义 prefixCls。
-  const prefixCls = getPrefixCls('agentic-chatboot-button-tab', customPrefixCls);
+  const prefixCls = getPrefixCls(
+    'agentic-chatboot-button-tab',
+    customPrefixCls,
+  );
   const { wrapSSR, hashId } = useStyle(prefixCls);
 
   // P0-3：disabled 时统一短路，避免键盘 Enter/Space 仍能触发 onClick
@@ -124,9 +127,7 @@ const ButtonTabComponent: React.FC<ButtonTabProps> = ({
           onKeyDown={onIconClick && !disabled ? handleIconKeyDown : undefined}
           role={onIconClick && !disabled ? 'button' : undefined}
           tabIndex={onIconClick && !disabled ? 0 : undefined}
-          aria-label={
-            onIconClick && !disabled ? 'tab icon action' : undefined
-          }
+          aria-label={onIconClick && !disabled ? 'tab icon action' : undefined}
         >
           {icon}
         </span>

@@ -173,8 +173,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       wordWrap: 'break-word',
       fontSize: '15px',
       // Jinja 语法高亮，仅通过 CSS 变量定制（在 .ant-agentic-md-editor-content 上覆盖）
-      [JINJA_CSS_VAR.variable]:
-        'var(--color-primary-control-fill-primary)',
+      [JINJA_CSS_VAR.variable]: 'var(--color-primary-control-fill-primary)',
       [JINJA_CSS_VAR.tag]: 'var(--color-orange-6, #d46b08)',
       [JINJA_CSS_VAR.comment]: 'var(--color-text-tertiary, rgba(0,0,0,0.25))',
       [JINJA_CSS_VAR.keyword]: '#5c4033',
@@ -182,8 +181,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       [JINJA_CSS_VAR.number]: 'var(--color-primary-10, #066ced)',
       [JINJA_CSS_VAR.filter]: 'var(--color-primary-8, #689ef0)',
       [JINJA_CSS_VAR.variableName]: 'var(--color-green-10, #10af74)',
-      [JINJA_CSS_VAR.placeholder]:
-        'var(--color-primary-control-fill-primary)',
+      [JINJA_CSS_VAR.placeholder]: 'var(--color-primary-control-fill-primary)',
       [JINJA_CSS_VAR.placeholderBg]:
         'var(--color-primary-bg-tip, rgba(0,102,255,0.08))',
       [JINJA_CSS_VAR.delimiter]: '#d4b84b',
@@ -202,8 +200,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           '&::before': {
             cursor: 'text',
             content: 'attr(data-slate-placeholder)',
-            color:
-              'var(--color-gray-text-disabled, rgba(20, 22, 28, 0.25))',
+            color: 'var(--color-gray-text-disabled, rgba(20, 22, 28, 0.25))',
             display: 'inline-block',
             position: 'absolute',
             width: 'max-content',

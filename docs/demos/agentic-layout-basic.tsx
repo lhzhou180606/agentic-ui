@@ -3,7 +3,14 @@ import React from 'react';
 
 const CenterContent = () => (
   <ChatLayout header={{ title: 'AI 助手' }}>
-    <div style={{ padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div
+      style={{
+        padding: '16px 24px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+      }}
+    >
       <div
         style={{
           padding: '12px 16px',

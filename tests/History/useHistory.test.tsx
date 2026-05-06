@@ -417,6 +417,47 @@ describe('useHistory Hook', () => {
       expect(onLoadMore).toHaveBeenCalled();
     });
 
+    it('reload 拉到展示语义相同的列表时应保持 chatList 引用稳定（#12 referential equality）', async () => {
+      // 准备一个会被多次调用、每次都返回「内容相同但是新数组」的 request
+      const stableData: HistoryDataType[] = [
+        {
+          id: '1',
+          sessionId: 'session1',
+          sessionTitle: '稳定会话',
+          gmtCreate: 1700000000000,
+          gmtLastConverse: 1700000000000,
+          isFavorite: false,
+        },
+      ];
+      const request = vi.fn().mockImplementation(async () =>
+        // 故意每次 new 一个数组 + 浅拷贝元素，模拟接口幂等返回
+        stableData.map((item) => ({ ...item })),
+      );
+
+      const { result } = renderHook(() => useHistory({ ...defaultProps, request }));
+
+      await act(async () => {
+        await result.current.loadHistory();
+      });
+      const firstRef = result.current.filteredList;
+      expect(firstRef).toHaveLength(1);
+
+      // 二次 reload，新数组但展示字段完全一致 → bail-out 应保持引用
+      await act(async () => {
+        await result.current.loadHistory();
+      });
+      expect(result.current.filteredList).toBe(firstRef);
+
+      // 关键展示字段变化（sessionTitle）→ 应触发新引用
+      const changed = stableData.map((item) => ({ ...item, sessionTitle: '新标题' }));
+      request.mockResolvedValueOnce(changed);
+      await act(async () => {
+        await result.current.loadHistory();
+      });
+      expect(result.current.filteredList).not.toBe(firstRef);
+      expect(result.current.filteredList[0]?.sessionTitle).toBe('新标题');
+    });
+
     it('handleNewChat 应 await onNewChat 并关闭菜单', async () => {
       const onNewChat = vi.fn().mockResolvedValue(undefined);
       const { result } = renderHook(() =>

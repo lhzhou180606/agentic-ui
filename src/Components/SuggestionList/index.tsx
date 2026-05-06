@@ -108,7 +108,10 @@ const OverflowTooltip: React.FC<OverflowTooltipProps> = memo(
 
     if (!shouldShowTooltip) {
       return (
-        <span ref={textRef} className={classNames(`${prefixCls}-label`, hashId)}>
+        <span
+          ref={textRef}
+          className={classNames(`${prefixCls}-label`, hashId)}
+        >
           {children}
         </span>
       );
@@ -116,7 +119,10 @@ const OverflowTooltip: React.FC<OverflowTooltipProps> = memo(
 
     return (
       <Tooltip mouseEnterDelay={0.3} title={title} placement="top">
-        <span ref={textRef} className={classNames(`${prefixCls}-label`, hashId)}>
+        <span
+          ref={textRef}
+          className={classNames(`${prefixCls}-label`, hashId)}
+        >
           {children}
         </span>
       </Tooltip>

@@ -64,10 +64,11 @@ export interface LoadingLottieProps {
  * @param props.size - 动画尺寸（宽度和高度）
  * @returns 渲染的加载动画组件
  */
-export const LoadingLottie: React.FC<LoadingLottieProps> = createLottieComponent({
-  loadJson: () => import('./loading.json'),
-  dataTestId: 'lottie-animation',
-  displayName: 'LoadingLottie',
-});
+export const LoadingLottie: React.FC<LoadingLottieProps> =
+  createLottieComponent({
+    loadJson: () => import('./loading.json'),
+    dataTestId: 'lottie-animation',
+    displayName: 'LoadingLottie',
+  });
 
 export default LoadingLottie;

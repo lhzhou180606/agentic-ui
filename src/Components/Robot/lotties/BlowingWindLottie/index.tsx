@@ -57,10 +57,11 @@ export interface BlowingWindLottieProps {
  * - 支持播放控制
  * - 支持自定义样式
  */
-export const BlowingWindLottie: React.FC<BlowingWindLottieProps> = createLottieComponent({
-  loadJson: () => import('./lottie.json'),
-  defaultSize: 32,
-  displayName: 'BlowingWindLottie',
-});
+export const BlowingWindLottie: React.FC<BlowingWindLottieProps> =
+  createLottieComponent({
+    loadJson: () => import('./lottie.json'),
+    defaultSize: 32,
+    displayName: 'BlowingWindLottie',
+  });
 
 export default BlowingWindLottie;

@@ -39,9 +39,7 @@ describe('withSanitizeInvalidChildren', () => {
 
   it('compacts sparse editor root without duplicating blocks', () => {
     const editor = withSanitizeInvalidChildren(createEditor());
-    const root = [
-      { type: 'paragraph', children: [{ text: 'a' }] },
-    ] as any;
+    const root = [{ type: 'paragraph', children: [{ text: 'a' }] }] as any;
     root.length = 2;
     editor.children = root;
 

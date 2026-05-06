@@ -57,10 +57,11 @@ export interface BouncingLottieProps {
  * - 支持播放控制
  * - 支持自定义样式
  */
-export const BouncingLottie: React.FC<BouncingLottieProps> = createLottieComponent({
-  loadJson: () => import('./lottie.json'),
-  defaultSize: 32,
-  displayName: 'BouncingLottie',
-});
+export const BouncingLottie: React.FC<BouncingLottieProps> =
+  createLottieComponent({
+    loadJson: () => import('./lottie.json'),
+    defaultSize: 32,
+    displayName: 'BouncingLottie',
+  });
 
 export default BouncingLottie;

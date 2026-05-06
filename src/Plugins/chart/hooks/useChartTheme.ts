@@ -15,7 +15,9 @@ import { useMemo } from 'react';
  *
  * @since 1.0.0
  */
-export const useChartTheme = (theme: 'light' | 'dark' | undefined = 'light') => {
+export const useChartTheme = (
+  theme: 'light' | 'dark' | undefined = 'light',
+) => {
   return useMemo(() => {
     const isLight = (theme ?? 'light') === 'light';
     const axisTextColor = isLight

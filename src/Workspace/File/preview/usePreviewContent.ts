@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import type { FileNode } from '../../types';
-import { fileTypeProcessor, type FileProcessResult } from '../FileTypeProcessor';
+import {
+  fileTypeProcessor,
+  type FileProcessResult,
+} from '../FileTypeProcessor';
 import type { ContentState } from './types';
 import { buildMarkdownContent } from './utils';
 

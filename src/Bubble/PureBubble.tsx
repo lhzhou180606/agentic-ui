@@ -6,8 +6,8 @@ import React from 'react';
 import { BaseMarkdownEditor } from '../MarkdownEditor/BaseMarkdownEditor';
 import { runRender } from './AIBubble';
 import { BubbleAvatar } from './Avatar';
-import { BubbleConfigContext } from './BubbleConfigProvide';
 import type { ChatConfigType } from './BubbleConfigProvide';
+import { BubbleConfigContext } from './BubbleConfigProvide';
 import { MessagesContext } from './MessagesContent/BubbleContext';
 import { BubbleExtra } from './MessagesContent/BubbleExtra';
 import { useStyle } from './style';
@@ -35,7 +35,8 @@ export const PureBubble: React.FC<
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const context = useContext(BubbleConfigContext);
-  const { compact, standalone, extraShowOnHover } = context || ({} as ChatConfigType);
+  const { compact, standalone, extraShowOnHover } =
+    context || ({} as ChatConfigType);
 
   const prefixClass = getPrefixCls('agentic');
   const { wrapSSR, hashId } = useStyle(prefixClass);

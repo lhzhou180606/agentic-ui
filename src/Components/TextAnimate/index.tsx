@@ -36,8 +36,10 @@ type AnimationVariant =
   | 'scaleUp'
   | 'scaleDown';
 
-export interface TextAnimateProps
-  extends Omit<React.HTMLAttributes<HTMLElement>, 'children'> {
+export interface TextAnimateProps extends Omit<
+  React.HTMLAttributes<HTMLElement>,
+  'children'
+> {
   /**
    * The text content to animate
    */
@@ -257,8 +259,7 @@ const TextAnimateBase = ({
           isObject(segment) ? (segment as React.ReactElement).key : segment
         }-${i}`;
         const itemDelaySec =
-          delay +
-          i * (variants ? customStaggerDelaySec : staggerChildrenSec);
+          delay + i * (variants ? customStaggerDelaySec : staggerChildrenSec);
 
         return (
           <span

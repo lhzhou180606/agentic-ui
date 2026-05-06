@@ -202,11 +202,7 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
       [`${prefixCls}-success`]: status === 'success',
       [`${prefixCls}-light`]: light,
     });
-    const bar = classNames(
-      `${prefixCls}-bar`,
-      hashId,
-      customClassNames?.bar,
-    );
+    const bar = classNames(`${prefixCls}-bar`, hashId, customClassNames?.bar);
     const header = classNames(
       `${prefixCls}-header`,
       hashId,
@@ -222,9 +218,14 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
     const headerRight = classNames(`${prefixCls}-header-right`, hashId, {
       [`${prefixCls}-header-right-loading`]: isLoading,
     });
-    const name = classNames(`${prefixCls}-name`, hashId, customClassNames?.name, {
-      [`${prefixCls}-name-light`]: light,
-    });
+    const name = classNames(
+      `${prefixCls}-name`,
+      hashId,
+      customClassNames?.name,
+      {
+        [`${prefixCls}-name-light`]: light,
+      },
+    );
     const container = classNames(
       `${prefixCls}-container`,
       hashId,

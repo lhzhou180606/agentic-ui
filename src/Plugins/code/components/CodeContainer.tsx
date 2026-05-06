@@ -60,8 +60,7 @@ export function CodeContainer({
             : hide
               ? 'transparent'
               : 'var(--color-gray-bg-page-light, #fafafa)',
-          color:
-            'var(--color-gray-text-default, rgba(20, 22, 28, 0.88))',
+          color: 'var(--color-gray-text-default, rgba(20, 22, 28, 0.88))',
           height: hide ? 0 : 'auto',
           opacity: hide ? 0 : 1,
         }}

@@ -102,7 +102,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
         // 键盘焦点：用 focus-visible 而非 focus，避免鼠标点击后残留焦点框
         '&:focus-visible': {
-          outline: '2px solid var(--color-primary-control-fill-active, #1677ff)',
+          outline:
+            '2px solid var(--color-primary-control-fill-active, #1677ff)',
           outlineOffset: 1,
         },
 

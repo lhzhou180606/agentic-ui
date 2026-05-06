@@ -1,5 +1,4 @@
-import type { AttachmentFile } from './attachment';
-import type { AttachmentConfig } from './attachment';
+import type { AttachmentConfig, AttachmentFile } from './attachment';
 import type { FileUploadStatus, FileUploadSummary } from './shared';
 
 /**

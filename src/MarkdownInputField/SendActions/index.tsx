@@ -10,11 +10,11 @@ import { AttachmentButton } from '../AttachmentButton';
 import type { AttachmentFile } from '../AttachmentButton/types';
 import type { SendButtonCustomizationProps } from '../SendButton';
 import { SendButton, resolveSendDisabled } from '../SendButton';
+import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
 import type { FileUploadStatus, FileUploadSummary } from '../types/shared';
 import type { ActionsSlotState } from '../types/slots';
 import type { CreateRecognizer } from '../VoiceInput';
 import { VoiceInputButton } from '../VoiceInput';
-import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
 
 export interface SendActionsProps {
   /** 附件配置 */

@@ -20,7 +20,9 @@ export const shallowEqualRecord = (
   const keysB = Object.keys(b);
   if (keysA.length !== keysB.length) return false;
   for (const k of keysA) {
-    if ((a as Record<string, unknown>)[k] !== (b as Record<string, unknown>)[k]) {
+    if (
+      (a as Record<string, unknown>)[k] !== (b as Record<string, unknown>)[k]
+    ) {
       return false;
     }
   }
@@ -46,7 +48,12 @@ export const shallowEqualStyles = (
       !Array.isArray(va) &&
       !Array.isArray(vb)
     ) {
-      if (!shallowEqualRecord(va as Record<string, unknown>, vb as Record<string, unknown>)) {
+      if (
+        !shallowEqualRecord(
+          va as Record<string, unknown>,
+          vb as Record<string, unknown>,
+        )
+      ) {
         return false;
       }
     } else {
@@ -64,7 +71,9 @@ const shallowEqualClassNames = (
   if (!a || !b) return !a && !b;
   const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
   for (const k of keys) {
-    if ((a as Record<string, unknown>)[k] !== (b as Record<string, unknown>)[k]) {
+    if (
+      (a as Record<string, unknown>)[k] !== (b as Record<string, unknown>)[k]
+    ) {
       return false;
     }
   }
@@ -94,7 +103,12 @@ const shallowEqualConfigObject = (
       !Array.isArray(va) &&
       !Array.isArray(vb)
     ) {
-      if (!shallowEqualRecord(va as Record<string, unknown>, vb as Record<string, unknown>)) {
+      if (
+        !shallowEqualRecord(
+          va as Record<string, unknown>,
+          vb as Record<string, unknown>,
+        )
+      ) {
         return false;
       }
     } else {
@@ -107,23 +121,34 @@ const shallowEqualConfigObject = (
 const metaAffectsBubble = (m: BubbleMetaData | undefined): boolean =>
   Boolean(
     m?.avatar ||
-      m?.title ||
-      m?.name ||
-      m?.description ||
-      m?.backgroundColor ||
-      (m?.metadata && Object.keys(m.metadata).length > 0),
+    m?.title ||
+    m?.name ||
+    m?.description ||
+    m?.backgroundColor ||
+    (m?.metadata && Object.keys(m.metadata).length > 0),
   );
 
-const metaEqualForMemo = (a: BubbleMetaData | undefined, b: BubbleMetaData | undefined): boolean => {
+const metaEqualForMemo = (
+  a: BubbleMetaData | undefined,
+  b: BubbleMetaData | undefined,
+): boolean => {
   if (a === b) return true;
-  if (!shallowEqualRecord((a || {}) as Record<string, unknown>, (b || {}) as Record<string, unknown>)) {
+  if (
+    !shallowEqualRecord(
+      (a || {}) as Record<string, unknown>,
+      (b || {}) as Record<string, unknown>,
+    )
+  ) {
     return false;
   }
   const ma = a?.metadata;
   const mb = b?.metadata;
   if (ma === mb) return true;
   if (!ma || !mb) return !ma && !mb;
-  return shallowEqualRecord(ma as Record<string, unknown>, mb as Record<string, unknown>);
+  return shallowEqualRecord(
+    ma as Record<string, unknown>,
+    mb as Record<string, unknown>,
+  );
 };
 
 const originDataEqualForMemo = (
@@ -164,7 +189,10 @@ const preMessageEqualForMemo = (
   return a.id === b.id && a.role === b.role;
 };
 
-const depsArrayEqual = (a: unknown[] | undefined, b: unknown[] | undefined): boolean => {
+const depsArrayEqual = (
+  a: unknown[] | undefined,
+  b: unknown[] | undefined,
+): boolean => {
   if (a === b) return true;
   if (!a || !b) return !a && !b;
   if (a.length !== b.length) return false;
@@ -215,10 +243,20 @@ export const bubblePropsAreEqual = (
   ) {
     return false;
   }
-  if (!shallowEqualConfigObject(prev.docListProps as object | undefined, next.docListProps as object | undefined)) {
+  if (
+    !shallowEqualConfigObject(
+      prev.docListProps as object | undefined,
+      next.docListProps as object | undefined,
+    )
+  ) {
     return false;
   }
-  if (!shallowEqualConfigObject(prev.customConfig as object | undefined, next.customConfig as object | undefined)) {
+  if (
+    !shallowEqualConfigObject(
+      prev.customConfig as object | undefined,
+      next.customConfig as object | undefined,
+    )
+  ) {
     return false;
   }
   if (prev.bubbleListRef !== next.bubbleListRef) return false;

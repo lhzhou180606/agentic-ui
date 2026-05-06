@@ -84,7 +84,9 @@ const GroupHeaderComponent: FC<GroupHeaderProps> = ({
               {group.name}
             </span>
           </div>
-          <div className={classNames(`${prefixCls}-group-header-right`, hashId)}>
+          <div
+            className={classNames(`${prefixCls}-group-header-right`, hashId)}
+          >
             <span className={classNames(`${prefixCls}-group-count`, hashId)}>
               {group.children.length}
             </span>
@@ -93,10 +95,7 @@ const GroupHeaderComponent: FC<GroupHeaderProps> = ({
                 title={locale?.['workspace.file.download'] || '下载'}
                 onClick={handleDownload}
                 tooltipProps={{ mouseEnterDelay: 0.3 }}
-                className={classNames(
-                  `${prefixCls}-group-action-btn`,
-                  hashId,
-                )}
+                className={classNames(`${prefixCls}-group-action-btn`, hashId)}
               >
                 <DownloadIcon />
               </ActionIconBox>

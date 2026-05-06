@@ -239,7 +239,10 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
           pendingWidthRef.current = null;
         }
         if (boundMoveHandlerRef.current) {
-          document.removeEventListener('mousemove', boundMoveHandlerRef.current);
+          document.removeEventListener(
+            'mousemove',
+            boundMoveHandlerRef.current,
+          );
           boundMoveHandlerRef.current = null;
         }
         if (boundUpHandlerRef.current) {

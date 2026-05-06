@@ -65,10 +65,7 @@ const ButtonTabGroupComponent: React.FC<ButtonTabGroupProps> = ({
   // 回落到第一个有效项；这样首屏 items=[] 后 items 到达时也能默认选中第一项。
   useEffect(() => {
     if (isControlled) return;
-    if (
-      internalActiveKey &&
-      items.some((it) => it.key === internalActiveKey)
-    ) {
+    if (internalActiveKey && items.some((it) => it.key === internalActiveKey)) {
       return;
     }
     setInternalActiveKey(items[0]?.key);

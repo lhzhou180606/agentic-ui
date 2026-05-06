@@ -27,7 +27,6 @@ vi.mock('lottie-react', () => ({
   ),
 }));
 
-
 async function findLoadedLottie() {
   const el = await screen.findByTestId('lottie-animation');
   await waitFor(() => {

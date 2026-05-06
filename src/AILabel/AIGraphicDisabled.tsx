@@ -21,11 +21,7 @@ export function AIGraphicDisabled() {
           id="master_svg0_3772_44168"
         >
           <stop offset="0%" stopColor="#C6C6C6" stopOpacity="1" />
-          <stop
-            offset="98.5714%"
-            stopColor="#C8C8C8"
-            stopOpacity="1"
-          />
+          <stop offset="98.5714%" stopColor="#C8C8C8" stopOpacity="1" />
         </linearGradient>
         <linearGradient
           x1="1.2141"

@@ -1,6 +1,6 @@
 import { parseChineseCurrencyToNumber } from '../../Plugins/chart/utils';
-import { normalizeChartConfigAxisFields } from '../utils/chartAxisMatch';
 import { extractTableData } from '../utils/astExtract';
+import { normalizeChartConfigAxisFields } from '../utils/chartAxisMatch';
 
 /**
  * 匹配形如 `<!-- [{"chartType":"line",...}] -->` 或 `<!-- {"chartType":"line",...} -->` 的注释。

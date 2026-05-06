@@ -1,10 +1,10 @@
+import { LoadingOutlined } from '@ant-design/icons';
 import {
   Download as DownloadIcon,
   ArrowLeft as LeftIcon,
   Locate,
   SquareArrowOutUpRight as ShareIcon,
 } from '@sofa-design/icons';
-import { LoadingOutlined } from '@ant-design/icons';
 import { Alert, ConfigProvider, Segmented, Spin } from 'antd';
 import classNames from 'clsx';
 import React, { type FC, useContext, useEffect, useRef, useState } from 'react';
@@ -342,7 +342,11 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
           <div className={classNames(`${prefixCls}-file-info`, hashId)}>
             <div className={classNames(`${prefixCls}-file-title`, hashId)}>
               <span className={classNames(`${prefixCls}-file-icon`, hashId)}>
-                {getFileTypeIcon(headerFileType, headerFile.icon, headerFile.name)}
+                {getFileTypeIcon(
+                  headerFileType,
+                  headerFile.icon,
+                  headerFile.name,
+                )}
               </span>
               <span className={classNames(`${prefixCls}-file-name`, hashId)}>
                 {headerFile.name}
@@ -351,7 +355,9 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
             {headerLastModified && (
               <div className={classNames(`${prefixCls}-generate-time`, hashId)}>
                 {locale?.['workspace.file.generationTime'] || '生成时间：'}
-                {formatLastModified(headerLastModified as string | number | Date)}
+                {formatLastModified(
+                  headerLastModified as string | number | Date,
+                )}
               </div>
             )}
           </div>

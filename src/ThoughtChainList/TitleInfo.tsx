@@ -9,8 +9,8 @@ import { Popover } from 'antd';
 import classNames from 'clsx';
 import React, { useContext, useMemo } from 'react';
 import { DocMeta } from '.';
-import { I18nContext } from '../I18n';
 import { ActionIconBox } from '../Components/ActionIconBox';
+import { I18nContext } from '../I18n';
 import { CostMillis } from './CostMillis';
 import { FlipText } from './FlipText';
 

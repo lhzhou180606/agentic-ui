@@ -1559,6 +1559,7 @@ export default App;
    ```
 
 3. **大量消息处理**
+
    ```tsx | pure
    // ✅ 推荐：使用 BubbleList 的虚拟滚动
    <BubbleList

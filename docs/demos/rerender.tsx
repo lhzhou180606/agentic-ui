@@ -95,7 +95,9 @@ export const RerenderMdDemo = () => {
     setRestartKey((prev) => prev + 1);
   };
 
-  const handleSourceChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleSourceChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;

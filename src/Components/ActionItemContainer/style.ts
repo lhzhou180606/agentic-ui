@@ -1,8 +1,5 @@
+import { resetComponent, useEditorStyleRegister } from '../../Hooks/useStyle';
 import { genStyle } from '../ActionItemBox/style';
-import {
-  resetComponent,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
 
 /**
  * ActionItemContainer 样式入口。

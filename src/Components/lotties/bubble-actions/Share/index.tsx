@@ -43,9 +43,11 @@ export type ShareLottieProps = Omit<AbstractLottieProps, 'animationData'>;
  * @param props.size - 动画尺寸（宽度和高度），默认为 '1em'
  * @returns 渲染的分享操作动画组件
  */
-export const ShareLottie: React.FC<ShareLottieProps> = createBubbleActionLottie({
-  loadJson: () => import('./lottie.json'),
-  displayName: 'ShareLottie',
-});
+export const ShareLottie: React.FC<ShareLottieProps> = createBubbleActionLottie(
+  {
+    loadJson: () => import('./lottie.json'),
+    displayName: 'ShareLottie',
+  },
+);
 
 export default ShareLottie;

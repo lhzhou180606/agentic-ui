@@ -46,9 +46,12 @@ function applyIconStyle(
   if (!iconStyle) return child;
 
   const childProps = (child.props ?? {}) as { style?: React.CSSProperties };
-  return React.cloneElement(child as React.ReactElement<{ style?: React.CSSProperties }>, {
-    style: { ...childProps.style, ...iconStyle },
-  });
+  return React.cloneElement(
+    child as React.ReactElement<{ style?: React.CSSProperties }>,
+    {
+      style: { ...childProps.style, ...iconStyle },
+    },
+  );
 }
 
 /**
@@ -61,7 +64,9 @@ function renderIconChildren(
   if (React.isValidElement(element)) {
     return applyIconStyle(element, iconStyle);
   }
-  return React.Children.map(element, (child) => applyIconStyle(child, iconStyle));
+  return React.Children.map(element, (child) =>
+    applyIconStyle(child, iconStyle),
+  );
 }
 /**
  * ActionIconBox 组件 - 操作图标盒子组件
@@ -225,14 +230,21 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
     >
       {icon}
       {showTitle && (
-        <span className={classNames(`${prefixCls}-title`, hashId)}>{title}</span>
+        <span className={classNames(`${prefixCls}-title`, hashId)}>
+          {title}
+        </span>
       )}
     </span>
   );
 
   return wrapSSR(
     title ? (
-      <Tooltip title={title} arrow={false} mouseEnterDelay={1} {...tooltipProps}>
+      <Tooltip
+        title={title}
+        arrow={false}
+        mouseEnterDelay={1}
+        {...tooltipProps}
+      >
         {renderInner({ 'data-title': titleText })}
       </Tooltip>
     ) : (

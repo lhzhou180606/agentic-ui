@@ -1,26 +1,70 @@
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+// 显式注册 relativeTime 插件以启用 dayjs().fromNow()，
+// 取代之前 `@ts-ignore + ?.fromNow?.()` 的隐式依赖（一旦上游没注册插件就会静默返回 undefined）。
+dayjs.extend(relativeTime);
+
+/**
+ * 用于覆盖 formatTime 输出的可选 i18n 文案。
+ * 全部可选；未提供时回落到默认中文。
+ */
+export interface FormatTimeLocale {
+  /** 当天 */
+  today?: string;
+  /** 昨天 */
+  yesterday?: string;
+  /** 一周内 */
+  withinWeek?: string;
+}
 
 /**
  * 格式化时间显示
+ *
  * @param time 时间戳或时间字符串
- * @returns 格式化后的时间字符串
+ * @param locale 可选的文案覆盖，用于 i18n。未传时回落到中文默认值。
+ * @returns 格式化后的时间字符串；time 为空时返回空串
  */
-export const formatTime = (time?: number | string): string => {
+export const formatTime = (
+  time?: number | string,
+  locale?: FormatTimeLocale,
+): string => {
   if (!time) {
     return '';
   }
-  // 如果是今天
-  if (dayjs().isSame(dayjs(time), 'day')) {
-    return '今日';
+  const target = dayjs(time);
+  const now = dayjs();
+
+  if (now.isSame(target, 'day')) {
+    return locale?.today ?? '今日';
   }
-  if (dayjs().isSame(dayjs(time).add(1, 'day'), 'day')) {
-    return '昨日';
+  if (now.isSame(target.add(1, 'day'), 'day')) {
+    return locale?.yesterday ?? '昨日';
   }
-  if (dayjs().isSame(dayjs(time).add(7, 'day'), 'day')) {
-    return '一周内';
+  if (now.isSame(target.add(7, 'day'), 'day')) {
+    return locale?.withinWeek ?? '一周内';
   }
-  //@ts-ignore 如果是昨天
-  return dayjs(time)?.fromNow?.();
+  return target.fromNow();
+};
+
+/**
+ * 把 HistoryDataType.gmtCreate 安全地转成毫秒时间戳。
+ *
+ * `gmtCreate` 在类型定义里是 `number | string | Date | undefined`，
+ * 之前在多处直接 `item.gmtCreate as number` 强转，既不安全也无法表达"缺失"语义。
+ * 这里集中处理：缺失返回 `0`（dayjs 会回落到 epoch），其它走 `dayjs.valueOf()`。
+ *
+ * @param item 历史记录数据项；只读取 `gmtCreate` 字段
+ * @returns 毫秒时间戳；缺失或无法解析时返回 0
+ */
+export const getItemTimestamp = (item: {
+  gmtCreate?: number | string | Date;
+}): number => {
+  const raw = item.gmtCreate;
+  if (raw == null) return 0;
+  if (typeof raw === 'number') return raw;
+  const t = dayjs(raw).valueOf();
+  return Number.isNaN(t) ? 0 : t;
 };
 
 /**

@@ -316,7 +316,10 @@ const createMarkdownProcessor = (
   const processor = unified();
   const remarkPlugins = resolveRemarkPlugins(plugins);
   applyPlugins(processor, remarkPlugins);
-  processor.use(rehypeRaw).use(rehypeSanitizeUserHtml as unknown as Plugin).use(rehypeKatex as unknown as Plugin);
+  processor
+    .use(rehypeRaw)
+    .use(rehypeSanitizeUserHtml as unknown as Plugin)
+    .use(rehypeKatex as unknown as Plugin);
 
   // 应用配置选项
   if (config?.openLinksInNewTab) {

@@ -21,11 +21,7 @@ export function AIGraphic() {
           id="master_svg0_3772_44158"
         >
           <stop offset="0%" stopColor="#A2B9FF" stopOpacity="1" />
-          <stop
-            offset="98.5714%"
-            stopColor="#B3D9FE"
-            stopOpacity="1"
-          />
+          <stop offset="98.5714%" stopColor="#B3D9FE" stopOpacity="1" />
         </linearGradient>
         <linearGradient
           x1="1.2141"
@@ -35,11 +31,7 @@ export function AIGraphic() {
           id="master_svg1_3772_44149"
         >
           <stop offset="0%" stopColor="#A2B9FF" stopOpacity="1" />
-          <stop
-            offset="98.5714%"
-            stopColor="#8E7AE1"
-            stopOpacity="1"
-          />
+          <stop offset="98.5714%" stopColor="#8E7AE1" stopOpacity="1" />
         </linearGradient>
         <filter
           id="master_svg2_3772_44523"
@@ -57,10 +49,7 @@ export function AIGraphic() {
             in2="BackgroundImageFix"
             result="shape"
           />
-          <feGaussianBlur
-            in="BackgroundImageFix"
-            stdDeviation="37.6923"
-          />
+          <feGaussianBlur in="BackgroundImageFix" stdDeviation="37.6923" />
           <feComposite
             in2="SourceAlpha"
             operator="in"
@@ -81,11 +70,7 @@ export function AIGraphic() {
           id="master_svg3_3772_44144"
         >
           <stop offset="0%" stopColor="#5DF050" stopOpacity="1" />
-          <stop
-            offset="97.1429%"
-            stopColor="#97E3FF"
-            stopOpacity="1"
-          />
+          <stop offset="97.1429%" stopColor="#97E3FF" stopOpacity="1" />
         </linearGradient>
         <linearGradient
           x1="0.5"
@@ -95,11 +80,7 @@ export function AIGraphic() {
           id="master_svg4_3772_44152"
         >
           <stop offset="0%" stopColor="#5BD3FF" stopOpacity="1" />
-          <stop
-            offset="98.5714%"
-            stopColor="#B3D9FE"
-            stopOpacity="1"
-          />
+          <stop offset="98.5714%" stopColor="#B3D9FE" stopOpacity="1" />
         </linearGradient>
       </defs>
       <path

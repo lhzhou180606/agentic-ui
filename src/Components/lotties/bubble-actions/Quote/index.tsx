@@ -43,9 +43,11 @@ export type QuoteLottieProps = Omit<AbstractLottieProps, 'animationData'>;
  * @param props.size - 动画尺寸（宽度和高度），默认为 '1em'
  * @returns 渲染的引用操作动画组件
  */
-export const QuoteLottie: React.FC<QuoteLottieProps> = createBubbleActionLottie({
-  loadJson: () => import('./lottie.json'),
-  displayName: 'QuoteLottie',
-});
+export const QuoteLottie: React.FC<QuoteLottieProps> = createBubbleActionLottie(
+  {
+    loadJson: () => import('./lottie.json'),
+    displayName: 'QuoteLottie',
+  },
+);
 
 export default QuoteLottie;

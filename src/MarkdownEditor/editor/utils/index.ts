@@ -47,7 +47,10 @@ export function debounce(
 
 import { DependencyList, useCallback, useEffect, useRef } from 'react';
 
-function useTimeoutFn(fn: Function, ms: number = 0): [() => boolean | null, () => void, () => void] {
+function useTimeoutFn(
+  fn: Function,
+  ms: number = 0,
+): [() => boolean | null, () => void, () => void] {
   const ready = useRef<boolean | null>(false);
   const timeout = useRef<ReturnType<typeof setTimeout>>();
   const callback = useRef(fn);

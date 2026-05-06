@@ -5,8 +5,8 @@ import { parserMdToSchema } from './editor/parser/parserMdToSchema';
 import { EditorUtils } from './editor/utils/editorUtils';
 import { MarkdownEditorProps } from './types';
 
-export { EditorUtils, parserMdToSchema };
 export { sanitizeEditorChromeStyle } from './utils/sanitizeChromeStyle';
+export { EditorUtils, parserMdToSchema };
 
 export * from './editor/elements';
 export * from './editor/utils';

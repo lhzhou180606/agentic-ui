@@ -5,8 +5,8 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
-import { ChartTypeConfig } from '../../../el';
 import { rehypeSanitizeUserHtml } from '../../../../Utils/rehypeSanitizeUserHtml';
+import { ChartTypeConfig } from '../../../el';
 import {
   convertParagraphToImage,
   fixStrongWithSpecialChars,

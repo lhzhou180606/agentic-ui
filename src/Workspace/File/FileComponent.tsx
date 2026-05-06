@@ -1,22 +1,19 @@
 import { ConfigProvider, Empty, Image, Spin, Typography } from 'antd';
 import classNames from 'clsx';
-import React, {
-  type FC,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { type FC, useContext, useEffect, useRef, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext, compileTemplate } from '../../I18n';
 import type { MarkdownEditorProps } from '../../MarkdownEditor';
 import type { FileNode, FileProps, FileType, GroupNode } from '../types';
-import { FileGroup, GROUP_INITIAL_PAGE_SIZE, GROUP_PAGE_SIZE_INCREMENT } from './components/FileGroup';
+import {
+  FileGroup,
+  GROUP_INITIAL_PAGE_SIZE,
+  GROUP_PAGE_SIZE_INCREMENT,
+} from './components/FileGroup';
 import { FileItem } from './components/FileItem';
 import { SearchInput } from './components/SearchInput';
 import { isImageFile } from './FileTypeProcessor';
 import {
-  ensureNodeWithId,
   getPreviewSource,
   handleDefaultShare,
   handleFileDownload,
@@ -361,14 +358,12 @@ export const FileComponent: FC<{
     setFlatVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT);
   });
 
-  const handleFlatShowMoreKeyDown = useRefFunction(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        handleFlatShowMore();
-      }
-    },
-  );
+  const handleFlatShowMoreKeyDown = useRefFunction((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleFlatShowMore();
+    }
+  });
 
   const renderFileContent = useRefFunction(() => {
     if (safeNodes.length === 0 && !loading) {

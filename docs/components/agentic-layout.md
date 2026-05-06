@@ -58,16 +58,16 @@ group:
 
 ### AgenticLayoutProps
 
-| 属性       | 说明                                                                       | 类型                  | 默认值    | 版本 |
-| ---------- | -------------------------------------------------------------------------- | --------------------- | --------- | ---- |
-| center     | 中间内容区域（必填）                                                       | `ReactNode`           | -         | -    |
-| left       | 左侧边栏内容                                                               | `ReactNode`           | -         | -    |
-| right      | 右侧边栏内容                                                               | `ReactNode`           | -         | -    |
-| header     | 头部配置，包含折叠控制等（详见 [LayoutHeader](/components/layout-header)） | `LayoutHeaderConfig`  | -         | -    |
-| leftWidth  | 左侧边栏宽度（px）                                                         | `number`              | `256`     | -    |
-| rightWidth | 右侧边栏初始宽度（px），可通过拖拽调整，最小 400px，最大窗口宽度的 70%     | `number`              | `540`     | -    |
-| className  | 根容器自定义类名                                                           | `string`              | -         | -    |
-| style      | 根容器自定义样式                                                           | `React.CSSProperties` | -         | -    |
+| 属性       | 说明                                                                       | 类型                  | 默认值 | 版本 |
+| ---------- | -------------------------------------------------------------------------- | --------------------- | ------ | ---- |
+| center     | 中间内容区域（必填）                                                       | `ReactNode`           | -      | -    |
+| left       | 左侧边栏内容                                                               | `ReactNode`           | -      | -    |
+| right      | 右侧边栏内容                                                               | `ReactNode`           | -      | -    |
+| header     | 头部配置，包含折叠控制等（详见 [LayoutHeader](/components/layout-header)） | `LayoutHeaderConfig`  | -      | -    |
+| leftWidth  | 左侧边栏宽度（px）                                                         | `number`              | `256`  | -    |
+| rightWidth | 右侧边栏初始宽度（px），可通过拖拽调整，最小 400px，最大窗口宽度的 70%     | `number`              | `540`  | -    |
+| className  | 根容器自定义类名                                                           | `string`              | -      | -    |
+| style      | 根容器自定义样式                                                           | `React.CSSProperties` | -      | -    |
 
 ### header 配置（LayoutHeaderConfig）
 

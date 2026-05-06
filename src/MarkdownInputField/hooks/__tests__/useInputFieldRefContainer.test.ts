@@ -33,7 +33,9 @@ describe('useInputFieldRefContainer', () => {
     rerender();
     const secondSnapshot = result.current;
 
-    expect(secondSnapshot.markdownEditorRef).toBe(firstSnapshot.markdownEditorRef);
+    expect(secondSnapshot.markdownEditorRef).toBe(
+      firstSnapshot.markdownEditorRef,
+    );
     expect(secondSnapshot.quickActionsRef).toBe(firstSnapshot.quickActionsRef);
     expect(secondSnapshot.actionsRef).toBe(firstSnapshot.actionsRef);
     expect(secondSnapshot.isSendingRef).toBe(firstSnapshot.isSendingRef);

@@ -93,10 +93,7 @@ export const useAutoScroll = <T extends HTMLDivElement>(
 
   const tolerance = props.SCROLL_TOLERANCE ?? SCROLL_TOLERANCE;
   // pinThreshold 必须 >= tolerance，否则会出现"既算贴底又算脱离"的逻辑空洞
-  const pinThreshold = Math.max(
-    props.pinThreshold ?? PIN_THRESHOLD,
-    tolerance,
-  );
+  const pinThreshold = Math.max(props.pinThreshold ?? PIN_THRESHOLD, tolerance);
 
   /**
    * 用 ref 持有最新回调与 scrollBehavior，避免引用变化导致 effect 反复重建监听。
@@ -328,9 +325,7 @@ export const useAutoScroll = <T extends HTMLDivElement>(
       if (upKeys.includes(e.key) || (e.shiftKey && e.key === ' ')) {
         cancelAnimation();
         const distance =
-          container.scrollHeight -
-          container.scrollTop -
-          container.clientHeight;
+          container.scrollHeight - container.scrollTop - container.clientHeight;
         if (distance > tolerance) {
           const wasPinned = isPinned.current;
           isPinned.current = false;

@@ -26,8 +26,7 @@ const messages: MessageBubbleData[] = [
   {
     id: '1',
     role: 'assistant',
-    content:
-      '### Ant Design 聊天助手\n可协助解答问题、提供示例与文档说明。',
+    content: '### Ant Design 聊天助手\n可协助解答问题、提供示例与文档说明。',
     createAt: Date.now(),
     updateAt: Date.now(),
     isFinished: true,

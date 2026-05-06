@@ -46,9 +46,9 @@ interface CreateLottieComponentOptions {
  * 用于消除 lotties/ 与 Robot/lotties/ 下大量结构完全相同的 Lottie 包装组件
  * （只有 `import('./xxx.json')` 与 displayName/默认尺寸不同）。
  */
-export function createLottieComponent<P extends BaseLottieProps = BaseLottieProps>(
-  options: CreateLottieComponentOptions,
-): React.FC<P> {
+export function createLottieComponent<
+  P extends BaseLottieProps = BaseLottieProps,
+>(options: CreateLottieComponentOptions): React.FC<P> {
   const {
     loadJson,
     defaultSize,

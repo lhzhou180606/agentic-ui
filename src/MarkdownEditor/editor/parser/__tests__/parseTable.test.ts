@@ -62,9 +62,7 @@ describe('parseTable', () => {
 
     it('半角括号与多层括号后缀', () => {
       expect(columnKeyMatchesConfiguredField('销量(万台)', '销量')).toBe(true);
-      expect(
-        columnKeyMatchesConfiguredField('指标(A)(B)', '指标'),
-      ).toBe(true);
+      expect(columnKeyMatchesConfiguredField('指标(A)(B)', '指标')).toBe(true);
     });
 
     it('配置名与列名不同时不匹配', () => {
@@ -138,9 +136,10 @@ describe('parseTable', () => {
     });
 
     it('图表 x/y 为短名且表头带括号单位时仍解析为 chart 并改写为实际 dataIndex', () => {
-      const table = minimalTable(['年份', 'GDP总量（万亿元）'], [
-        ['2020', '103.49'],
-      ]);
+      const table = minimalTable(
+        ['年份', 'GDP总量（万亿元）'],
+        [['2020', '103.49']],
+      );
       const pre: RootContent = {
         type: 'code',
         language: 'html',

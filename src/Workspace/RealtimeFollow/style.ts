@@ -99,7 +99,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           [`&--default`]: {
             width: '40px',
             height: '40px',
-            background: 'linear-gradient(180deg, var(--color-gray-bg-page-light), var(--color-gray-bg-page))',
+            background:
+              'linear-gradient(180deg, var(--color-gray-bg-page-light), var(--color-gray-bg-page))',
           },
         },
 

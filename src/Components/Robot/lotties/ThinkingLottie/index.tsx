@@ -57,10 +57,11 @@ export interface ThinkingLottieProps {
  * - 支持播放控制
  * - 支持自定义样式
  */
-export const ThinkingLottie: React.FC<ThinkingLottieProps> = createLottieComponent({
-  loadJson: () => import('./thinking.json'),
-  defaultSize: 32,
-  displayName: 'RobotThinkingLottie',
-});
+export const ThinkingLottie: React.FC<ThinkingLottieProps> =
+  createLottieComponent({
+    loadJson: () => import('./thinking.json'),
+    defaultSize: 32,
+    displayName: 'RobotThinkingLottie',
+  });
 
 export default ThinkingLottie;

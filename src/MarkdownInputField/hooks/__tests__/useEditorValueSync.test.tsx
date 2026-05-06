@@ -58,7 +58,9 @@ describe('useEditorValueSync', () => {
     rerender({ value: 'external update' });
     await act(async () => {});
 
-    expect(mockEditor.store.setMDContent).toHaveBeenCalledWith('external update');
+    expect(mockEditor.store.setMDContent).toHaveBeenCalledWith(
+      'external update',
+    );
   });
 
   it('Guard 1：当 props.value 等于编辑器最近一次 emit 的 value 时跳过写回', async () => {

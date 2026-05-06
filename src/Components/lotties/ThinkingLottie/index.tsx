@@ -58,9 +58,10 @@ export interface ThinkingLottieProps {
  * - 支持自定义样式
  * - 提供默认的加载动画
  */
-export const ThinkingLottie: React.FC<ThinkingLottieProps> = createLottieComponent({
-  loadJson: () => import('./thinking.json'),
-  displayName: 'ThinkingLottie',
-});
+export const ThinkingLottie: React.FC<ThinkingLottieProps> =
+  createLottieComponent({
+    loadJson: () => import('./thinking.json'),
+    displayName: 'ThinkingLottie',
+  });
 
 export default ThinkingLottie;

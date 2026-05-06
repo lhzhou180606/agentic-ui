@@ -14,28 +14,30 @@ export type { RenderElementProps } from 'slate-react';
 
 // ─── 通用类型 ────────────────────────────────────────────────────────────────
 export {
-  type BaseStyleProps,
-  type MultiStyleProps,
-  type MultiClassNameProps,
-  type WithFalse,
-  type RoleType,
-  type FeedbackType,
   type BaseStateProps,
+  type BaseStyleProps,
   type BubbleMetaData,
+  type FeedbackType,
   type MessageBubbleData,
+  type MultiClassNameProps,
+  type MultiStyleProps,
+  type RoleType,
+  type WithFalse,
 } from './Types';
 
 // ─── 布局组件 ────────────────────────────────────────────────────────────────
 export { AgenticLayout, type AgenticLayoutProps } from './AgenticLayout';
-export { default as Workspace } from './Workspace';
-export { type BrowserItem, type BrowserSuggestion } from './Workspace/types';
 export {
-  type FileActionRef,
   File,
   FileTree,
   PreviewComponent,
-  type PreviewComponentProps,
+  default as Workspace,
+  getFileTypeIcon,
   getFileTypeName,
+  getGroupIcon,
+  type BrowserProps,
+  type CustomProps,
+  type FileActionRef,
   type FileBuiltinActions,
   type FileNode,
   type FileProps,
@@ -44,11 +46,8 @@ export {
   type FileTreeProps,
   type FileType,
   type GroupNode,
-  getFileTypeIcon,
-  getGroupIcon,
   type HtmlPreviewProps,
-  type BrowserProps,
-  type CustomProps,
+  type PreviewComponentProps,
   type RealtimeProps,
   type TabConfiguration,
   type TabItem,
@@ -56,34 +55,20 @@ export {
   type WorkspacePanelType,
   type WorkspaceProps,
 } from './Workspace';
+export { type BrowserItem, type BrowserSuggestion } from './Workspace/types';
 
 // ─── 聊天气泡 ────────────────────────────────────────────────────────────────
 export {
   AIBubble,
-  runRender,
   Bubble,
-  type ChatConfigType,
   BubbleConfigContext,
-  PureBubbleList,
+  MessagesContext,
   PureAIBubble,
   PureBubble,
+  PureBubbleList,
   PureUserBubble,
-  MessagesContext,
-  type BubbleImperativeHandle,
-  type BubbleStyleProps,
-  type BubbleSlotStyles,
-  type BubbleSlotClassNames,
-  type BubbleStyles,
-  type BubbleClassNames,
-  type BubbleItemStyleProps,
-  type CustomConfig,
-  type BubbleRenderConfig,
-  type BubbleProps,
-  UserBubble,
   SchemaEditorBridgeManager,
-  type BubbleHandler,
-  useSchemaEditorBridge,
-  type UseSchemaEditorBridgeResult,
+  UserBubble,
   mapOllamaMessagesToMessageBubbleData,
   mapOpenAIMessagesToMessageBubbleData,
   mapOpenClawMessagesToMessageBubbleData,
@@ -91,13 +76,26 @@ export {
   normalizeOllamaMessagesToOpenAI,
   normalizeOpenClawMessageToOpenAI,
   normalizeOpenClawMessagesToOpenAI,
+  runRender,
+  useOllamaMessageBubbleData,
+  useOpenAIMessageBubbleData,
+  useOpenClawMessageBubbleData,
+  useSchemaEditorBridge,
+  type BubbleClassNames,
+  type BubbleHandler,
+  type BubbleImperativeHandle,
+  type BubbleItemStyleProps,
+  type BubbleProps,
+  type BubbleRenderConfig,
+  type BubbleSlotClassNames,
+  type BubbleSlotStyles,
+  type BubbleStyleProps,
+  type BubbleStyles,
+  type ChatConfigType,
+  type CustomConfig,
   type OllamaChatMessage,
   type OllamaMessagesMapOptions,
   type OllamaToolCall,
-  type OpenClawChatMessage,
-  type OpenClawChatMessageToolResult,
-  type OpenClawChatMeta,
-  type OpenClawMessagesMapOptions,
   type OpenAIChatContentPart,
   type OpenAIChatContentPartFallback,
   type OpenAIChatMessage,
@@ -110,33 +108,35 @@ export {
   type OpenAIChatTextPart,
   type OpenAIMessagesMapMessage,
   type OpenAIMessagesMapOptions,
-  useOllamaMessageBubbleData,
-  useOpenAIMessageBubbleData,
-  useOpenClawMessageBubbleData,
+  type OpenClawChatMessage,
+  type OpenClawChatMessageToolResult,
+  type OpenClawChatMeta,
+  type OpenClawMessagesMapOptions,
+  type UseSchemaEditorBridgeResult,
 } from './Bubble';
 export { BubbleList, type BubbleListProps } from './Bubble/List';
 export {
+  type UseSpeechAdapter,
   type UseSpeechSynthesisOptions,
   type UseSpeechSynthesisResult,
-  type UseSpeechAdapter,
 } from './Bubble/MessagesContent/VoiceButton/types';
 export { type DocInfoListProps } from './Bubble/types/DocInfo';
 
 // ─── 聊天启动页 ──────────────────────────────────────────────────────────────
 export {
-  Title,
-  type TitleProps,
-  CaseReply,
-  type CaseReplyProps,
   ButtonTab,
-  type ButtonTabProps,
   ButtonTabGroup,
+  CaseReply,
+  Title,
   type ButtonTabGroupProps,
   type ButtonTabItem,
+  type ButtonTabProps,
+  type CaseReplyProps,
+  type TitleProps,
 } from './ChatBootPage';
 export {
-  ChatLayout,
   ChatFlowHeader,
+  ChatLayout,
   type ChatFlowHeaderProps,
   type ChatLayoutProps,
   type ChatLayoutRef,
@@ -144,13 +144,18 @@ export {
 
 // ─── 思维链 / 工具调用 ──────────────────────────────────────────────────────
 export {
+  ThoughtChainList,
   type Chunk,
   type DocMeta,
   type ThoughtChainListProps,
   type WhiteBoxProcessInterface,
-  ThoughtChainList,
 } from './ThoughtChainList';
-export { ToolUseBarItem, type ToolCall, type ToolUseBarItemProps, ToolUseBar } from './ToolUseBar';
+export {
+  ToolUseBar,
+  ToolUseBarItem,
+  type ToolCall,
+  type ToolUseBarItemProps,
+} from './ToolUseBar';
 export { ToolUseBarThink, type ToolUseBarThinkProps } from './ToolUseBarThink';
 
 // ─── 任务相关 ────────────────────────────────────────────────────────────────
@@ -159,21 +164,21 @@ export {
   AgentRunBar,
   TASK_RUNNING_STATUS,
   TASK_STATUS,
-  TaskRunningStatusList,
-  TaskStatusList,
   /** @deprecated 请使用 `AgentRunBar` */
   TaskRunning,
+  TaskRunningStatusList,
+  TaskStatusList,
 } from './AgentRunBar';
 export type {
   AgentRunBarActionsRender,
   AgentRunBarProps,
   AgentRunBarVariant,
+  TaskRunningStatus as AgentTaskRunningStatus,
+  // 重命名导出，避免与 ./TaskList 中同名 TaskStatus 冲突
+  TaskStatus as AgentTaskStatus,
   TaskRunningActionsRender,
   TaskRunningProps,
   TaskRunningVariant,
-  // 重命名导出，避免与 ./TaskList 中同名 TaskStatus 冲突
-  TaskStatus as AgentTaskStatus,
-  TaskRunningStatus as AgentTaskRunningStatus,
 } from './AgentRunBar';
 export {
   TaskList,
@@ -186,46 +191,48 @@ export {
 
 // ─── 历史记录 ────────────────────────────────────────────────────────────────
 export {
+  History,
   HistoryActionsBox,
-  HistoryItem,
-  generateHistoryItems,
-  HistoryRunningIcon,
-  type HistoryRunningIconContainerProps,
-  type HistoryRunningIconProps,
   HistoryEmpty,
+  HistoryItem,
   HistoryLoadMore,
   HistoryNewChat,
+  HistoryRunningIcon,
   HistorySearch,
-  useHistory,
-  type HistoryProps,
-  type HistoryActionsBoxProps,
-  type ActionsBoxProps,
-  type TaskStatusEnum,
   TaskStatusData,
-  type HistoryDataType,
-  type HistoryChatType,
   formatTime,
+  generateHistoryItems,
   groupByCategory,
-  History,
+  useHistory,
+  type ActionsBoxProps,
+  type HistoryActionsBoxProps,
+  type HistoryChatType,
+  type HistoryDataType,
+  type HistoryProps,
+  type HistoryRunningIconContainerProps,
+  type HistoryRunningIconProps,
+  type TaskStatusEnum,
 } from './History';
 export { type HistoryListConfig } from './History/types/HistoryList';
 
 // ─── Markdown 渲染器（流式/只读轻量渲染，无 Slate 依赖） ─────────────────────
 export {
-  AnimationText,
-  type AnimationConfig,
-  type AnimationTextProps,
-  CharacterQueue,
-  type UseMarkdownToReactOptions,
-  MarkdownRenderer,
   AgenticUiFileMapBlockRenderer,
   AgenticUiTaskBlockRenderer,
   AgenticUiToolUseBarBlockRenderer,
+  AnimationText,
+  CharacterQueue,
   ChartBlockRenderer,
   CodeBlockRenderer,
+  MarkdownRenderer,
   MermaidBlockRenderer,
   SchemaBlockRenderer,
+  markdownToReactSync,
+  useMarkdownToReact,
+  useStreaming,
   useStreamingMarkdownReact,
+  type AnimationConfig,
+  type AnimationTextProps,
   type CharacterQueueOptions,
   type FileMapConfig,
   type MarkdownRendererEleProps,
@@ -233,28 +240,27 @@ export {
   type MarkdownRendererRef,
   type RenderMode,
   type RendererBlockProps,
-  markdownToReactSync,
-  useMarkdownToReact,
-  useStreaming,
+  type UseMarkdownToReactOptions,
 } from './MarkdownRenderer';
 
 // ─── Markdown 编辑器 ─────────────────────────────────────────────────────────
 export {
-  EditorUtils,
-  parserMdToSchema,
-  sanitizeEditorChromeStyle,
-  dragStart,
-  MElement,
-  MLeaf,
+  BaseMarkdownEditor,
   Blockquote,
   Break,
   Code,
+  EditorUtils,
   Head,
   Hr,
   InlineKatex,
   Katex,
+  KeyboardTask,
   List,
   ListItem,
+  MARKDOWN_EDITOR_EVENTS,
+  MElement,
+  MLeaf,
+  MarkdownEditor,
   Media,
   Mermaid,
   Paragraph,
@@ -272,94 +278,97 @@ export {
   ReadonlyLinkCard,
   ReadonlyList,
   ReadonlyListItem,
+  ReadonlyMarkdownEditorView,
   ReadonlyMedia,
   ReadonlyMermaid,
   ReadonlyParagraph,
   ReadonlySchema,
   ReadonlyTableComponent,
   Schema,
-  nid,
+  calcPath,
+  convertRemoteImages,
   copy,
-  isMod,
-  download,
-  modal$,
-  isMarkdown,
-  debounce,
-  useDebounce,
-  useGetSetState,
-  MARKDOWN_EDITOR_EVENTS,
-  parserSlateNodeToMarkdown,
-  isMix,
-  getDefaultView,
-  isDOMNode,
-  isEventHandled,
-  hasTarget,
-  isTargetInsideVoid,
-  createSelectionFromNodes,
   createDomRangeFromNodes,
-  getSelectionFromDomSelection,
-  hasEditableTarget,
+  createSelectionFromNodes,
+  debounce,
+  download,
+  dragStart,
+  escapeRegExp,
+  findByPathAndText,
+  findLeafPath,
+  getDefaultView,
   getPointStrOffset,
   getRelativePath,
-  calcPath,
-  isPath,
-  findLeafPath,
-  escapeRegExp,
-  normalizeMarkdownSearchText,
-  findByPathAndText,
-  type Methods,
-  KeyboardTask,
-  useSystemKeyboard,
   getRemoteMediaType,
-  convertRemoteImages,
+  getSelectionFromDomSelection,
+  hasEditableTarget,
+  hasTarget,
+  isDOMNode,
+  isEventHandled,
   isLink,
+  isMarkdown,
+  isMix,
+  isMod,
+  isPath,
+  isTargetInsideVoid,
+  modal$,
+  nid,
+  normalizeMarkdownSearchText,
   parsePath,
+  parserMdToSchema,
+  parserSlateNodeToMarkdown,
+  sanitizeEditorChromeStyle,
   toUnixPath,
+  useDebounce,
+  useGetSetState,
   useLocalState,
+  useSystemKeyboard,
+  type AttachNode,
+  type BlockQuoteNode,
+  type BreakNode,
+  type BulletedListNode,
+  type CardAfterNode,
+  type CardBeforeNode,
+  type CardNode,
+  type ChartNode,
+  type ChartTypeConfig,
+  type CodeNode,
+  type CommentDataType,
+  type CustomLeaf,
+  type DetailedSettings,
+  type ElementProps,
+  type Elements,
+  type FootnoteDefinitionNode,
+  type HeadNode,
+  type HrNode,
+  type IEditor,
+  type InlineKatexNode,
+  type JinjaConfig,
+  type JinjaTemplateItem,
+  type JinjaTemplatePanelConfig,
+  type JinjaTemplatePanelItems,
+  type LinkCardNode,
+  type ListItemNode,
+  type ListNode,
+  type MapValue,
+  type MarkdownEditorInstance,
+  type MarkdownEditorProps,
+  type MediaNode,
+  type Methods,
+  type NodeTypes,
+  type NumberedListNode,
+  type ParagraphNode,
+  type SchemaNode,
   type TableCellNode,
   type TableNode,
   type TableRowNode,
-  type DetailedSettings,
-  type CodeNode,
-  type ParagraphNode,
-  type FootnoteDefinitionNode,
-  type CardNode,
-  type CardBeforeNode,
-  type CardAfterNode,
-  type BlockQuoteNode,
-  type BulletedListNode,
-  type NumberedListNode,
-  type ListNode,
-  type ChartTypeConfig,
-  type ChartNode,
-  type ListItemNode,
-  type HeadNode,
-  type HrNode,
-  type BreakNode,
-  type MediaNode,
-  type LinkCardNode,
-  type AttachNode,
-  type SchemaNode,
-  type Elements,
-  type CustomLeaf,
-  type NodeTypes,
-  type MapValue,
-  type InlineKatexNode,
-  type ElementProps,
-  type CommentDataType,
-  type JinjaTemplateItem,
-  type JinjaTemplatePanelItems,
-  type JinjaTemplatePanelConfig,
-  type JinjaConfig,
-  type IEditor,
-  type MarkdownEditorInstance,
-  type MarkdownEditorProps,
-  ReadonlyMarkdownEditorView,
-  BaseMarkdownEditor,
-  MarkdownEditor,
 } from './MarkdownEditor';
 export { useSelStatus } from './MarkdownEditor/hooks/editor';
-export { type RendererPlugin, type MarkdownEditorPlugin, PluginContext } from './MarkdownEditor/plugin';
+export {
+  PluginContext,
+  type MarkdownEditorPlugin,
+  type RendererPlugin,
+} from './MarkdownEditor/plugin';
 export {
   createJinjaPlugin,
   jinjaPlugin,
@@ -367,78 +376,109 @@ export {
 } from './MarkdownEditor/plugins/jinja';
 
 // MarkdownEditor 内部工具（保持向后兼容，后续版本考虑收敛）
-export { CommentList, ContributorAvatar, AvatarList, TextStyleTag, type LazyElementProps, LazyElement } from './MarkdownEditor/editor/components/index';
+export {
+  AvatarList,
+  CommentList,
+  ContributorAvatar,
+  LazyElement,
+  TextStyleTag,
+  type LazyElementProps,
+} from './MarkdownEditor/editor/components/index';
 export { SlateTable } from './MarkdownEditor/editor/elements/Table/Table';
-export { type TableContextValue, TablePropsContext, TablePropsProvider } from './MarkdownEditor/editor/elements/Table/TableContext';
+export {
+  TablePropsContext,
+  TablePropsProvider,
+  type TableContextValue,
+} from './MarkdownEditor/editor/elements/Table/TableContext';
 export { partialParse } from './MarkdownEditor/editor/parser/json-parse';
-export { clearParseCache, simpleHash, type ParserMarkdownToSlateNodeConfig, MarkdownToSlateParser, parserMarkdownToSlateNode } from './MarkdownEditor/editor/parser/parserMarkdownToSlateNode';
-export { parserSlateNodeToMarkdown as parserSlateNodeToMarkdownDirect, isMix as isMixDirect } from './MarkdownEditor/editor/parser/parserSlateNodeToMarkdown';
-export { type EditorStoreContextType, EditorStoreContext, useEditorStore, EditorStore } from './MarkdownEditor/editor/store';
 export {
-  type HtmlToMarkdownOptions,
-  htmlToMarkdown,
-  cleanHtml,
-  isHtml,
-  extractTextFromHtml,
-  batchHtmlToMarkdown,
-} from './MarkdownEditor/editor/utils/htmlToMarkdown';
+  MarkdownToSlateParser,
+  clearParseCache,
+  parserMarkdownToSlateNode,
+  simpleHash,
+  type ParserMarkdownToSlateNodeConfig,
+} from './MarkdownEditor/editor/parser/parserMarkdownToSlateNode';
 export {
-  type MarkdownRemarkPlugin,
-  type MarkdownToHtmlOptions,
-  type MarkdownToHtmlConfig,
-  escapeHtml,
-  REMARK_REHYPE_DIRECTIVE_HANDLERS,
-  DEFAULT_MARKDOWN_REMARK_PLUGINS,
-  markdownToHtml,
-  markdownToHtmlSync,
-} from './MarkdownEditor/editor/utils/markdownToHtml';
+  isMix as isMixDirect,
+  parserSlateNodeToMarkdown as parserSlateNodeToMarkdownDirect,
+} from './MarkdownEditor/editor/parser/parserSlateNodeToMarkdown';
 export {
-  docxDeserializer,
+  EditorStore,
+  EditorStoreContext,
+  useEditorStore,
+  type EditorStoreContextType,
+} from './MarkdownEditor/editor/store';
+export {
   TEXT_TAGS,
-  makeDeserializer,
-  imagePastingListener,
+  docxDeserializer,
   extractTagsFromHtml,
+  imagePastingListener,
+  makeDeserializer,
 } from './MarkdownEditor/editor/utils/docx/index';
 export {
+  batchHtmlToMarkdown,
+  cleanHtml,
+  extractTextFromHtml,
+  htmlToMarkdown,
+  isHtml,
+  type HtmlToMarkdownOptions,
+} from './MarkdownEditor/editor/utils/htmlToMarkdown';
+export {
+  DEFAULT_MARKDOWN_REMARK_PLUGINS,
+  REMARK_REHYPE_DIRECTIVE_HANDLERS,
+  escapeHtml,
+  markdownToHtml,
+  markdownToHtmlSync,
+  type MarkdownRemarkPlugin,
+  type MarkdownToHtmlConfig,
+  type MarkdownToHtmlOptions,
+} from './MarkdownEditor/editor/utils/markdownToHtml';
+export {
+  NativeTableEditor,
   type CellElement,
   type Edge,
   type NodeEntryWithContext,
   type SelectionMode,
   type WithType,
-  NativeTableEditor,
 } from './MarkdownEditor/utils/native-table/native-table-editor';
 
 // ─── Markdown 输入框 ─────────────────────────────────────────────────────────
 export {
-  SupportedFileFormats,
-  type SupportedFormat,
-  AttachmentSupportedFormatsContent,
-  type AttachmentButtonPopoverProps,
-  AttachmentButtonPopover,
-  type AttachmentFile,
-  type UploadResponse,
-  type AttachmentButtonProps,
-  upLoadFileToServer,
   AttachmentButton,
+  AttachmentButtonPopover,
+  AttachmentSupportedFormatsContent,
+  SupportedFileFormats,
+  upLoadFileToServer,
+  type AttachmentButtonPopoverProps,
+  type AttachmentButtonProps,
+  type AttachmentFile,
+  type SupportedFormat,
+  type UploadResponse,
 } from './MarkdownInputField/AttachmentButton';
-export { AttachmentFileList, type AttachmentFileListProps } from './MarkdownInputField/AttachmentButton/AttachmentFileList';
+export {
+  AttachmentFileList,
+  type AttachmentFileListProps,
+} from './MarkdownInputField/AttachmentButton/AttachmentFileList';
 export { AttachmentFileListItem } from './MarkdownInputField/AttachmentButton/AttachmentFileList/AttachmentFileListItem';
 export {
-  kbToSize,
-  isImageFile,
-  isVideoFile,
-  isMediaFile,
+  getDeviceBrand,
   isAttachmentFileLoading,
   isFileMetaPlaceholderState,
-  getDeviceBrand,
-  isVivoDevice,
-  isOppoDevice,
-  isVivoOrOppoDevice,
+  isImageFile,
+  isMediaFile,
   isMobileDevice,
+  isOppoDevice,
+  isVideoFile,
+  isVivoDevice,
+  isVivoOrOppoDevice,
   isWeChat,
+  kbToSize,
 } from './MarkdownInputField/AttachmentButton/utils';
 export { ActionItemContainer } from './MarkdownInputField/BeforeToolContainer/BeforeToolContainer';
-export { FileMapView, type FileMapViewProps } from './MarkdownInputField/FileMapView';
+export {
+  FileMapView,
+  type FileMapViewProps,
+} from './MarkdownInputField/FileMapView';
 export {
   MarkdownInputField,
   type ActionsSlotState,
@@ -446,41 +486,52 @@ export {
   type SlotRenderState,
 } from './MarkdownInputField/MarkdownInputField';
 export { MARKDOWN_INPUT_FIELD_TEST_IDS } from './MarkdownInputField/testIds';
-export { VoiceInputButton, type VoiceRecognizer, type CreateRecognizer } from './MarkdownInputField/VoiceInput';
+export {
+  VoiceInputButton,
+  type CreateRecognizer,
+  type VoiceRecognizer,
+} from './MarkdownInputField/VoiceInput';
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
 export {
-  type LowCodeSchema,
-  type SchemaEditorProps,
-  type SchemaEditorRef,
-  type SchemaFormProps,
   SchemaEditor,
   SchemaForm,
   SchemaRenderer,
   SchemaValidator,
   TemplateEngine,
   validator,
+  type LowCodeSchema,
+  type SchemaEditorProps,
+  type SchemaEditorRef,
+  type SchemaFormProps,
 } from './Schema';
 
 // ─── 插件 ────────────────────────────────────────────────────────────────────
 export {
-  ChartAttrToolBar,
   Area,
-  Bar,
-  Column,
-  Line,
-  Pie,
-  ChartRender,
   AreaChart,
+  Bar,
   BarChart,
   BoxPlotChart,
+  ChartAttrToolBar,
+  ChartElement,
+  ChartFilter,
+  ChartRender,
   ChartStatistic,
+  ChartToolBar,
+  Column,
   DonutChart,
   FunnelChart,
   HistogramChart,
+  Line,
   LineChart,
+  Pie,
   RadarChart,
   ScatterChart,
+  chartDebounce,
+  defaultColorList,
+  downloadChart,
+  stringFormatNumber,
   type AreaChartConfigItem,
   type AreaChartDataItem,
   type AreaChartProps,
@@ -489,12 +540,18 @@ export {
   type BarChartProps,
   type BoxPlotChartDataItem,
   type BoxPlotChartProps,
+  type ChartClassNames,
+  type ChartFilterProps,
   type ChartStatisticClassNames,
   type ChartStatisticProps,
   type ChartStatisticStyles,
+  type ChartStyles,
+  type ChartToolBarProps,
+  type ClassNameType,
   type DonutChartConfig,
   type DonutChartData,
   type DonutChartProps,
+  type FilterOption,
   type FunnelChartDataItem,
   type FunnelChartProps,
   type HistogramChartDataItem,
@@ -503,22 +560,9 @@ export {
   type LineChartDataItem,
   type LineChartProps,
   type RadarChartDataItem,
+  type RegionOption,
   type ScatterChartDataItem,
   type ScatterChartProps,
-  defaultColorList,
-  chartDebounce,
-  stringFormatNumber,
-  type ChartClassNames,
-  type ChartStyles,
-  type ClassNameType,
-  ChartFilter,
-  ChartToolBar,
-  downloadChart,
-  type ChartFilterProps,
-  type ChartToolBarProps,
-  type FilterOption,
-  type RegionOption,
-  ChartElement,
 } from './Plugins/chart';
 export {
   AceEditor,
@@ -526,114 +570,173 @@ export {
   CodeContainer,
   CodeRenderer,
   CodeToolbar,
-  type CodeToolbarProps,
   HtmlPreview,
   LanguageSelector,
-  type LanguageSelectorProps,
   LoadImage,
   ThinkBlock,
-  type ThinkBlockContextType,
   ThinkBlockProvider,
+  type CodeToolbarProps,
+  type LanguageSelectorProps,
+  type ThinkBlockContextType,
 } from './Plugins/code/components';
 export { MarkdownFormatter } from './Plugins/formatter';
 export { MermaidElement } from './Plugins/mermaid';
 
 // ─── 基础 UI 组件 ────────────────────────────────────────────────────────────
-export { AILabel, type AILabelStatus, type AILabelProps } from './AILabel';
+export { AILabel, type AILabelProps, type AILabelStatus } from './AILabel';
 export { AnswerAlert, type AnswerAlertProps } from './AnswerAlert';
-export { type BackBottomProps, type BackTopProps, BackTo } from './BackTo';
+export { BackTo, type BackBottomProps, type BackTopProps } from './BackTo';
 export { default as Quote } from './Quote';
 export type { QuoteProps } from './Quote';
 export {
   WelcomeMessage,
-  type WelcomeMessageTitleAnimateProps,
   type WelcomeMessageDescriptionAnimateProps,
   type WelcomeMessageProps,
+  type WelcomeMessageTitleAnimateProps,
 } from './WelcomeMessage';
 
 // ─── 通用子组件 ──────────────────────────────────────────────────────────────
-export { ActionIconBox, type ActionIconBoxProps } from './Components/ActionIconBox';
-export { ActionItemBox } from './Components/ActionItemBox';
-export { IconButton, type IconButtonProps, SwitchButton, type SwitchButtonProps, ToggleButton, type ToggleButtonProps } from './Components/Button';
-export { GradientText, type GradientTextProps } from './Components/GradientText';
-export { type LayoutHeaderConfig, type LayoutHeaderProps, LayoutHeader } from './Components/LayoutHeader';
-export { CreativeRecommendationLoading, CreativeSparkLoading, Loading } from './Components/Loading';
 export {
-  CopyLottie, type CopyLottieProps,
-  DislikeLottie, type DislikeLottieProps,
-  LikeLottie, type LikeLottieProps,
-  MoreLottie, type MoreLottieProps,
-  PlayLottie, type PlayLottieProps,
-  QuoteLottie, type QuoteLottieProps,
-  RefreshLottie, type RefreshLottieProps,
-  ShareLottie, type ShareLottieProps,
+  ActionIconBox,
+  type ActionIconBoxProps,
+} from './Components/ActionIconBox';
+export { ActionItemBox } from './Components/ActionItemBox';
+export {
+  IconButton,
+  SwitchButton,
+  ToggleButton,
+  type IconButtonProps,
+  type SwitchButtonProps,
+  type ToggleButtonProps,
+} from './Components/Button';
+export {
+  GradientText,
+  type GradientTextProps,
+} from './Components/GradientText';
+export {
+  LayoutHeader,
+  type LayoutHeaderConfig,
+  type LayoutHeaderProps,
+} from './Components/LayoutHeader';
+export {
+  CreativeRecommendationLoading,
+  CreativeSparkLoading,
+  Loading,
+} from './Components/Loading';
+export {
+  CopyLottie,
+  CreativeSparkLottie,
+  DazingLottie,
+  DislikeLottie,
+  LikeLottie,
+  LoadingLottie,
+  MoreLottie,
+  PlayLottie,
+  QuoteLottie,
+  RefreshLottie,
+  ShareLottie,
+  TextLoading,
+  ThinkingLottie,
+  ThreeThinkingLottie,
   useAsyncLottieData,
-  CreativeSparkLottie, type CreativeSparkLottieProps,
-  DazingLottie, type DazingLottieProps,
-  LoadingLottie, type LoadingLottieProps,
-  TextLoading, type TextLoadingProps,
-  ThinkingLottie, type ThinkingLottieProps,
-  ThreeThinkingLottie, type ThreeThinkingLottieProps,
+  type CopyLottieProps,
+  type CreativeSparkLottieProps,
+  type DazingLottieProps,
+  type DislikeLottieProps,
+  type LikeLottieProps,
+  type LoadingLottieProps,
+  type MoreLottieProps,
+  type PlayLottieProps,
+  type QuoteLottieProps,
+  type RefreshLottieProps,
+  type ShareLottieProps,
+  type TextLoadingProps,
+  type ThinkingLottieProps,
+  type ThreeThinkingLottieProps,
 } from './Components/lotties';
 export {
-  BlowingWindLottie, type BlowingWindLottieProps,
-  BouncingLottie, type BouncingLottieProps,
-  PeekLottie, type PeekLottieProps,
-  type RobotStatus,
+  BlowingWindLottie,
+  BouncingLottie,
+  PeekLottie,
+  default as Robot,
+  type BlowingWindLottieProps,
+  type BouncingLottieProps,
+  type PeekLottieProps,
   type RobotProps,
+  type RobotStatus,
 } from './Components/Robot';
-export { default as Robot } from './Components/Robot';
-export { SuggestionList, type SuggestionItem, type SuggestionListProps } from './Components/SuggestionList';
-export { resolveSegments, TextAnimate, type TextAnimateProps } from './Components/TextAnimate';
-export { TypingAnimation, type TypingAnimationProps } from './Components/TypingAnimation';
-export { VisualList, type VisualListItem, type VisualListProps } from './Components/VisualList';
+export {
+  SuggestionList,
+  type SuggestionItem,
+  type SuggestionListProps,
+} from './Components/SuggestionList';
+export {
+  TextAnimate,
+  resolveSegments,
+  type TextAnimateProps,
+} from './Components/TextAnimate';
+export {
+  TypingAnimation,
+  type TypingAnimationProps,
+} from './Components/TypingAnimation';
+export {
+  VisualList,
+  type VisualListItem,
+  type VisualListProps,
+} from './Components/VisualList';
 
 // ─── Hooks ───────────────────────────────────────────────────────────────────
 export { useAutoScroll } from './Hooks/useAutoScroll';
 export { useLanguage } from './Hooks/useLanguage';
 export { useRefFunction } from './Hooks/useRefFunction';
-export { type CSSInterpolation, type GenerateStyle, type ChatTokenType, resetComponent, useEditorStyleRegister } from './Hooks/useStyle';
+export {
+  resetComponent,
+  useEditorStyleRegister,
+  type CSSInterpolation,
+  type ChatTokenType,
+  type GenerateStyle,
+} from './Hooks/useStyle';
 export { useThrottleFn } from './Hooks/useThrottleFn';
 
 // ─── 国际化 ──────────────────────────────────────────────────────────────────
 export {
+  I18nContext,
+  I18nProvide,
   cnLabels,
-  enLabels,
-  type LocalKeys,
+  compileTemplate,
   detectUserLanguage,
+  enLabels,
   getLocaleByLanguage,
   saveUserLanguage,
-  I18nContext,
   useLocale,
   useMergedLocale,
-  I18nProvide,
-  compileTemplate,
+  type LocalKeys,
 } from './I18n';
 
 // ─── 工具 / 沙箱 ────────────────────────────────────────────────────────────
 export {
+  DEFAULT_SANDBOX_CONFIG,
+  DEFAULT_SECURITY_CONFIG,
   ProxySandbox,
-  createSandbox,
-  runInSandbox,
-  type SandboxConfig,
-  type SandboxResult,
+  SandboxHealthChecker,
   SecurityContextManager,
+  createConfiguredSandbox,
+  createSandbox,
   createSecurityContextManager,
+  quickExecute,
+  runInSandbox,
   runInSecureContext,
+  safeMathEval,
+  sandboxHealthChecker,
   type ExecutionContext,
   type MonitoringConfig,
   type PermissionConfig,
   type ResourceLimits,
-  type SecurityContextConfig,
+  type SandboxConfig,
   type SandboxInstance,
+  type SandboxResult,
+  type SecurityContextConfig,
   type SecurityManager,
-  DEFAULT_SANDBOX_CONFIG,
-  DEFAULT_SECURITY_CONFIG,
-  createConfiguredSandbox,
-  quickExecute,
-  safeMathEval,
-  SandboxHealthChecker,
-  sandboxHealthChecker,
 } from './Utils/proxySandbox';
 
 // ─── 第三方 SDK re-export（向后兼容，后续版本考虑移除） ───────────────────────

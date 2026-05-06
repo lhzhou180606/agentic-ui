@@ -27,46 +27,42 @@ export const useExposeInputRef = ({
   markdownEditorRef,
   setValue,
 }: UseExposeInputRefParams): void => {
-  useImperativeHandle(
-    inputRef,
-    (): MarkdownEditorInstance | undefined => {
-      const editor = markdownEditorRef.current;
+  useImperativeHandle(inputRef, (): MarkdownEditorInstance | undefined => {
+    const editor = markdownEditorRef.current;
 
-      const syncValueAndSetMDContent = (
-        md?: string,
-        plugins?: any,
-        options?: any,
-      ) => {
-        if (md !== undefined) {
-          setValue(md);
-        }
-        return editor?.store?.setMDContent(md, plugins, options);
-      };
-
-      // editor 尚未就绪时，仍提供一个最小可用的 store，至少保证 setMDContent
-      // 调用安全（同步外部 value，方便父组件做受控初始化）。
-      if (!editor) {
-        return {
-          store: {
-            setMDContent: syncValueAndSetMDContent,
-          },
-        } as unknown as MarkdownEditorInstance;
+    const syncValueAndSetMDContent = (
+      md?: string,
+      plugins?: any,
+      options?: any,
+    ) => {
+      if (md !== undefined) {
+        setValue(md);
       }
+      return editor?.store?.setMDContent(md, plugins, options);
+    };
 
-      const storeProxy = new Proxy(editor.store, {
-        get(target, prop) {
-          if (prop === 'setMDContent') {
-            return syncValueAndSetMDContent;
-          }
-          return Reflect.get(target, prop);
-        },
-      });
-
+    // editor 尚未就绪时，仍提供一个最小可用的 store，至少保证 setMDContent
+    // 调用安全（同步外部 value，方便父组件做受控初始化）。
+    if (!editor) {
       return {
-        ...editor,
-        store: storeProxy,
-      } as MarkdownEditorInstance;
-    },
-    [setValue],
-  );
+        store: {
+          setMDContent: syncValueAndSetMDContent,
+        },
+      } as unknown as MarkdownEditorInstance;
+    }
+
+    const storeProxy = new Proxy(editor.store, {
+      get(target, prop) {
+        if (prop === 'setMDContent') {
+          return syncValueAndSetMDContent;
+        }
+        return Reflect.get(target, prop);
+      },
+    });
+
+    return {
+      ...editor,
+      store: storeProxy,
+    } as MarkdownEditorInstance;
+  }, [setValue]);
 };

@@ -270,7 +270,9 @@ const AnswerAlertComponent: React.FC<AnswerAlertProps> = ({
       data-testid={prefixCls}
       style={style}
       role={getAriaRole(type)}
-      aria-live={type === 'error' || type === 'warning' ? 'assertive' : 'polite'}
+      aria-live={
+        type === 'error' || type === 'warning' ? 'assertive' : 'polite'
+      }
     >
       <div className={classNames(`${prefixCls}-content`, hashId)}>
         {showIcon ? (
@@ -316,4 +318,5 @@ AnswerAlertComponent.displayName = 'AnswerAlert';
 export const AnswerAlert = memo(AnswerAlertComponent);
 
 // memo 包装会丢失内部组件 displayName，显式补回，便于 DevTools / 测试 snapshot 识别
-(AnswerAlert as unknown as { displayName?: string }).displayName = 'AnswerAlert';
+(AnswerAlert as unknown as { displayName?: string }).displayName =
+  'AnswerAlert';

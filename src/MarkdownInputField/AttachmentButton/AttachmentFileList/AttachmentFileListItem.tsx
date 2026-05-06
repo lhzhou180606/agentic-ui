@@ -194,13 +194,9 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
           `${parentPrefix}-item-motion`，与 style.ts 中的选择器一致。 */}
       <div
         onClick={handleFileClick}
-        className={classNames(
-          className,
-          `${prefixCls}-motion`,
-          {
-            [`${prefixCls}-meta-placeholder`]: isFileMetaPlaceholderState(file),
-          },
-        )}
+        className={classNames(className, `${prefixCls}-motion`, {
+          [`${prefixCls}-meta-placeholder`]: isFileMetaPlaceholderState(file),
+        })}
         data-testid="file-item"
         data-state={motionState}
         style={

@@ -2,7 +2,10 @@ import React, { useMemo } from 'react';
 import { useAsyncLottieData } from '../useAsyncLottieData';
 import AbstractLottie, { AbstractLottieProps } from './Abstract';
 
-export type BubbleActionLottieProps = Omit<AbstractLottieProps, 'animationData'>;
+export type BubbleActionLottieProps = Omit<
+  AbstractLottieProps,
+  'animationData'
+>;
 
 interface CreateBubbleActionLottieOptions {
   /** 动态 import 函数，例如 `() => import('./lottie.json')` */

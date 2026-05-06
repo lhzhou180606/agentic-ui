@@ -294,11 +294,7 @@ const VisualListComponent: React.FC<VisualListProps> = ({
   }
 
   return wrapSSR(
-    <div
-      className={containerClassName}
-      data-testid={prefixCls}
-      style={style}
-    >
+    <div className={containerClassName} data-testid={prefixCls} style={style}>
       <ul className={classNames(prefixCls, hashId)}>{listItems}</ul>
       {/* 用来处理margin-8*/}
       <div style={{ width: 4 }} />

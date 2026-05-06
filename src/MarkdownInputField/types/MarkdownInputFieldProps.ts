@@ -4,11 +4,11 @@ import {
   MarkdownEditorInstance,
   MarkdownEditorProps,
 } from '../../MarkdownEditor';
-import type { AttachmentConfig } from './attachment';
-import type { ActionsSlotState, SlotRenderState } from './slots';
 import type { SendButtonCustomizationProps } from '../SendButton';
 import type { SkillModeConfig } from '../SkillModeBar';
 import type { CreateRecognizer } from '../VoiceInput';
+import type { AttachmentConfig } from './attachment';
+import type { ActionsSlotState, SlotRenderState } from './slots';
 
 export type { ActionsSlotState, SlotRenderState };
 

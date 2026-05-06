@@ -181,6 +181,12 @@ export const cnLabels = {
   'chat.task.search.placeholder': '搜索任务',
   'chat.history.empty.chat.title': '找不到相关结果',
   'chat.history.empty.chat.description': '换个关键词试试吧',
+  'chat.history.empty.task.title': '暂无历史任务',
+  'chat.history.empty.task.description': '完成的任务会出现在这里',
+  // 历史时间分组标签：用于 formatTime 的 i18n 文案覆盖
+  'chat.history.time.today': '今日',
+  'chat.history.time.yesterday': '昨日',
+  'chat.history.time.withinWeek': '一周内',
   // TaskList 组件相关
   'taskList.expand': '展开',
   'taskList.collapse': '收起',
@@ -645,6 +651,12 @@ export const enLabels: typeof cnLabels = {
   'chat.task.search.placeholder': 'Search Task',
   'chat.history.empty.chat.title': 'No related results found',
   'chat.history.empty.chat.description': 'Try a different keyword',
+  'chat.history.empty.task.title': 'No history tasks',
+  'chat.history.empty.task.description': 'Completed tasks will show up here',
+  // History time group labels: i18n overrides for formatTime
+  'chat.history.time.today': 'Today',
+  'chat.history.time.yesterday': 'Yesterday',
+  'chat.history.time.withinWeek': 'Within a week',
   // TaskList component related
   'taskList.expand': 'Expand',
   'taskList.collapse': 'Collapse',

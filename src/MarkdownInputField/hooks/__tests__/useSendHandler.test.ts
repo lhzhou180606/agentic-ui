@@ -99,9 +99,7 @@ describe('useSendHandler', () => {
     const err = new Error('send failed');
     params.props.onSend = vi.fn().mockRejectedValue(err);
     params.markdownEditorRef.current!.store.getMDContent.mockReturnValue('hi');
-    const consoleSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const { result } = renderHook(() => useSendHandler(params));
     await expect(result.current.sendMessage()).rejects.toThrow('send failed');
     expect(consoleSpy).toHaveBeenCalledWith('Send message failed:', err);
