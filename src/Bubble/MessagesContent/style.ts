@@ -136,6 +136,20 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         opacity: 1,
       },
     },
+
+    // BubbleExtra 操作区入场动画：替代 framer-motion 的 fade-in
+    // 原实现 staggerChildren 对子组件无效（子组件并非 motion.*），故直接 fade
+    [`${token.componentCls}-action-box`]: {
+      animationName: `${token.componentCls}-actionBoxFadeIn`,
+      animationDuration: '0.3s',
+      animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      animationDelay: '0.5s',
+      animationFillMode: 'both',
+    },
+    [`@keyframes ${token.componentCls}-actionBoxFadeIn`]: {
+      from: { opacity: 0 },
+      to: { opacity: 1 },
+    },
   };
 };
 

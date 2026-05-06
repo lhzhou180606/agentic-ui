@@ -182,10 +182,16 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             inset: '0',
             borderRadius: '50%',
             background:
-              'conic-gradient(from var(--rotate, 0deg),transparent 0deg 0deg, #5EF050 35deg 55deg, #37ABFF 105deg 115deg,  #D7B9FF 135deg 135deg, transparent 165deg 360deg)',
+              'conic-gradient(transparent 0deg 0deg, #5EF050 35deg 55deg, #37ABFF 105deg 115deg,  #D7B9FF 135deg 135deg, transparent 165deg 360deg)',
             WebkitMask:
               'radial-gradient(50% 50% at 50% 50%, rgba(255, 0, 0, 0) 65%, #FF0000 100%)',
             mask: 'radial-gradient(50% 50% at 50% 50%, rgba(255, 0, 0, 0) 80%, #FF0000 80%, #FF0000 100%)',
+            // 纯 CSS 旋转动画，等价于原 framer-motion 的 `--rotate: 0deg → 360deg`
+            // 视觉效果一致：以中心为轴线性旋转 conic-gradient
+            animationName: `${token.componentCls}-toolImageSpin`,
+            animationDuration: '1s',
+            animationTimingFunction: 'linear',
+            animationIterationCount: 'infinite',
           },
         },
       },
@@ -348,6 +354,40 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             color: 'var(--color-red-text-default)',
           },
         },
+      },
+
+      // 纯 CSS 旋转关键帧，替代 framer-motion 的 `--rotate` 动画
+      [`@keyframes ${token.componentCls}-toolImageSpin`]: {
+        from: { transform: 'rotate(0deg)' },
+        to: { transform: 'rotate(360deg)' },
+      },
+
+      // 加载态横扫蒙版动画（替代 framer-motion 的 maskImage 关键帧动画）
+      // 通过遮罩在文字上做从左到右的高光横扫，提示进行中
+      [`@keyframes ${token.componentCls}-toolMaskSweep`]: {
+        from: {
+          WebkitMaskImage:
+            'linear-gradient(to right, rgba(0,0,0,0.99) -50%, rgba(0,0,0,0.15) -50%, rgba(0,0,0,0.99) 150%)',
+          maskImage:
+            'linear-gradient(to right, rgba(0,0,0,0.99) -50%, rgba(0,0,0,0.15) -50%, rgba(0,0,0,0.99) 150%)',
+        },
+        to: {
+          WebkitMaskImage:
+            'linear-gradient(to right, rgba(0,0,0,0.99) -50%, rgba(0,0,0,0.15) 150%, rgba(0,0,0,0.99) 150%)',
+          maskImage:
+            'linear-gradient(to right, rgba(0,0,0,0.99) -50%, rgba(0,0,0,0.15) 150%, rgba(0,0,0,0.99) 150%)',
+        },
+      },
+      // 加载态横扫修饰类，由 ToolHeaderRight 在 loading 时挂载
+      '&-tool-header-right-loading': {
+        WebkitMaskImage:
+          'linear-gradient(to right, rgba(0,0,0,0.99) -30%, rgba(0,0,0,0.15) -50%, rgba(0,0,0,0.99) 120%)',
+        maskImage:
+          'linear-gradient(to right, rgba(0,0,0,0.99) -30%, rgba(0,0,0,0.15) -50%, rgba(0,0,0,0.99) 120%)',
+        animationName: `${token.componentCls}-toolMaskSweep`,
+        animationDuration: '1s',
+        animationTimingFunction: 'linear',
+        animationIterationCount: 'infinite',
       },
     },
   } as any;

@@ -6,7 +6,6 @@ import {
   X,
 } from '@sofa-design/icons';
 import classNames from 'clsx';
-import { motion } from 'framer-motion';
 import React, {
   memo,
   useCallback,
@@ -47,64 +46,18 @@ const ToolImageComponent: React.FC<ToolImageProps> = ({
     return classNames(`${prefixCls}-tool-image`, hashId);
   }, [prefixCls, hashId]);
 
-  // 缓存动画配置，避免重复创建对象
-  const loadingAnimationConfig = useMemo(
-    () => ({
-      animate: {
-        '--rotate': ['0deg', '360deg'],
-      },
-      transition: {
-        '--rotate': {
-          duration: 1,
-          repeat: Infinity,
-          ease: 'linear',
-        },
-      },
-      style: {
-        '--rotation': '360deg',
-      } as React.CSSProperties,
-    }),
-    [],
-  );
-
-  const idleAnimationConfig = useMemo(
-    () => ({
-      style: {
-        '--rotation': '0deg',
-      } as React.CSSProperties,
-    }),
-    [],
-  );
-
-  const animationProps = useMemo(() => {
-    if (disableAnimation) return {};
-    return tool.status === 'loading'
-      ? loadingAnimationConfig
-      : idleAnimationConfig;
-  }, [
-    tool.status,
-    loadingAnimationConfig,
-    idleAnimationConfig,
-    disableAnimation,
-  ]);
-
   // 缓存图标渲染
   const iconElement = useMemo(() => {
     return tool.icon ? tool.icon : <Api />;
   }, [tool.icon]);
 
-  if (disableAnimation) {
-    return (
-      <div className={toolImageWrapperClassName}>
-        <div className={toolImageClassName}>{iconElement}</div>
-      </div>
-    );
-  }
-
+  // 旋转动画完全由 CSS 控制（参见 ToolUseBar/style.ts 中的
+  // `&-tool-image-wrapper-loading::after` + `@keyframes -toolImageSpin`），
+  // 无需 JS 运行时；`disableAnimation` 仅控制是否挂载 loading 修饰类。
   return (
-    <motion.div className={toolImageWrapperClassName} {...animationProps}>
+    <div className={toolImageWrapperClassName}>
       <div className={toolImageClassName}>{iconElement}</div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -125,57 +78,34 @@ const ToolHeaderRightComponent: React.FC<ToolHeaderRightProps> = ({
   light,
   disableAnimation = false,
 }) => {
+  const isLoading = tool.status === 'loading';
+  // 加载态横扫动画完全由 CSS 控制（参见 ToolUseBar/style.ts 中的
+  // `&-tool-header-right-loading` + `@keyframes -toolMaskSweep`），
+  // `disableAnimation` 仅控制是否挂载该修饰类。
   const toolHeaderRightClassName = useMemo(() => {
     return classNames(
       `${prefixCls}-tool-header-right`,
       {
         [`${prefixCls}-tool-header-right-light`]: light,
+        [`${prefixCls}-tool-header-right-loading`]:
+          !disableAnimation && isLoading,
       },
       hashId,
     );
-  }, [prefixCls, hashId, light]);
+  }, [prefixCls, hashId, light, disableAnimation, isLoading]);
 
   const toolNameClassName = useMemo(() => {
     return classNames(`${prefixCls}-tool-name`, hashId, {
-      [`${prefixCls}-tool-name-loading`]: tool.status === 'loading',
+      [`${prefixCls}-tool-name-loading`]: isLoading,
     });
-  }, [prefixCls, hashId, tool.status]);
+  }, [prefixCls, hashId, isLoading]);
 
   const toolTargetClassName = useMemo(() => {
     return classNames(`${prefixCls}-tool-target`, hashId, {
-      [`${prefixCls}-tool-target-loading`]: tool.status === 'loading',
+      [`${prefixCls}-tool-target-loading`]: isLoading,
       [`${prefixCls}-tool-target-light`]: light,
     });
-  }, [prefixCls, hashId, tool.status, light]);
-
-  // 缓存加载动画配置
-  const loadingAnimationConfig = useMemo(
-    () => ({
-      animate: {
-        maskImage: [
-          'linear-gradient(to right, rgba(0,0,0,0.99)  -50%, rgba(0,0,0,0.15)   -50%,rgba(0,0,0,0.99)  150%)',
-          'linear-gradient(to right, rgba(0,0,0,0.99)  -50%,  rgba(0,0,0,0.15)  150%,rgba(0,0,0,0.99)  150%)',
-        ],
-      },
-      transition: {
-        maskImage: {
-          duration: 1,
-          repeat: Infinity,
-          ease: 'linear',
-        },
-      },
-      style: {
-        maskImage:
-          'linear-gradient(to right, rgba(0,0,0,0.99) -30%, rgba(0,0,0,0.15) -50%, rgba(0,0,0,0.99) 120%)',
-      } as React.CSSProperties,
-    }),
-    [],
-  );
-
-  const animationProps = useMemo(() => {
-    if (disableAnimation) return {};
-    return tool.status === 'loading' ? loadingAnimationConfig : {};
-  }, [tool.status, loadingAnimationConfig, disableAnimation]);
+  }, [prefixCls, hashId, isLoading, light]);
 
   // 缓存工具名称和目标渲染
   const toolNameElement = useMemo(() => {
@@ -195,20 +125,11 @@ const ToolHeaderRightComponent: React.FC<ToolHeaderRightProps> = ({
     ) : null;
   }, [tool.toolTarget, toolTargetClassName]);
 
-  if (disableAnimation) {
-    return (
-      <div className={toolHeaderRightClassName}>
-        {toolNameElement}
-        {toolTargetElement}
-      </div>
-    );
-  }
-
   return (
-    <motion.div className={toolHeaderRightClassName} {...animationProps}>
+    <div className={toolHeaderRightClassName}>
       {toolNameElement}
       {toolTargetElement}
-    </motion.div>
+    </div>
   );
 };
 

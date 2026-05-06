@@ -34,6 +34,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         gap: 4,
         padding: '0px',
         overflow: 'hidden',
+        // 列表入场淡入（替代 framer-motion variants 的 opacity 动画）
+        animationName: `${token.componentCls}-listFadeIn`,
+        animationDuration: '0.3s',
+        animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        animationFillMode: 'both',
         '&-item': {
           display: 'flex',
           gap: 4,
@@ -45,6 +50,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           color: 'rgba(0,0,0,0.65)',
+          // 每项入场淡入，由 inline style 通过 --doc-item-delay 注入
+          // 替代 framer-motion 父级 staggerChildren 的效果
+          opacity: 0,
+          animationName: `${token.componentCls}-listItemFadeIn`,
+          animationDuration: '0.25s',
+          animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          animationDelay: 'var(--doc-item-delay, 0s)',
+          animationFillMode: 'forwards',
           '&:hover': {
             backgroundColor: 'rgba(0,0,0,0.02)',
           },
@@ -60,6 +73,15 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             height: 16,
           },
         },
+      },
+
+      [`@keyframes ${token.componentCls}-listFadeIn`]: {
+        from: { opacity: 0 },
+        to: { opacity: 1 },
+      },
+      [`@keyframes ${token.componentCls}-listItemFadeIn`]: {
+        from: { opacity: 0 },
+        to: { opacity: 1 },
       },
     },
   };
