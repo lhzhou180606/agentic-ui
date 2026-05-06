@@ -31,12 +31,12 @@ export const usePasteHandler = ({
       if (!attachmentConfig?.upload && !attachmentConfig?.uploadWithResponse) {
         return;
       }
-      const imageFiles = (await getFileListFromDataTransferItems(e)).filter(
-        (file) => file?.type?.startsWith('image/'),
-      );
+      const imageFiles = (
+        await getFileListFromDataTransferItems(e.clipboardData)
+      ).filter((file) => file?.type?.startsWith('image/'));
       if (imageFiles.length === 0) return;
 
-      upLoadFileToServer(imageFiles, {
+      await upLoadFileToServer(imageFiles, {
         ...attachmentConfig,
         fileMap,
         onFileMapChange: setFileMap,

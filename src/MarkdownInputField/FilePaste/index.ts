@@ -30,65 +30,73 @@ const readAllDirectoryEntries = (
   });
 };
 
-const processEntry = async (entry: FileSystemEntry): Promise<File[]> => {
-  return new Promise((resolve) => {
-    if (entry.isFile) {
-      (entry as FileSystemFileEntry).file(
-        (file) => {
-          resolve([file]);
-        },
-        () => {
-          // 单个文件读取失败时跳过，不阻塞整批
-          resolve([]);
-        },
-      );
-    } else if (entry.isDirectory) {
-      const dirReader = (entry as FileSystemDirectoryEntry).createReader();
-      readAllDirectoryEntries(dirReader)
-        .then(async (entries) => {
-          const filesPromises = entries.map((element) => processEntry(element));
-          const fileArrays = await Promise.all(filesPromises);
-          resolve(fileArrays.flat());
-        })
-        .catch(() => {
-          // 目录读取失败时返回空，避免 unhandled rejection
-          resolve([]);
-        });
-    } else {
-      resolve([]);
-    }
+/**
+ * 将单个 FileSystemFileEntry 解析为 File，失败时返回空数组（不阻塞整批）。
+ */
+const readFileEntry = (entry: FileSystemFileEntry): Promise<File[]> =>
+  new Promise((resolve) => {
+    entry.file(
+      (file) => resolve([file]),
+      () => resolve([]),
+    );
   });
+
+/**
+ * 递归处理 FileSystemEntry，返回该条目下所有 File 对象。
+ * - 文件：直接读取
+ * - 目录：递归展开
+ * - 其他：返回空
+ */
+const processEntry = async (entry: FileSystemEntry): Promise<File[]> => {
+  if (entry.isFile) {
+    return readFileEntry(entry as FileSystemFileEntry);
+  }
+
+  if (entry.isDirectory) {
+    try {
+      const dirReader = (entry as FileSystemDirectoryEntry).createReader();
+      const entries = await readAllDirectoryEntries(dirReader);
+      const fileArrays = await Promise.all(entries.map(processEntry));
+      return fileArrays.flat();
+    } catch {
+      // 目录读取失败时返回空，避免 unhandled rejection
+      return [];
+    }
+  }
+
+  return [];
 };
 
+/**
+ * 从剪贴板事件中提取所有 File 对象。
+ *
+ * 优先使用 `getAsFile()`（兼容 Safari），回退到 `webkitGetAsEntry()` 以支持目录粘贴。
+ *
+ * @param clipboardData - 剪贴板数据对象（`ClipboardEvent.clipboardData`）
+ */
 export const getFileListFromDataTransferItems = async (
-  event: React.ClipboardEvent<HTMLDivElement>,
-) => {
-  const items = Array.from(event.clipboardData?.items || []);
+  clipboardData: DataTransfer | null | undefined,
+): Promise<File[]> => {
+  const items = Array.from(clipboardData?.items || []);
   if (items.length === 0) {
     return [];
   }
 
-  // get filesList
   const filePromises: Promise<File[]>[] = [];
   for (const item of items) {
-    if (item.kind === 'file') {
-      // Safari browser may throw error when using FileSystemFileEntry.file()
-      // So we prioritize using getAsFile() method first for better browser compatibility
-      const file = item.getAsFile();
+    if (item.kind !== 'file') continue;
 
-      if (file) {
-        filePromises.push(
-          new Promise((resolve) => {
-            resolve([file]);
-          }),
-        );
-      } else {
-        const entry = item.webkitGetAsEntry();
+    // Safari browser may throw error when using FileSystemFileEntry.file()
+    // So we prioritize using getAsFile() method first for better browser compatibility
+    const file = item.getAsFile();
+    if (file) {
+      filePromises.push(Promise.resolve([file]));
+      continue;
+    }
 
-        if (entry) {
-          filePromises.push(processEntry(entry));
-        }
-      }
+    const entry = item.webkitGetAsEntry();
+    if (entry) {
+      filePromises.push(processEntry(entry));
     }
   }
 
