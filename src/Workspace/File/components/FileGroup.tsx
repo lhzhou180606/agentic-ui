@@ -1,6 +1,5 @@
 import classNames from 'clsx';
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { type FC, useEffect, useMemo, useState } from 'react';
+import React, { type FC, useEffect, useRef, useState } from 'react';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { compileTemplate } from '../../../I18n';
 import type { FileNode, FileType, GroupNode } from '../../types';
@@ -54,6 +53,36 @@ const FileGroupComponent: FC<FileGroupProps> = ({
     setVisibleCount(GROUP_INITIAL_PAGE_SIZE);
   }, [group.id, group.children.length]);
 
+  // 内容挂载状态：展开时立即挂载、折叠时等过渡结束再卸载
+  // 这样既保留 CSS 折叠动画的视觉过渡，又让折叠后内容真正不可达（query / a11y / Tab）
+  const [contentMounted, setContentMounted] = useState(!group.collapsed);
+  const collapseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (collapseTimerRef.current) {
+      clearTimeout(collapseTimerRef.current);
+      collapseTimerRef.current = null;
+    }
+    if (!group.collapsed) {
+      // 展开：立即挂载
+      setContentMounted(true);
+      return;
+    }
+    // 折叠：等 CSS 过渡结束（与 style.ts 中 0.26s 对齐）后卸载
+    collapseTimerRef.current = setTimeout(() => {
+      setContentMounted(false);
+      collapseTimerRef.current = null;
+    }, 280);
+  }, [group.collapsed]);
+
+  useEffect(() => {
+    return () => {
+      if (collapseTimerRef.current) {
+        clearTimeout(collapseTimerRef.current);
+      }
+    };
+  }, []);
+
   const totalCount = group.children.length;
   const visibleFiles = group.children.slice(0, visibleCount);
   const remainingCount = totalCount - visibleCount;
@@ -72,22 +101,6 @@ const FileGroupComponent: FC<FileGroupProps> = ({
     }
   });
 
-  const contentVariants = useMemo(
-    () => ({
-      expanded: { height: 'auto', opacity: 1 },
-      collapsed: { height: 0, opacity: 0 },
-    }),
-    [],
-  );
-
-  const contentTransition = useMemo(
-    () => ({
-      height: { duration: 0.26, ease: [0.4, 0, 0.2, 1] },
-      opacity: { duration: 0.2, ease: 'linear' },
-    }),
-    [],
-  );
-
   const showMoreLabel = hasMore
     ? compileTemplate(
         locale?.['workspace.file.showMore'] || '查看更多（还有 ${count} 个）',
@@ -105,18 +118,20 @@ const FileGroupComponent: FC<FileGroupProps> = ({
         hashId={hashId}
         locale={locale}
       />
-      <AnimatePresence initial={false}>
-        {!group.collapsed && (
-          <motion.div
-            key="group-content"
-            variants={contentVariants}
-            initial="collapsed"
-            animate="expanded"
-            exit="collapsed"
-            transition={contentTransition}
-            className={classNames(`${prefixCls}-group-content`, hashId)}
-          >
-            {visibleFiles.map((file) => (
+      {/*
+        纯 CSS 折叠动画：
+        - 外壳用 grid-template-rows: 1fr ↔ 0fr 让浏览器原生过渡行高
+        - 内容始终挂载，避免折叠动画期间的子组件状态丢失与重渲染抖动
+        - 折叠态置 aria-hidden 与 pointer-events: none（CSS 中），确保 a11y
+      */}
+      <div
+        className={classNames(`${prefixCls}-group-content-wrapper`, hashId)}
+        data-collapsed={group.collapsed ? 'true' : 'false'}
+        aria-hidden={group.collapsed ? true : undefined}
+      >
+        <div className={classNames(`${prefixCls}-group-content`, hashId)}>
+          {contentMounted &&
+            visibleFiles.map((file) => (
               <FileItem
                 key={file.id}
                 file={file}
@@ -131,21 +146,20 @@ const FileGroupComponent: FC<FileGroupProps> = ({
                 bindDomId={!!bindDomId}
               />
             ))}
-            {hasMore && (
-              <div
-                role="button"
-                tabIndex={0}
-                className={classNames(`${prefixCls}-show-more`, hashId)}
-                onClick={handleShowMore}
-                onKeyDown={handleShowMoreKeyDown}
-                aria-label={showMoreLabel}
-              >
-                {showMoreLabel}
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+          {contentMounted && hasMore && (
+            <div
+              role="button"
+              tabIndex={group.collapsed ? -1 : 0}
+              className={classNames(`${prefixCls}-show-more`, hashId)}
+              onClick={handleShowMore}
+              onKeyDown={handleShowMoreKeyDown}
+              aria-label={showMoreLabel}
+            >
+              {showMoreLabel}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
