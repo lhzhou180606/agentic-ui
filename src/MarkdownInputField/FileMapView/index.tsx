@@ -1,7 +1,6 @@
 import { FileSearch, Play } from '@sofa-design/icons';
 import { ConfigProvider, Image, Modal } from 'antd';
 import classNames from 'clsx';
-import { motion } from 'framer-motion';
 import React, { useContext, useMemo, useState } from 'react';
 import { FileMetaPlaceholder } from '../AttachmentButton/AttachmentFileList/AttachmentFileIcon';
 import { AttachmentFile } from '../AttachmentButton/types';
@@ -188,25 +187,8 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
       }}
     >
       {imgList.length > 0 && (
-        <motion.div
-          variants={{
-            visible: {
-              opacity: 1,
-              transition: {
-                when: 'beforeChildren',
-                staggerChildren: 0.1,
-              },
-            },
-            hidden: {
-              opacity: 0,
-              transition: {
-                when: 'afterChildren',
-              },
-            },
-          }}
-          whileInView="visible"
-          initial="hidden"
-          animate={'visible'}
+        // 入场 fade-in 由 CSS 控制（参见 style.ts 的 -motion-fade-in）
+        <div
           style={props.style}
           data-testid="file-view-image-list"
           className={classNames(
@@ -214,6 +196,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
             hashId,
             props.className,
             `${prefix}-${placement}`,
+            `${prefix}-motion-fade-in`,
             {
               [`${prefix}-image-list-view`]: imgList.length > 1,
               [`${prefix}-image-list-view-${placement}`]: imgList.length > 1,
@@ -269,21 +252,15 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
                 : defaultImageDom;
             })}
           </Image.PreviewGroup>
-        </motion.div>
+        </div>
       )}
       {videoList.length > 0 && (
-        <motion.div
-          variants={{
-            visible: { opacity: 1 },
-            hidden: { opacity: 0 },
-          }}
-          whileInView="visible"
-          initial="hidden"
-          animate="visible"
+        <div
           data-testid="file-view-video-list"
           className={classNames(
             `${prefix}-video-row`,
             `${prefix}-video-row-${placement}`,
+            `${prefix}-motion-fade-in`,
             hashId,
           )}
           style={props.style}
@@ -359,7 +336,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
               ? props.itemRender(file, defaultVideoDom)
               : defaultVideoDom;
           })}
-        </motion.div>
+        </div>
       )}
       <Modal
         open={videoModalOpen}
@@ -380,25 +357,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
         )}
       </Modal>
       {allNoMediaFiles.length > 0 && (
-        <motion.div
-          variants={{
-            visible: {
-              opacity: 1,
-              transition: {
-                when: 'beforeChildren',
-                staggerChildren: 0.1,
-              },
-            },
-            hidden: {
-              opacity: 0,
-              transition: {
-                when: 'afterChildren',
-              },
-            },
-          }}
-          whileInView="visible"
-          initial="hidden"
-          animate={'visible'}
+        <div
           data-testid="file-view-file-list"
           className={classNames(
             prefix,
@@ -406,6 +365,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
             props.className,
             `${prefix}-${placement}`,
             `${prefix}-vertical`,
+            `${prefix}-motion-fade-in`,
           )}
           style={props.style}
         >
@@ -454,7 +414,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
               </div>
             </div>
           ) : null}
-        </motion.div>
+        </div>
       )}
     </div>,
   );

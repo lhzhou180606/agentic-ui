@@ -246,6 +246,45 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         border: 'none',
       },
     },
+
+    // 列表整体入场淡入（替代 framer-motion variants opacity 动画）
+    // 原 framer-motion 父级 `staggerChildren: 0.1` 通过子项的 inline
+    // `--attachment-item-delay` 等价实现，行为完全保留。
+    [`${token.componentCls}-motion-fade-in`]: {
+      animationName: `${token.componentCls}-attachmentFadeIn`,
+      animationDuration: '0.3s',
+      animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      animationFillMode: 'both',
+    },
+    // 单个文件项的入场/退出动画，由父组件通过 data-state="enter"|"exit" 切换。
+    // 等价于 framer-motion 的 variants={hidden:{y:20,opacity:0}, visible:{y:0,opacity:1}, exit:{y:-20,opacity:0}}。
+    // 退出动画通过父组件维护"正在退出"的影子状态 + setTimeout 延迟卸载实现，
+    // 等价于 AnimatePresence 的退出延时卸载。
+    [`${token.componentCls}-item-motion`]: {
+      animationDuration: '0.25s',
+      animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      animationFillMode: 'both',
+      '&[data-state="enter"]': {
+        animationName: `${token.componentCls}-attachmentItemSlideInUp`,
+        animationDelay: 'var(--attachment-item-delay, 0s)',
+      },
+      '&[data-state="exit"]': {
+        animationName: `${token.componentCls}-attachmentItemSlideOutUp`,
+        pointerEvents: 'none',
+      },
+    },
+    [`@keyframes ${token.componentCls}-attachmentFadeIn`]: {
+      from: { opacity: 0 },
+      to: { opacity: 1 },
+    },
+    [`@keyframes ${token.componentCls}-attachmentItemSlideInUp`]: {
+      from: { transform: 'translateY(20px)', opacity: 0 },
+      to: { transform: 'translateY(0)', opacity: 1 },
+    },
+    [`@keyframes ${token.componentCls}-attachmentItemSlideOutUp`]: {
+      from: { transform: 'translateY(0)', opacity: 1 },
+      to: { transform: 'translateY(-20px)', opacity: 0 },
+    },
   };
 };
 

@@ -3,88 +3,12 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('framer-motion', () => ({
-  AnimatePresence: ({ children }: any) => (
-    <div data-testid="animate-presence">{children}</div>
-  ),
-  motion: (Component: any) => {
-    const Wrapped = React.forwardRef((props: any, ref: any) => {
-      const {
-        variants,
-        initial,
-        whileInView,
-        animate,
-        exit,
-        viewport,
-        custom,
-        ...rest
-      } = props;
-      return (
-        <Component
-          ref={ref}
-          data-variants={JSON.stringify(variants)}
-          {...rest}
-        />
-      );
-    });
-    Wrapped.displayName = `motion(${typeof Component === 'string' ? Component : 'Component'})`;
-    return Wrapped;
-  },
-}));
-
-// 给 motion 对象添加 span
-vi.mock('framer-motion', async () => {
-  const motionFn = (Component: any) => {
-    const Wrapped = React.forwardRef((props: any, ref: any) => {
-      const {
-        variants,
-        initial,
-        whileInView,
-        animate,
-        exit,
-        viewport,
-        custom,
-        ...rest
-      } = props;
-      return <Component ref={ref} {...rest} />;
-    });
-    Wrapped.displayName = `motion(${typeof Component === 'string' ? Component : 'Component'})`;
-    return Wrapped;
-  };
-  motionFn.span = React.forwardRef((props: any, ref: any) => {
-    const {
-      variants,
-      initial,
-      whileInView,
-      animate,
-      exit,
-      viewport,
-      custom,
-      ...rest
-    } = props;
-    return <span ref={ref} data-testid="motion-span" {...rest} />;
-  });
-  motionFn.div = React.forwardRef((props: any, ref: any) => {
-    const {
-      variants,
-      initial,
-      whileInView,
-      animate,
-      exit,
-      viewport,
-      custom,
-      ...rest
-    } = props;
-    return <div ref={ref} {...rest} />;
-  });
-  return {
-    AnimatePresence: ({ children }: any) => (
-      <div data-testid="animate-presence">{children}</div>
-    ),
-    motion: motionFn,
-  };
-});
-
+// TextAnimate 已完全去除 framer-motion，改为纯 CSS 实现：
+// - 容器元素带 data-testid="ant-text-animate"，等价旧实现的 "animate-presence"
+// - 每个 segment 是 <span class="ant-text-animate-item ...">，通过 className 查询
+//   等价旧实现的 motion.span（旧 mock 用的 data-testid="motion-span"）
+//
+// 同时 mock 掉 useTextAnimateStyle 以稳定 className（不依赖 hashId 生成器）。
 vi.mock('../../src/Components/TextAnimate/style', () => ({
   useTextAnimateStyle: () => ({
     wrapSSR: (node: any) => node,
@@ -93,6 +17,10 @@ vi.mock('../../src/Components/TextAnimate/style', () => ({
 }));
 
 import { resolveSegments, TextAnimate } from '../../src/Components/TextAnimate';
+
+/** 查询渲染出的所有 segment span，等价旧实现中 `getAllByTestId('motion-span')` */
+const getSegmentSpans = (root: HTMLElement = document.body): HTMLElement[] =>
+  Array.from(root.querySelectorAll<HTMLElement>('.ant-text-animate-item'));
 
 describe('resolveSegments', () => {
   it('按单词拆分文本，保留空白', () => {
@@ -146,15 +74,20 @@ describe('resolveSegments', () => {
 
 describe('TextAnimate 组件', () => {
   it('使用默认 props 渲染文本', () => {
-    render(<TextAnimate>hello world</TextAnimate>);
-    expect(screen.getByTestId('animate-presence')).toBeInTheDocument();
-    const spans = screen.getAllByTestId('motion-span');
+    // startOnView=false 跳过 IntersectionObserver，确保 segment 立即渲染
+    render(<TextAnimate startOnView={false}>hello world</TextAnimate>);
+    expect(screen.getByTestId('ant-text-animate')).toBeInTheDocument();
+    const spans = getSegmentSpans();
     expect(spans.length).toBeGreaterThan(0);
   });
 
   it('使用 by="character" 拆分并渲染', () => {
-    render(<TextAnimate by="character">abc</TextAnimate>);
-    const spans = screen.getAllByTestId('motion-span');
+    render(
+      <TextAnimate startOnView={false} by="character">
+        abc
+      </TextAnimate>,
+    );
+    const spans = getSegmentSpans();
     expect(spans).toHaveLength(3);
     expect(spans[0]).toHaveTextContent('a');
     expect(spans[1]).toHaveTextContent('b');
@@ -162,83 +95,120 @@ describe('TextAnimate 组件', () => {
   });
 
   it('使用 by="line" 拆分并渲染', () => {
-    render(<TextAnimate by="line">{'line1\nline2'}</TextAnimate>);
-    const spans = screen.getAllByTestId('motion-span');
+    render(
+      <TextAnimate startOnView={false} by="line">
+        {'line1\nline2'}
+      </TextAnimate>,
+    );
+    const spans = getSegmentSpans();
     expect(spans).toHaveLength(2);
   });
 
-  it('传入自定义 variants 时使用自定义容器动画', () => {
+  it('传入自定义 variants 时使用 data-animation="custom"', () => {
     const customVariants = {
       hidden: { opacity: 0, scale: 0.8 },
       show: { opacity: 1, scale: 1 },
     };
-    render(<TextAnimate variants={customVariants}>custom</TextAnimate>);
-    expect(screen.getByTestId('animate-presence')).toBeInTheDocument();
+    render(
+      <TextAnimate startOnView={false} variants={customVariants}>
+        custom
+      </TextAnimate>,
+    );
+    expect(screen.getByTestId('ant-text-animate')).toBeInTheDocument();
+    const spans = getSegmentSpans();
+    expect(spans[0]).toHaveAttribute('data-animation', 'custom');
   });
 
   it('传入 animation="blurIn" 使用预设动画', () => {
-    render(<TextAnimate animation="blurIn">blur text</TextAnimate>);
-    expect(screen.getByTestId('animate-presence')).toBeInTheDocument();
+    render(
+      <TextAnimate startOnView={false} animation="blurIn">
+        blur text
+      </TextAnimate>,
+    );
+    expect(screen.getByTestId('ant-text-animate')).toBeInTheDocument();
+    const spans = getSegmentSpans();
+    expect(spans[0]).toHaveAttribute('data-animation', 'blurIn');
   });
 
   it('自定义 as 元素类型', () => {
-    render(<TextAnimate as="div">in a div</TextAnimate>);
-    expect(screen.getByTestId('animate-presence')).toBeInTheDocument();
+    render(
+      <TextAnimate startOnView={false} as="div">
+        in a div
+      </TextAnimate>,
+    );
+    const container = screen.getByTestId('ant-text-animate');
+    expect(container).toBeInTheDocument();
+    expect(container.tagName.toLowerCase()).toBe('div');
   });
 
   it('segmentClassName 应用到每个片段', () => {
     render(
-      <TextAnimate segmentClassName="seg-cls" by="character">
+      <TextAnimate
+        startOnView={false}
+        segmentClassName="seg-cls"
+        by="character"
+      >
         ab
       </TextAnimate>,
     );
-    const spans = screen.getAllByTestId('motion-span');
+    const spans = getSegmentSpans();
     spans.forEach((s) => expect(s.className).toContain('seg-cls'));
   });
 
   it('accessible 为 true 且 children 为字符串时设置 aria-label', () => {
-    render(<TextAnimate accessible>hello</TextAnimate>);
-    // 组件应正常渲染
-    expect(screen.getByTestId('animate-presence')).toBeInTheDocument();
+    render(
+      <TextAnimate startOnView={false} accessible>
+        hello
+      </TextAnimate>,
+    );
+    const container = screen.getByTestId('ant-text-animate');
+    expect(container).toHaveAttribute('aria-label', 'hello');
   });
 
-  it('空文本时 segments 为空，staggerChildren 为 0', () => {
-    render(<TextAnimate>{''}</TextAnimate>);
-    expect(screen.queryAllByTestId('motion-span')).toHaveLength(0);
+  it('空文本时 segments 为空，不渲染任何 segment span', () => {
+    render(<TextAnimate startOnView={false}>{''}</TextAnimate>);
+    expect(getSegmentSpans()).toHaveLength(0);
   });
 
   it('React 元素子节点在 map 中使用 element.key 生成 key', () => {
     render(
-      <TextAnimate by="text">
+      <TextAnimate startOnView={false} by="text">
         <span key="custom-key">element child</span>
       </TextAnimate>,
     );
-    const spans = screen.getAllByTestId('motion-span');
+    const spans = getSegmentSpans();
     expect(spans).toHaveLength(1);
     expect(spans[0]).toHaveTextContent('element child');
   });
 
-  it('animation 为 null 时使用默认容器与片段变体分支', () => {
-    render(<TextAnimate animation={null as any}>plain</TextAnimate>);
-    expect(screen.getByTestId('animate-presence')).toBeInTheDocument();
+  it('animation 为 null 时回退到默认 fadeIn 预设', () => {
+    render(
+      <TextAnimate startOnView={false} animation={null as any}>
+        plain
+      </TextAnimate>,
+    );
+    expect(screen.getByTestId('ant-text-animate')).toBeInTheDocument();
+    const spans = getSegmentSpans();
+    expect(spans[0]).toHaveAttribute('data-animation', 'fadeIn');
   });
 
   it('accessible=false 时片段不设置 aria-hidden', () => {
     render(
-      <TextAnimate accessible={false} by="character">
+      <TextAnimate startOnView={false} accessible={false} by="character">
         ab
       </TextAnimate>,
     );
-    const spans = screen.getAllByTestId('motion-span');
+    const spans = getSegmentSpans();
     expect(spans[0]).not.toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('startOnView=false 时使用 animate=show 而非 whileInView', () => {
+  it('startOnView=false 时立即播放（data-in-view=true）', () => {
     render(
       <TextAnimate startOnView={false} by="word">
         hi
       </TextAnimate>,
     );
-    expect(screen.getByTestId('animate-presence')).toBeInTheDocument();
+    const container = screen.getByTestId('ant-text-animate');
+    expect(container).toHaveAttribute('data-in-view', 'true');
   });
 });

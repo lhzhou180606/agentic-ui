@@ -1,12 +1,13 @@
 import { ConfigProvider, Tooltip, TooltipProps } from 'antd';
 import classNames from 'clsx';
-import { AnimatePresence, motion } from 'framer-motion';
 import { isObject } from 'lodash-es';
 import React, {
   forwardRef,
   isValidElement,
   useContext,
+  useEffect,
   useImperativeHandle,
+  useState,
 } from 'react';
 import {
   useScrollVisible,
@@ -15,6 +16,8 @@ import {
 import { prefixCls, useStyle } from './style';
 
 const DEFAULT_VISIBLE_THRESHOLD = 400;
+/** 退出动画时长（毫秒），需与 style.ts 中的 transition 时长保持一致 */
+const PRESENCE_EXIT_DURATION_MS = 180;
 
 const getDefaultTarget = () => window;
 
@@ -37,8 +40,6 @@ const getTooltipProps = (
   }
   return { title: tooltip };
 };
-
-const EXIT_ANIMATION = { opacity: 0 };
 
 /**
  * ScrollVisibleButton 组件属性
@@ -122,6 +123,30 @@ export const ScrollVisibleButton = forwardRef<
       shouldVisible,
     });
 
+    // 替代 framer-motion 的 AnimatePresence + exit 动画：
+    // 通过本地 shouldRender + dataState 实现"显示时立即挂载、隐藏时延迟卸载"。
+    const [shouldRender, setShouldRender] = useState<boolean>(visible);
+    const [dataState, setDataState] = useState<'enter' | 'exit'>(
+      visible ? 'enter' : 'exit',
+    );
+
+    useEffect(() => {
+      if (visible) {
+        setShouldRender(true);
+        // 在挂载后下一帧切到 enter，触发 opacity 过渡
+        const raf = requestAnimationFrame(() => setDataState('enter'));
+        return () => cancelAnimationFrame(raf);
+      }
+      // 退出：先切到 exit 触发淡出，过渡结束后卸载
+      setDataState('exit');
+      const timer = window.setTimeout(() => {
+        setShouldRender(false);
+      }, PRESENCE_EXIT_DURATION_MS);
+      return () => {
+        window.clearTimeout(timer);
+      };
+    }, [visible]);
+
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       onClick?.(e, currentContainer.current);
     };
@@ -147,11 +172,16 @@ export const ScrollVisibleButton = forwardRef<
     );
 
     return wrapSSR(
-      <AnimatePresence>
-        {visible && (
-          <motion.div exit={EXIT_ANIMATION}>{buttonWithTooltip}</motion.div>
-        )}
-      </AnimatePresence>,
+      <>
+        {shouldRender ? (
+          <div
+            className={`${baseCls}-presence ${hashId}`}
+            data-state={dataState}
+          >
+            {buttonWithTooltip}
+          </div>
+        ) : null}
+      </>,
     );
   },
 );

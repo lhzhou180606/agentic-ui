@@ -1,6 +1,5 @@
 import { ConfigProvider, Tooltip, theme as antdTheme } from 'antd';
 import classNames from 'clsx';
-import { motion } from 'framer-motion';
 import React, { useContext, useEffect, useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import {
@@ -89,34 +88,28 @@ function SendIcon(
       viewBox="0 0 32 32"
       {...rest}
     >
-      <motion.circle
+      {/* 替代 framer-motion 的 motion.circle/motion.path fill 颜色过渡：
+          通过 CSS transition + inline fill 触发等价过渡（duration 与原值保持一致）。 */}
+      <circle
         cx="50%"
         cy="50%"
         r="0.5em"
-        initial={false}
-        animate={{
-          fill: circleFill,
-          fillOpacity: 1,
+        fill={circleFill}
+        fillOpacity={1}
+        style={{
+          transition: 'fill 0.6s ease-in-out, fill-opacity 0.6s ease-in-out',
         }}
-        transition={{
-          duration: 0.6,
-          ease: 'easeInOut',
-        }}
-      ></motion.circle>
+      />
       <g>
-        <motion.path
+        <path
           d="M16.667 12.943l3.528 3.528a.667.667 0 00.943-.942l-4.666-4.667a.665.665 0 00-.943 0l-4.667 4.667a.667.667 0 10.943.942l3.528-3.528v7.724a.667.667 0 101.334 0v-7.724z"
           fillRule="evenodd"
-          initial={false}
-          animate={{
-            fill: arrowFill,
-            fillOpacity: 1,
+          fill={arrowFill}
+          fillOpacity={1}
+          style={{
+            transition: 'fill 0.2s ease-in-out, fill-opacity 0.2s ease-in-out',
           }}
-          transition={{
-            duration: 0.2,
-            ease: 'easeInOut',
-          }}
-        ></motion.path>
+        />
       </g>
     </svg>
   );

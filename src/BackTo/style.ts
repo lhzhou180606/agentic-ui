@@ -43,6 +43,18 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         transform: 'scale(0.95)',
       },
     },
+
+    // 包裹容器的入场/退出淡入淡出（替代 framer-motion 的 AnimatePresence + motion.div exit:opacity:0）
+    [`${token.componentCls}-presence`]: {
+      transition: 'opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
+      '&[data-state="enter"]': {
+        opacity: 1,
+      },
+      '&[data-state="exit"]': {
+        opacity: 0,
+        pointerEvents: 'none',
+      },
+    },
   };
 };
 

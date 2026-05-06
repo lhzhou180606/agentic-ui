@@ -241,6 +241,28 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 };
 
 /**
+ * 思维链项入场动画样式：替代 framer-motion 的
+ * `variants={{ hidden:{y:8,opacity:0}, visible:{y:0,opacity:1, delay:0.1*i} }}`。
+ *
+ * 通过 CSS keyframes + inline `animation-delay` 实现按 index 的 stagger 入场，
+ * 在测试环境（process.env.NODE_ENV === 'test'）下由组件层禁用动画。
+ */
+const genMotionStyle: GenerateStyle<ChatTokenType> = (token) => {
+  return {
+    [`${token.componentCls}-content-list-item-motion`]: {
+      animationName: `${token.componentCls}-thoughtChainItemFadeInUp`,
+      animationDuration: '0.3s',
+      animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      animationFillMode: 'both',
+    },
+    [`@keyframes ${token.componentCls}-thoughtChainItemFadeInUp`]: {
+      from: { transform: 'translateY(8px)', opacity: 0 },
+      to: { transform: 'translateY(0)', opacity: 1 },
+    },
+  };
+};
+
+/**
  * BubbleChat
  * @param prefixCls
  * @returns
@@ -252,6 +274,10 @@ export function useStyle(prefixCls?: string) {
       componentCls: `.${prefixCls}`,
     };
 
-    return [resetComponent(proChatToken), genStyle(proChatToken)];
+    return [
+      resetComponent(proChatToken),
+      genStyle(proChatToken),
+      genMotionStyle(proChatToken),
+    ];
   });
 }

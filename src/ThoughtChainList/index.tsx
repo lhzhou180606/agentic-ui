@@ -10,7 +10,6 @@ import { ConfigProvider, Descriptions, Drawer, Typography } from 'antd';
 import classNames from 'clsx';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { motion } from 'framer-motion';
 import { merge } from 'lodash-es';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -85,7 +84,7 @@ const ThoughtChainTitle = React.memo<{
     );
 
     const dom = (
-      <motion.div
+      <div
         className={classNames(`${prefixCls}-title`, hashId, {
           [`${prefixCls}-title-collapse`]: collapse,
           [`${prefixCls}-title-compact`]: compact,
@@ -103,7 +102,7 @@ const ThoughtChainTitle = React.memo<{
         <span className={classNames(`${prefixCls}-title-extra`, hashId)}>
           {props.titleExtraRender ? props.titleExtraRender(extra) : extra}
         </span>
-      </motion.div>
+      </div>
     );
     if (props.titleRender) {
       return props.titleRender(dom);
@@ -266,7 +265,7 @@ const ThoughtChainContent = React.memo<
     );
 
     return (
-      <motion.div
+      <div
         className={classNames(
           `${prefixCls}-content`,
           {
@@ -277,11 +276,9 @@ const ThoughtChainContent = React.memo<
         )}
         ref={containerRef}
       >
-        <motion.div
+        <div
           role="list"
           className={classNames(`${prefixCls}-content-list`, hashId)}
-          initial={false}
-          animate={{ opacity: 1 }}
         >
           {processedItems.map((item, index) => {
             const info = item.info?.split(/(\$\{\w+\})/);
@@ -324,8 +321,8 @@ const ThoughtChainContent = React.memo<
               </ErrorBoundary>
             );
           })}
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     );
   },
 );
@@ -491,7 +488,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
           data-testid={prefixCls}
           style={restStyle}
         >
-          <motion.div
+          <div
             className={classNames(`${prefixCls}-container`, hashId, {
               [`${prefixCls}-container-loading`]: !bubble?.isFinished,
             })}
@@ -530,7 +527,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
                 {...props.thoughtChainItemRender}
               />
             </div>
-          </motion.div>
+          </div>
         </div>
       </>,
     );

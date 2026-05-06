@@ -2,7 +2,6 @@ import { Download, EllipsisVertical, Eye } from '@sofa-design/icons';
 import { Tooltip } from 'antd';
 import classNames from 'clsx';
 import dayjs from 'dayjs';
-import { motion } from 'framer-motion';
 import React, { useContext } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';
@@ -199,7 +198,9 @@ export const FileMapViewItem: React.FC<{
       placement="topLeft"
       arrow={false}
     >
-      <motion.div
+      {/* 入场动画完全由 CSS 控制（参见 FileMapView/style.ts 的 -item-motion-slide-in）。
+          原 framer-motion 的 exit 因外层无 AnimatePresence 实际未生效，故未保留。 */}
+      <div
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onClick={() => {
@@ -212,16 +213,17 @@ export const FileMapViewItem: React.FC<{
             window.open(file.previewUrl || file.url, '_blank');
           }
         }}
-        variants={{
-          hidden: { x: 20, opacity: 0 },
-          visible: { x: 0, opacity: 1 },
-          exit: { x: -20, opacity: 0 },
-        }}
-        exit={{ opacity: 0, x: -20 }}
-        className={classNames(props.className, {
-          [`${props.prefixCls}-meta-placeholder`]:
-            isFileMetaPlaceholderState(file),
-        })}
+        className={classNames(
+          props.className,
+          // 注意：这里 prefixCls 是 `${parentPrefix}-item`，而 keyframes/类名定义在
+          // 父级 `md-md-editor-file-view` 的 `-item-motion-slide-in` 上，
+          // 因此完整类名需用 props.prefixCls 直接拼装：`${prefix-item}-motion-slide-in`
+          `${props.prefixCls}-motion-slide-in`,
+          {
+            [`${props.prefixCls}-meta-placeholder`]:
+              isFileMetaPlaceholderState(file),
+          },
+        )}
         data-testid="file-item"
       >
         <div
@@ -344,7 +346,7 @@ export const FileMapViewItem: React.FC<{
             )}
           </div>
         ) : null}
-      </motion.div>
+      </div>
     </Tooltip>
   );
 };

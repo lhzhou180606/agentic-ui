@@ -1,7 +1,6 @@
 import { FileFailed, FileUploadingSpin, X } from '@sofa-design/icons';
 import { Tooltip } from 'antd';
 import classNames from 'clsx';
-import { motion } from 'framer-motion';
 import React, { useContext } from 'react';
 import { I18nContext } from '../../../I18n';
 import { AttachmentFile } from '../types';
@@ -23,6 +22,18 @@ interface FileListItemProps {
   className?: string;
   prefixCls?: string;
   hashId?: string;
+  /**
+   * 入场/退出动画状态，由父组件 AttachmentFileList 控制：
+   * - `enter`：入场播放 slide-in-up
+   * - `exit`：退出播放 slide-out-up，动画结束后由父组件真正卸载
+   *
+   * 等价于 framer-motion 的 AnimatePresence + variants={hidden/visible/exit}。
+   */
+  motionState?: 'enter' | 'exit';
+  /**
+   * 入场动画延迟（秒），等价于 framer-motion 父级 `staggerChildren: 0.1 * index`。
+   */
+  motionDelaySec?: number;
 }
 
 const getFileNameWithoutExtension = (fileName: string) => {
@@ -129,12 +140,6 @@ const DeleteButton: React.FC<{
   );
 };
 
-const ANIMATION_VARIANTS = {
-  hidden: { y: 20, opacity: 0 },
-  visible: { y: 0, opacity: 1 },
-  exit: { opacity: 0, y: -20 },
-};
-
 export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
   file,
   prefixCls,
@@ -143,6 +148,8 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
   onRetry,
   onDelete,
   className,
+  motionState = 'enter',
+  motionDelaySec = 0,
 }) => {
   const { locale } = useContext(I18nContext);
   const isErrorStatus = file.status === 'error';
@@ -179,14 +186,28 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
       title={canRetry ? locale?.clickToRetry || '点击重试' : undefined}
       open={canRetry ? undefined : false}
     >
-      <motion.div
-        variants={ANIMATION_VARIANTS}
+      {/* 入场/退出动画由 CSS 控制（参见 AttachmentFileList/style.ts 的 -item-motion）。
+          通过 data-state 切换 enter/exit keyframes，配合父组件维护的"正在退出"
+          影子状态 + 延迟卸载，等价于 framer-motion 的 AnimatePresence + variants。
+          注意：style 选择器定义在父级 componentCls 上（{prefix}-item-motion），
+          这里 props.prefixCls 是 `${parentPrefix}-item`，拼接后类名为
+          `${parentPrefix}-item-motion`，与 style.ts 中的选择器一致。 */}
+      <div
         onClick={handleFileClick}
-        className={classNames(className, {
-          [`${prefixCls}-meta-placeholder`]: isFileMetaPlaceholderState(file),
-        })}
+        className={classNames(
+          className,
+          `${prefixCls}-motion`,
+          {
+            [`${prefixCls}-meta-placeholder`]: isFileMetaPlaceholderState(file),
+          },
+        )}
         data-testid="file-item"
-        exit={ANIMATION_VARIANTS.exit}
+        data-state={motionState}
+        style={
+          {
+            '--attachment-item-delay': `${motionDelaySec}s`,
+          } as React.CSSProperties
+        }
       >
         <FileIcon file={file} prefixCls={prefixCls} hashId={hashId} />
         <div className={classNames(`${prefixCls}-file-info`, hashId)}>
@@ -208,7 +229,7 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
           prefixCls={prefixCls}
           hashId={hashId}
         />
-      </motion.div>
+      </div>
     </Tooltip>
   );
 };

@@ -294,7 +294,7 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
                     </ActionIconBox>
                   ) : null}
                 </div>
-              </motion.div>
+              </div>
             );
             if ((item?.content?.trim()?.length || 0) < 20) {
               return dom;
@@ -379,7 +379,7 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
               </Popover>
             );
           })}
-        </motion.div>
+        </div>
       </div>
     </>,
   );
