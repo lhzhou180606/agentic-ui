@@ -17,7 +17,7 @@ export interface GroupHeaderProps {
   onGroupDownload?: (files: FileNode[], groupType: FileType) => void;
   prefixCls: string;
   hashId: string;
-  locale?: Record<string, string>;
+  locale?: Record<string, any>;
 }
 
 /**

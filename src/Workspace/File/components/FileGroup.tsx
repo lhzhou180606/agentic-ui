@@ -26,7 +26,7 @@ export interface FileGroupProps {
   onLocate?: (file: FileNode) => void;
   prefixCls: string;
   hashId: string;
-  locale?: Record<string, string>;
+  locale?: Record<string, any>;
   bindDomId?: boolean;
 }
 

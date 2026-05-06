@@ -18,7 +18,7 @@ export interface UnsupportedFileCardProps {
   /** 预览区前缀（`workspace-file-preview`） */
   prefixCls: string;
   hashId: string;
-  locale?: Record<string, string>;
+  locale?: Record<string, any>;
 }
 
 /**

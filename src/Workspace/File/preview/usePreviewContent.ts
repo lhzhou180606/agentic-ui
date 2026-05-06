@@ -30,7 +30,7 @@ export interface UsePreviewContentResult {
 export const usePreviewContent = (
   file: FileNode,
   customContent: React.ReactNode | undefined,
-  locale?: Record<string, string>,
+  locale?: Record<string, any>,
 ): UsePreviewContentResult => {
   const [processResult, setProcessResult] = useState<FileProcessResult | null>(
     null,

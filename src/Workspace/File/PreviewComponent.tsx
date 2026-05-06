@@ -1,19 +1,11 @@
-import { LoadingOutlined } from '@ant-design/icons';
 import {
   Download as DownloadIcon,
   ArrowLeft as LeftIcon,
   Locate,
   SquareArrowOutUpRight as ShareIcon,
 } from '@sofa-design/icons';
-import {
-  Alert,
-  Button,
-  ConfigProvider,
-  Image,
-  Segmented,
-  Spin,
-  Typography,
-} from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+import { Alert, ConfigProvider, Segmented, Spin } from 'antd';
 import classNames from 'clsx';
 import React, { type FC, useContext, useEffect, useRef, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
@@ -24,53 +16,18 @@ import {
   type MarkdownEditorProps,
 } from '../../MarkdownEditor';
 import { HtmlPreview } from '../HtmlPreview';
-import { FileNode } from '../types';
-import { formatFileSize, formatLastModified } from '../utils';
-import {
-  getLanguageFromFilename,
-  wrapContentInCodeBlock,
-} from '../utils/codeLanguageUtils';
-import { FileProcessResult, fileTypeProcessor } from './FileTypeProcessor';
+import type { FileNode } from '../types';
+import { formatLastModified } from '../utils';
+import { fileTypeProcessor } from './FileTypeProcessor';
+import { MediaPreview } from './preview/components/MediaPreview';
+import { PlaceholderContent } from './preview/components/PlaceholderContent';
+import { UnsupportedFileCard } from './preview/components/UnsupportedFileCard';
+import { usePreviewContent } from './preview/usePreviewContent';
+import { getContentStatus, isHtmlFile } from './preview/utils';
 import { useFileStyle } from './style';
 import { getFileTypeIcon } from './utils';
 
-const HTML_MIME_TYPE = 'text/html';
-const HTML_EXTENSIONS = ['.html', '.htm'];
 const EDITOR_PADDING = '0 12px';
-
-const isHtmlFile = (fileName: string, mimeType?: string): boolean => {
-  const name = fileName?.toLowerCase() || '';
-  const byExtension = HTML_EXTENSIONS.some((ext) => name.endsWith(ext));
-  const byMimeType = mimeType === HTML_MIME_TYPE;
-  return byExtension || byMimeType;
-};
-
-const getContentStatus = (
-  state: ContentState,
-): 'loading' | 'error' | 'done' => {
-  if ('error' in state) return 'error';
-  return state.status === 'loading' ? 'loading' : 'done';
-};
-
-const buildMarkdownContent = (
-  raw: string,
-  category: string,
-  fileName: string,
-): string => {
-  if (category === 'code') {
-    const language = getLanguageFromFilename(fileName);
-    return wrapContentInCodeBlock(raw, language);
-  }
-  return raw;
-};
-
-type ContentState =
-  | {
-      status: 'idle' | 'loading' | 'ready';
-      mdContent: string;
-      rawContent?: string;
-    }
-  | { status: 'error'; error: string };
 
 /**
  * PreviewComponent 组件属性
@@ -103,67 +60,18 @@ export interface PreviewComponentProps {
   headerFileOverride?: Partial<FileNode>;
 }
 
-// 占位符组件
-const PlaceholderContent: FC<{
-  children?: React.ReactNode;
-  showFileInfo?: boolean;
-  file?: FileNode;
-  onDownload?: () => void;
-  locale?: any;
-  prefixCls?: string;
-  hashId?: string;
-}> = ({
-  children,
-  showFileInfo,
-  file,
-  onDownload,
-  locale,
-  prefixCls,
-  hashId,
-}) => {
-  const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
-  const finalPrefixCls = prefixCls || getPrefixCls('workspace-preview');
-
-  return (
-    <div className={classNames(`${finalPrefixCls}-placeholder`, hashId)}>
-      <div
-        className={classNames(`${finalPrefixCls}-placeholder-content`, hashId)}
-      >
-        {children}
-        {showFileInfo && file && (
-          <>
-            <p>
-              {locale?.['workspace.file.fileName'] || '文件名：'}
-              {file.name}
-            </p>
-            {file.size && (
-              <p>
-                {locale?.['workspace.file.fileSize'] || '文件大小：'}
-                {file.size}
-              </p>
-            )}
-            {onDownload && (
-              <button
-                type="button"
-                className={classNames(
-                  `${finalPrefixCls}-download-button`,
-                  hashId,
-                )}
-                onClick={onDownload}
-                aria-label={locale?.['workspace.file.download'] || '下载文件'}
-              >
-                {locale?.['workspace.file.clickToDownload'] || '点击下载'}
-              </button>
-            )}
-          </>
-        )}
-      </div>
-    </div>
-  );
-};
-
 /**
  * 文件预览组件
+ *
+ * 渲染管线：
+ * 1. `customContent` 优先 → 自定义节点
+ * 2. 文件 `loading` → 流式占位
+ * 3. `usePreviewContent` 未就绪 → Spin 占位
+ * 4. 内容加载错误 → Alert 占位
+ * 5. `canPreview === false` → `UnsupportedFileCard`
+ * 6. 文本/代码 → `MarkdownEditor`（HTML 子类型走 `HtmlPreview`，支持 preview/code 切换）
+ * 7. 图片/视频/音频/PDF → `MediaPreview`
+ * 8. 其它 → 通用占位（含可选下载）
  */
 export const PreviewComponent: FC<PreviewComponentProps> = ({
   file,
@@ -183,23 +91,13 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
   const { wrapSSR, hashId } = useFileStyle(filePrefixCls);
   const prefixCls = `${filePrefixCls}-preview`;
   const editorRef = useRef<MarkdownEditorInstance>();
-  const [processResult, setProcessResult] = useState<FileProcessResult | null>(
-    null,
+
+  const { processResult, contentState } = usePreviewContent(
+    file,
+    customContent,
+    locale,
   );
 
-  type ContentState =
-    | {
-        status: 'idle' | 'loading' | 'ready';
-        mdContent: string;
-        rawContent?: string;
-      }
-    | { status: 'error'; error: string };
-
-  const [contentState, setContentState] = useState<ContentState>({
-    status: 'idle',
-    mdContent: '',
-    rawContent: '',
-  });
   const [htmlViewMode, setHtmlViewMode] = useState<'preview' | 'code'>(
     'preview',
   );
@@ -222,73 +120,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
     onLocate?.(file);
   };
 
-  useEffect(() => {
-    if (customContent) return;
-    try {
-      const result = fileTypeProcessor.processFile(file);
-      setProcessResult(result);
-    } catch (err) {
-      setContentState({
-        status: 'error',
-        error:
-          err instanceof Error
-            ? err.message
-            : locale?.['workspace.file.processFailed'] || '文件处理失败',
-      });
-    }
-  }, [file, customContent]);
-
-  useEffect(() => {
-    if (customContent || !processResult) return;
-
-    const { typeInference, dataSource } = processResult;
-    const isTextOrCode =
-      typeInference.category === 'text' || typeInference.category === 'code';
-
-    // 非文本/代码类型时重置状态
-    if (!isTextOrCode) {
-      setContentState({ status: 'idle', mdContent: '', rawContent: '' });
-      return;
-    }
-
-    const setReadyContent = (raw: string) => {
-      setContentState({
-        status: 'ready',
-        mdContent: buildMarkdownContent(raw, typeInference.category, file.name),
-        rawContent: raw,
-      });
-    };
-
-    if (dataSource.content) {
-      setReadyContent(dataSource.content);
-      return;
-    }
-
-    if (dataSource.previewUrl) {
-      setContentState({ status: 'loading', mdContent: '', rawContent: '' });
-
-      fetch(dataSource.previewUrl)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-          }
-          return response.text();
-        })
-        .then(setReadyContent)
-        .catch((err) => {
-          const errorMessage =
-            err instanceof Error
-              ? err.message
-              : locale?.['common.loadTextFailed'] || '加载文本内容失败';
-          setContentState({ status: 'error', error: errorMessage });
-          console.error('加载文本内容失败:', err);
-        });
-    } else {
-      // 无数据源时重置状态，避免显示旧内容
-      setContentState({ status: 'idle', mdContent: '', rawContent: '' });
-    }
-  }, [processResult, file.name, customContent, locale]);
-
+  // 内容就绪后注入到 MarkdownEditor store
   useEffect(() => {
     if (customContent) return;
     if (
@@ -300,14 +132,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
     }
   }, [contentState, customContent]);
 
-  useEffect(() => {
-    return () => {
-      if (processResult) {
-        fileTypeProcessor.cleanupResult(processResult);
-      }
-    };
-  }, [processResult]);
-
+  // 切换文件时重置 HTML 视图模式
   useEffect(() => {
     setHtmlViewMode('preview');
   }, [file.name]);
@@ -316,6 +141,57 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
     file.name,
     processResult?.dataSource.mimeType,
   );
+
+  const renderTextOrCode = () => {
+    if (isCurrentFileHtml) {
+      const htmlStatus = getContentStatus(contentState);
+      const rawContent =
+        contentState.status === 'error' ? '' : contentState.rawContent || '';
+      return (
+        <div className={classNames(`${prefixCls}-text`, hashId)}>
+          <HtmlPreview
+            html={rawContent}
+            status={htmlStatus}
+            viewMode={htmlViewMode}
+            onViewModeChange={setHtmlViewMode}
+            iframeProps={{ sandbox: 'allow-scripts' }}
+            showSegmented={false}
+          />
+        </div>
+      );
+    }
+
+    if (contentState.status === 'loading') {
+      return (
+        <PlaceholderContent prefixCls={prefixCls} hashId={hashId}>
+          <Spin
+            size="large"
+            tip={
+              locale?.['workspace.loadingFileContent'] || '正在加载文件内容...'
+            }
+          >
+            <div
+              className={classNames(`${prefixCls}-spin-anchor`, hashId)}
+              style={{ minHeight: 64, width: '100%' }}
+              aria-hidden
+            />
+          </Spin>
+        </PlaceholderContent>
+      );
+    }
+
+    return (
+      <div className={classNames(`${prefixCls}-text`, hashId)}>
+        <MarkdownEditor
+          editorRef={editorRef}
+          initValue=""
+          readonly={true}
+          contentStyle={{ padding: EDITOR_PADDING }}
+          {...markdownEditorProps}
+        />
+      </div>
+    );
+  };
 
   const renderPreviewContent = () => {
     if (file.loading) {
@@ -335,6 +211,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
         </div>
       );
     }
+
     if (customContent) {
       return (
         <div className={classNames(`${prefixCls}-custom-content`, hashId)}>
@@ -378,272 +255,17 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
 
     if (!canPreview || previewMode === 'none') {
       return (
-        <PlaceholderContent prefixCls={prefixCls} hashId={hashId}>
-          <div className={classNames(`${prefixCls}-unsupported`, hashId)}>
-            <div
-              className={classNames(
-                `${filePrefixCls}-item`,
-                `${prefixCls}-unsupported-item`,
-                hashId,
-              )}
-            >
-              <div className={classNames(`${filePrefixCls}-item-icon`, hashId)}>
-                {getFileTypeIcon(
-                  fileTypeProcessor.inferFileType(file).fileType,
-                  file.icon,
-                  file.name,
-                )}
-              </div>
-              <div
-                className={classNames(`${filePrefixCls}-item-info`, hashId)}
-                style={{ textAlign: 'left' }}
-              >
-                <div
-                  className={classNames(`${filePrefixCls}-item-name`, hashId)}
-                >
-                  <Typography.Text
-                    ellipsis={{ tooltip: file.name }}
-                    style={{
-                      font: 'var(--font-text-h6-base)',
-                    }}
-                  >
-                    {file.name}
-                  </Typography.Text>
-                </div>
-                {(fileTypeProcessor.inferFileType(file).displayType ||
-                  file.size ||
-                  file.lastModified) && (
-                  <div
-                    className={classNames(
-                      `${filePrefixCls}-item-details`,
-                      hashId,
-                    )}
-                  >
-                    <Typography.Text type="secondary" ellipsis>
-                      {fileTypeProcessor.inferFileType(file).displayType && (
-                        <span
-                          className={classNames(
-                            `${filePrefixCls}-item-type`,
-                            hashId,
-                          )}
-                        >
-                          {fileTypeProcessor.inferFileType(file).displayType}
-                        </span>
-                      )}
-                      {file.size && (
-                        <>
-                          {fileTypeProcessor.inferFileType(file)
-                            .displayType && (
-                            <span
-                              className={classNames(
-                                `${filePrefixCls}-item-separator`,
-                                hashId,
-                              )}
-                            >
-                              |
-                            </span>
-                          )}
-                          <span
-                            className={classNames(
-                              `${filePrefixCls}-item-size`,
-                              hashId,
-                            )}
-                          >
-                            {formatFileSize(file.size as number)}
-                          </span>
-                        </>
-                      )}
-                      {file.lastModified && (
-                        <>
-                          {(fileTypeProcessor.inferFileType(file).displayType ||
-                            file.size) && (
-                            <span
-                              className={classNames(
-                                `${filePrefixCls}-item-separator`,
-                                hashId,
-                              )}
-                            >
-                              |
-                            </span>
-                          )}
-                          <span
-                            className={classNames(
-                              `${filePrefixCls}-item-time`,
-                              hashId,
-                            )}
-                          >
-                            {formatLastModified(file.lastModified as any)}
-                          </span>
-                        </>
-                      )}
-                    </Typography.Text>
-                  </div>
-                )}
-              </div>
-            </div>
-            {canDownload && onDownload ? (
-              <>
-                <div
-                  className={classNames(
-                    `${prefixCls}-unsupported-text`,
-                    hashId,
-                  )}
-                >
-                  {locale?.['workspace.file.unsupportedPreview'] ||
-                    '此文件无法预览，请下载查看。'}
-                </div>
-                <Button
-                  color="default"
-                  variant="solid"
-                  icon={<DownloadIcon />}
-                  onClick={handleDownload}
-                  aria-label={locale?.['workspace.file.download'] || '下载'}
-                >
-                  {locale?.['workspace.file.downloadButton'] || '下载'}
-                </Button>
-              </>
-            ) : (
-              <div
-                className={classNames(
-                  `${prefixCls}-unsupported-text`,
-                  hashId,
-                )}
-              >
-                {locale?.['workspace.file.unsupportedPreviewNoDownload'] ||
-                  '此文件无法预览。'}
-              </div>
-            )}
-          </div>
-        </PlaceholderContent>
+        <UnsupportedFileCard
+          file={file}
+          canDownload={canDownload}
+          onDownload={canDownload && onDownload ? handleDownload : undefined}
+          filePrefixCls={filePrefixCls}
+          prefixCls={prefixCls}
+          hashId={hashId}
+          locale={locale}
+        />
       );
     }
-
-    const renderTextOrCode = () => {
-      if (isCurrentFileHtml) {
-        const htmlStatus = getContentStatus(contentState);
-        return (
-          <div className={classNames(`${prefixCls}-text`, hashId)}>
-            <HtmlPreview
-              html={contentState.rawContent || ''}
-              status={htmlStatus as any}
-              viewMode={htmlViewMode}
-              onViewModeChange={setHtmlViewMode}
-              iframeProps={{ sandbox: 'allow-scripts' }}
-              showSegmented={false}
-            />
-          </div>
-        );
-      }
-
-      if (contentState.status === 'loading') {
-        return (
-          <PlaceholderContent prefixCls={prefixCls} hashId={hashId}>
-            <Spin
-              size="large"
-              tip={
-                locale?.['workspace.loadingFileContent'] ||
-                '正在加载文件内容...'
-              }
-            >
-              <div
-                className={classNames(`${prefixCls}-spin-anchor`, hashId)}
-                style={{ minHeight: 64, width: '100%' }}
-                aria-hidden
-              />
-            </Spin>
-          </PlaceholderContent>
-        );
-      }
-
-      return (
-        <div className={classNames(`${prefixCls}-text`, hashId)}>
-          <MarkdownEditor
-            editorRef={editorRef}
-            initValue=""
-            readonly={true}
-            contentStyle={{ padding: EDITOR_PADDING }}
-            {...markdownEditorProps}
-          />
-        </div>
-      );
-    };
-
-    const getPreviewErrorMessage = (category: string): string => {
-      const messages: Record<string, string> = {
-        image:
-          locale?.['workspace.file.cannotGetImagePreview'] ||
-          '无法获取图片预览',
-        video:
-          locale?.['workspace.file.cannotGetVideoPreview'] ||
-          '无法获取视频预览',
-        audio:
-          locale?.['workspace.file.cannotGetAudioPreview'] ||
-          '无法获取音频预览',
-        pdf:
-          locale?.['workspace.file.cannotGetPdfPreview'] || '无法获取PDF预览',
-      };
-      return messages[category] || `无法获取${category}预览`;
-    };
-
-    const renderMediaPreview = (
-      category: 'image' | 'video' | 'audio' | 'pdf',
-    ) => {
-      if (!dataSource.previewUrl) {
-        return (
-          <PlaceholderContent
-            locale={locale}
-            prefixCls={prefixCls}
-            hashId={hashId}
-          >
-            <p>{getPreviewErrorMessage(category)}</p>
-          </PlaceholderContent>
-        );
-      }
-
-      const mediaElements: Record<string, React.ReactNode> = {
-        image: (
-          <div className={classNames(`${prefixCls}-image`, hashId)}>
-            <Image src={dataSource.previewUrl} alt={file.name} />
-          </div>
-        ),
-        video: (
-          <video
-            className={classNames(`${prefixCls}-video`, hashId)}
-            src={dataSource.previewUrl}
-            controls
-            controlsList="nodownload"
-            preload="metadata"
-          >
-            <track kind="captions" />
-            {locale?.['workspace.file.videoNotSupported'] ||
-              '您的浏览器不支持视频播放'}
-          </video>
-        ),
-        audio: (
-          <audio
-            className={classNames(`${prefixCls}-audio`, hashId)}
-            src={dataSource.previewUrl}
-            controls
-            controlsList="nodownload"
-            preload="metadata"
-          >
-            {locale?.['workspace.file.audioNotSupported'] ||
-              '您的浏览器不支持音频播放'}
-          </audio>
-        ),
-        pdf: (
-          <embed
-            className={classNames(`${prefixCls}-pdf`, hashId)}
-            src={dataSource.previewUrl}
-            type="application/pdf"
-            width="100%"
-            height="100%"
-          />
-        ),
-      };
-
-      return mediaElements[category];
-    };
 
     switch (typeInference.category) {
       case 'text':
@@ -654,7 +276,16 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
       case 'video':
       case 'audio':
       case 'pdf':
-        return renderMediaPreview(typeInference.category);
+        return (
+          <MediaPreview
+            category={typeInference.category}
+            file={file}
+            previewUrl={dataSource.previewUrl}
+            prefixCls={prefixCls}
+            hashId={hashId}
+            locale={locale}
+          />
+        );
 
       default:
         return (
@@ -677,6 +308,13 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
         );
     }
   };
+
+  const headerFile = headerFileOverride
+    ? { ...file, ...headerFileOverride }
+    : file;
+  const headerFileType = fileTypeProcessor.inferFileType(file).fileType;
+  const headerLastModified =
+    headerFileOverride?.lastModified ?? file.lastModified;
 
   return wrapSSR(
     <div className={classNames(prefixCls, hashId)}>
@@ -703,38 +341,17 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
 
           <div className={classNames(`${prefixCls}-file-info`, hashId)}>
             <div className={classNames(`${prefixCls}-file-title`, hashId)}>
-              {(() => {
-                const headerFile = headerFileOverride
-                  ? { ...file, ...headerFileOverride }
-                  : file;
-                const fileType = fileTypeProcessor.inferFileType(file).fileType;
-                return (
-                  <>
-                    <span
-                      className={classNames(`${prefixCls}-file-icon`, hashId)}
-                    >
-                      {getFileTypeIcon(
-                        fileType,
-                        headerFile.icon,
-                        headerFile.name,
-                      )}
-                    </span>
-                    <span
-                      className={classNames(`${prefixCls}-file-name`, hashId)}
-                    >
-                      {headerFile.name}
-                    </span>
-                  </>
-                );
-              })()}
+              <span className={classNames(`${prefixCls}-file-icon`, hashId)}>
+                {getFileTypeIcon(headerFileType, headerFile.icon, headerFile.name)}
+              </span>
+              <span className={classNames(`${prefixCls}-file-name`, hashId)}>
+                {headerFile.name}
+              </span>
             </div>
-            {(headerFileOverride?.lastModified ?? file.lastModified) && (
+            {headerLastModified && (
               <div className={classNames(`${prefixCls}-generate-time`, hashId)}>
                 {locale?.['workspace.file.generationTime'] || '生成时间：'}
-                {formatLastModified(
-                  (headerFileOverride?.lastModified ??
-                    file.lastModified) as any,
-                )}
+                {formatLastModified(headerLastModified as string | number | Date)}
               </div>
             )}
           </div>

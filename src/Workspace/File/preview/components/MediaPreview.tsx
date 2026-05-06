@@ -13,12 +13,12 @@ export interface MediaPreviewProps {
   previewUrl?: string;
   prefixCls: string;
   hashId: string;
-  locale?: Record<string, string>;
+  locale?: Record<string, any>;
 }
 
 const getPreviewErrorMessage = (
   category: MediaCategory,
-  locale?: Record<string, string>,
+  locale?: Record<string, any>,
 ): string => {
   const messages: Record<MediaCategory, string> = {
     image:

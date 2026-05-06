@@ -91,8 +91,27 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             cursor: 'pointer',
             transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
           },
-          // 分组内容区域
+          // 分组内容外壳：使用 grid-template-rows: 0fr ↔ 1fr 实现纯 CSS 折叠动画
+          // 不依赖 framer-motion，浏览器原生过渡 grid 行高，避免写死 max-height
+          [`&-content-wrapper`]: {
+            display: 'grid',
+            gridTemplateRows: '1fr',
+            opacity: 1,
+            transition:
+              'grid-template-rows 0.26s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s linear',
+
+            '&[data-collapsed="true"]': {
+              gridTemplateRows: '0fr',
+              opacity: 0,
+              // 折叠完成前后避免触发焦点/点击
+              pointerEvents: 'none',
+            },
+          },
+
+          // 分组内容区域：作为 grid 子项，min-height: 0 让 0fr 能真正坍缩
           [`&-content`]: {
+            minHeight: 0,
+            overflow: 'hidden',
             paddingLeft: '12px',
           },
         },

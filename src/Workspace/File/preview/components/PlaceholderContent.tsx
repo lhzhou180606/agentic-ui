@@ -10,7 +10,7 @@ export interface PlaceholderContentProps {
   file?: FileNode;
   /** 显示「点击下载」按钮的回调 */
   onDownload?: () => void;
-  locale?: Record<string, string>;
+  locale?: Record<string, any>;
   /** 外部传入的样式前缀；未传时回退为 ant 默认前缀拼接 workspace-preview */
   prefixCls?: string;
   hashId?: string;

@@ -31,7 +31,7 @@ export interface FileItemProps {
   onLocate?: (file: FileNode) => void;
   prefixCls: string;
   hashId: string;
-  locale?: Record<string, string>;
+  locale?: Record<string, any>;
   /** 是否在元素上绑定 DOM id（默认 false） */
   bindDomId?: boolean;
 }

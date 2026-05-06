@@ -9,7 +9,7 @@ export interface SearchInputProps {
   searchPlaceholder?: string;
   prefixCls: string;
   hashId: string;
-  locale?: Record<string, string>;
+  locale?: Record<string, any>;
 }
 
 /**
