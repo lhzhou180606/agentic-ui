@@ -1,4 +1,5 @@
 import { parseChineseCurrencyToNumber } from '../../Plugins/chart/utils';
+import { normalizeChartConfigAxisFields } from '../utils/chartAxisMatch';
 import { extractTableData } from '../utils/astExtract';
 
 /**
@@ -64,8 +65,19 @@ export const remarkChartFromComment = () => {
       const tableData = extractTableData(next, parseChineseCurrencyToNumber);
       if (!tableData) continue;
 
+      // 注释里写的 x/y 可能是表头列名的「逻辑名」（如「客单价」），
+      // 实际表头常带括号单位说明（如「客单价(元)」）。
+      // 在生成 chart code 块前归一化为表格真实存在的 dataIndex，
+      // 让下游 ChartRenderer 能直接用 row[x]/row[y] 取到值。
+      const columnKeys = tableData.columns.map((col: any) =>
+        String(col?.dataIndex ?? ''),
+      );
+      const normalizedConfig = chartConfig.map((cfg: any) =>
+        normalizeChartConfigAxisFields(cfg, columnKeys),
+      );
+
       const chartJson = JSON.stringify({
-        config: chartConfig,
+        config: normalizedConfig,
         columns: tableData.columns,
         dataSource: tableData.dataSource,
       });

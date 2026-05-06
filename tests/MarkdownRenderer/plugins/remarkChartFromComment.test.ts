@@ -125,4 +125,159 @@ describe('remarkChartFromComment', () => {
       remarkChartFromComment()({ children: null } as any),
     ).not.toThrow();
   });
+
+  /**
+   * 列名带「单位括号」时，注释里写「逻辑名」也能正确归一化为表头实际 dataIndex。
+   * 这与 MarkdownEditor 链路（parseTable.ts 的 columnKeyMatchesConfiguredField）行为一致。
+   */
+  it('normalizes axis fields when column header carries a parenthesis unit suffix', () => {
+    const tree: any = {
+      type: 'root',
+      children: [
+        {
+          type: 'html',
+          value:
+            '<!-- {"chartType":"line","x":"时段","y":"客单价","title":"分时段客单价变化"} -->',
+        },
+        {
+          type: 'table',
+          children: [
+            {
+              type: 'tableRow',
+              children: [
+                {
+                  type: 'tableCell',
+                  children: [{ type: 'text', value: '时段' }],
+                },
+                {
+                  type: 'tableCell',
+                  children: [{ type: 'text', value: '客单价(元)' }],
+                },
+              ],
+            },
+            {
+              type: 'tableRow',
+              children: [
+                {
+                  type: 'tableCell',
+                  children: [{ type: 'text', value: '12:00' }],
+                },
+                {
+                  type: 'tableCell',
+                  children: [{ type: 'text', value: '118.19' }],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    remarkChartFromComment()(tree);
+
+    const chartNode = findChartCode(tree.children);
+    expect(chartNode).toBeDefined();
+
+    const payload = JSON.parse(chartNode.value);
+    // 关键断言：y 已被归一化为表头真实列名
+    expect(payload.config[0].y).toBe('客单价(元)');
+    expect(payload.config[0].x).toBe('时段');
+    // dataSource 行里能直接通过归一化后的 key 取到值
+    expect(payload.dataSource[0]['客单价(元)']).toBe(118.19);
+  });
+
+  it('also normalizes axis fields with Chinese full-width parenthesis suffix', () => {
+    const tree: any = {
+      type: 'root',
+      children: [
+        {
+          type: 'html',
+          value: '<!-- {"chartType":"bar","x":"季度","y":"GDP总量"} -->',
+        },
+        {
+          type: 'table',
+          children: [
+            {
+              type: 'tableRow',
+              children: [
+                {
+                  type: 'tableCell',
+                  children: [{ type: 'text', value: '季度' }],
+                },
+                {
+                  type: 'tableCell',
+                  children: [{ type: 'text', value: 'GDP总量（万亿元）' }],
+                },
+              ],
+            },
+            {
+              type: 'tableRow',
+              children: [
+                {
+                  type: 'tableCell',
+                  children: [{ type: 'text', value: '2024Q1' }],
+                },
+                {
+                  type: 'tableCell',
+                  children: [{ type: 'text', value: '30' }],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    remarkChartFromComment()(tree);
+    const payload = JSON.parse(findChartCode(tree.children).value);
+    expect(payload.config[0].y).toBe('GDP总量（万亿元）');
+  });
+
+  it('keeps the configured field as-is when no column matches', () => {
+    // 找不到匹配列时不应抛错，且配置字段保留原样（让下游决定如何处理）
+    const tree: any = {
+      type: 'root',
+      children: [
+        {
+          type: 'html',
+          value: '<!-- {"chartType":"line","x":"时段","y":"利润"} -->',
+        },
+        {
+          type: 'table',
+          children: [
+            {
+              type: 'tableRow',
+              children: [
+                {
+                  type: 'tableCell',
+                  children: [{ type: 'text', value: '时段' }],
+                },
+                {
+                  type: 'tableCell',
+                  children: [{ type: 'text', value: '客单价(元)' }],
+                },
+              ],
+            },
+            {
+              type: 'tableRow',
+              children: [
+                {
+                  type: 'tableCell',
+                  children: [{ type: 'text', value: '12:00' }],
+                },
+                {
+                  type: 'tableCell',
+                  children: [{ type: 'text', value: '118' }],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    remarkChartFromComment()(tree);
+    const payload = JSON.parse(findChartCode(tree.children).value);
+    expect(payload.config[0].y).toBe('利润');
+  });
 });
