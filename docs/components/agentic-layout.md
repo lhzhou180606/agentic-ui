@@ -34,7 +34,7 @@ group:
 
 使用 `header.leftDefaultCollapsed` / `header.rightDefaultCollapsed` 设置初始值，折叠状态由组件内部自动管理，无需外部 state。
 
-<code src="../demos/agentic-layout-uncontrolled.tsx" iframe=480>非受控折叠</code>
+<code src="../demos/agentic-layout-uncontrolled.tsx" iframe=540>非受控折叠</code>
 
 ### header 扩展内容
 
@@ -42,11 +42,11 @@ group:
 
 <code src="../demos/agentic-layout-header-extra.tsx" iframe=1020>header 扩展内容</code>
 
-### minHeight、style 与右侧栏拖拽
+### style 与右侧栏拖拽
 
-`minHeight` 控制组件最小高度，`className` / `style` 自定义根容器样式，右侧栏内置拖拽手柄可动态调整宽度。
+`className` / `style` 自定义根容器样式，右侧栏内置拖拽手柄可动态调整宽度。组件默认 `minHeight: 600px`，可通过 `style={{ minHeight: 0 }}` 覆盖。
 
-<code src="../demos/agentic-layout-style.tsx" iframe=1100>minHeight、style 与拖拽调整宽度</code>
+<code src="../demos/agentic-layout-style.tsx" iframe=1100>style 与拖拽调整宽度</code>
 
 ### 完整示例
 
@@ -66,7 +66,6 @@ group:
 | header     | 头部配置，包含折叠控制等（详见 [LayoutHeader](/components/layout-header)） | `LayoutHeaderConfig`  | -         | -    |
 | leftWidth  | 左侧边栏宽度（px）                                                         | `number`              | `256`     | -    |
 | rightWidth | 右侧边栏初始宽度（px），可通过拖拽调整，最小 400px，最大窗口宽度的 70%     | `number`              | `540`     | -    |
-| minHeight  | 组件最小高度                                                               | `string \| number`    | `'600px'` | -    |
 | className  | 根容器自定义类名                                                           | `string`              | -         | -    |
 | style      | 根容器自定义样式                                                           | `React.CSSProperties` | -         | -    |
 
@@ -107,3 +106,4 @@ group:
 - `center` 属性是必填的，左右侧栏为可选
 - 传入 `left` / `right` 内容时，对应折叠按钮会自动显示（无需手动设置 `leftCollapsible` / `rightCollapsible`）
 - 建议在外层容器设置明确的高度，避免布局塌陷
+- 组件默认 `minHeight: 600px`（CSS），可通过 `style={{ minHeight: 0 }}` 或 `style={{ minHeight: 400 }}` 覆盖
