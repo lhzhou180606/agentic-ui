@@ -3,28 +3,41 @@ import React from 'react';
 
 const CenterContent = () => (
   <ChatLayout header={{ title: 'AI 助手' }}>
-    <div style={{ padding: '16px 24px' }}>
-      {[
-        '你好！我是 AI 助手。',
-        '有什么可以帮您？',
-        '请随时告诉我您的需求。',
-      ].map((text, i) => (
-        <div
-          key={i}
-          style={{
-            padding: '8px 12px',
-            marginBottom: 8,
-            background:
-              i % 2 === 0
-                ? 'var(--ant-color-bg-text-hover, #f5f5f5)'
-                : 'transparent',
-            borderRadius: 8,
-            fontSize: 14,
-          }}
-        >
-          {text}
-        </div>
-      ))}
+    <div style={{ padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div
+        style={{
+          padding: '12px 16px',
+          background: 'var(--ant-color-bg-text-hover, rgba(0,0,0,0.04))',
+          borderRadius: 8,
+          fontSize: 14,
+          lineHeight: 1.6,
+        }}
+      >
+        你好！我是 AI 助手，可以帮你解答问题、生成代码、分析文档等。
+      </div>
+      <div
+        style={{
+          padding: '12px 16px',
+          background: 'transparent',
+          borderRadius: 8,
+          fontSize: 14,
+          lineHeight: 1.6,
+          textAlign: 'end',
+        }}
+      >
+        请帮我介绍一下 AgenticLayout 组件的用法。
+      </div>
+      <div
+        style={{
+          padding: '12px 16px',
+          background: 'var(--ant-color-bg-text-hover, rgba(0,0,0,0.04))',
+          borderRadius: 8,
+          fontSize: 14,
+          lineHeight: 1.6,
+        }}
+      >
+        AgenticLayout 提供左中右三栏布局，支持侧栏折叠和右侧栏拖拽调整宽度。
+      </div>
     </div>
   </ChatLayout>
 );
