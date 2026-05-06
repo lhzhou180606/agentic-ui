@@ -142,6 +142,250 @@ describe('astExtract / extractTableData', () => {
     const result = extractTableData(tableNode, stubChineseCurrency);
     expect(result!.dataSource).toHaveLength(0);
   });
+
+  /**
+   * 千分位数字识别：表头 `销售额(元)` 单元格写 `8,287.44` / `29,337.76` 时
+   * 应被解析为 number，而不是字符串，否则 ChartRenderer 无法用 row[y] 取数。
+   */
+  it('parses thousand-separated numbers like "8,287.44" and "29,337.76"', () => {
+    const tableNode = {
+      children: [
+        {
+          children: [
+            { children: [{ type: 'text', value: 'category' }] },
+            { children: [{ type: 'text', value: 'amount' }] },
+          ],
+        },
+        {
+          children: [
+            { children: [{ type: 'text', value: '休闲食品' }] },
+            { children: [{ type: 'text', value: '29,337.76' }] },
+          ],
+        },
+        {
+          children: [
+            { children: [{ type: 'text', value: '个人清洁' }] },
+            { children: [{ type: 'text', value: '8,287.44' }] },
+          ],
+        },
+        {
+          children: [
+            { children: [{ type: 'text', value: '香烟' }] },
+            { children: [{ type: 'text', value: '10,575' }] },
+          ],
+        },
+      ],
+    };
+    const result = extractTableData(tableNode, stubChineseCurrency);
+    expect(result!.dataSource[0].amount).toBe(29337.76);
+    expect(result!.dataSource[1].amount).toBe(8287.44);
+    expect(result!.dataSource[2].amount).toBe(10575);
+  });
+
+  it('parses negative thousand-separated numbers', () => {
+    const tableNode = {
+      children: [
+        {
+          children: [{ children: [{ type: 'text', value: 'delta' }] }],
+        },
+        {
+          children: [{ children: [{ type: 'text', value: '-1,234.56' }] }],
+        },
+      ],
+    };
+    const result = extractTableData(tableNode, stubChineseCurrency);
+    expect(result!.dataSource[0].delta).toBe(-1234.56);
+  });
+
+  it('parses thousand-separated numbers using full-width comma', () => {
+    const tableNode = {
+      children: [
+        {
+          children: [{ children: [{ type: 'text', value: 'amount' }] }],
+        },
+        {
+          children: [{ children: [{ type: 'text', value: '1，234.5' }] }],
+        },
+      ],
+    };
+    const result = extractTableData(tableNode, stubChineseCurrency);
+    expect(result!.dataSource[0].amount).toBe(1234.5);
+  });
+
+  it('parses loose grouped numbers like "12,3456" and "1,2,3456"', () => {
+    // 放宽规则：仅要求最后一段 ≥ 3 位数字
+    const tableNode = {
+      children: [
+        {
+          children: [{ children: [{ type: 'text', value: 'amount' }] }],
+        },
+        { children: [{ children: [{ type: 'text', value: '12,3456' }] }] },
+        { children: [{ children: [{ type: 'text', value: '1,2,3456' }] }] },
+        { children: [{ children: [{ type: 'text', value: '1,234,567' }] }] },
+        { children: [{ children: [{ type: 'text', value: '-12,3456.78' }] }] },
+      ],
+    };
+    const result = extractTableData(tableNode, stubChineseCurrency);
+    expect(result!.dataSource[0].amount).toBe(123456);
+    expect(result!.dataSource[1].amount).toBe(123456);
+    expect(result!.dataSource[2].amount).toBe(1234567);
+    expect(result!.dataSource[3].amount).toBe(-123456.78);
+  });
+
+  it('does not misidentify when last segment is shorter than 3 digits', () => {
+    // 末段 < 3 位 / 含非数字 → 走 currency 回退 → 仍 null → 保留原字符串
+    const tableNode = {
+      children: [
+        {
+          children: [{ children: [{ type: 'text', value: 'col' }] }],
+        },
+        { children: [{ children: [{ type: 'text', value: '1,2' }] }] },
+        { children: [{ children: [{ type: 'text', value: '12,34' }] }] },
+        { children: [{ children: [{ type: 'text', value: '1,2,3' }] }] },
+        { children: [{ children: [{ type: 'text', value: '1,234,abc' }] }] },
+      ],
+    };
+    const result = extractTableData(tableNode, stubChineseCurrency);
+    expect(result!.dataSource[0].col).toBe('1,2');
+    expect(result!.dataSource[1].col).toBe('12,34');
+    expect(result!.dataSource[2].col).toBe('1,2,3');
+    expect(result!.dataSource[3].col).toBe('1,234,abc');
+  });
+
+  it('keeps existing fallbacks: plain numeric, chinese currency, raw string', () => {
+    // 同时验证三条解析路径互不影响
+    const tableNode = {
+      children: [
+        {
+          children: [
+            { children: [{ type: 'text', value: 'a' }] },
+            { children: [{ type: 'text', value: 'b' }] },
+            { children: [{ type: 'text', value: 'c' }] },
+          ],
+        },
+        {
+          children: [
+            { children: [{ type: 'text', value: '42' }] }, // 走 Number
+            { children: [{ type: 'text', value: '一千' }] }, // 走 chinese currency stub
+            { children: [{ type: 'text', value: 'NA' }] }, // 全部失败 → 保留字符串
+          ],
+        },
+      ],
+    };
+    const result = extractTableData(tableNode, stubChineseCurrency);
+    expect(result!.dataSource[0]).toMatchObject({ a: 42, b: 1000, c: 'NA' });
+  });
+
+  /**
+   * 百分比识别：保留字面值（12.5% → 12.5），不做 /100 转换。
+   * 这样 chart y 轴显示百分比时不会被错误缩放。
+   */
+  it('parses percent values keeping the literal numeric part', () => {
+    const tableNode = {
+      children: [
+        {
+          children: [{ children: [{ type: 'text', value: 'rate' }] }],
+        },
+        { children: [{ children: [{ type: 'text', value: '12.5%' }] }] },
+        { children: [{ children: [{ type: 'text', value: '-3%' }] }] },
+        { children: [{ children: [{ type: 'text', value: '+12,345.6%' }] }] },
+        { children: [{ children: [{ type: 'text', value: '100 %' }] }] },
+      ],
+    };
+    const result = extractTableData(tableNode, stubChineseCurrency);
+    expect(result!.dataSource[0].rate).toBe(12.5);
+    expect(result!.dataSource[1].rate).toBe(-3);
+    expect(result!.dataSource[2].rate).toBe(12345.6);
+    expect(result!.dataSource[3].rate).toBe(100);
+  });
+
+  it('parses leading-plus numbers and combines with thousand separators', () => {
+    const tableNode = {
+      children: [
+        {
+          children: [{ children: [{ type: 'text', value: 'val' }] }],
+        },
+        { children: [{ children: [{ type: 'text', value: '+3.14' }] }] },
+        { children: [{ children: [{ type: 'text', value: '+1,234' }] }] },
+        { children: [{ children: [{ type: 'text', value: '+12,3456.78' }] }] },
+      ],
+    };
+    const result = extractTableData(tableNode, stubChineseCurrency);
+    expect(result!.dataSource[0].val).toBe(3.14);
+    expect(result!.dataSource[1].val).toBe(1234);
+    expect(result!.dataSource[2].val).toBe(123456.78);
+  });
+
+  /**
+   * 英文紧凑后缀：k = 1e3, m = 1e6, b = 1e9, t = 1e12（大小写均可）。
+   */
+  it('parses English compact suffixes (k/m/b/t, case-insensitive)', () => {
+    const tableNode = {
+      children: [
+        {
+          children: [{ children: [{ type: 'text', value: 'val' }] }],
+        },
+        { children: [{ children: [{ type: 'text', value: '1.2k' }] }] },
+        { children: [{ children: [{ type: 'text', value: '3M' }] }] },
+        { children: [{ children: [{ type: 'text', value: '-2.5B' }] }] },
+        { children: [{ children: [{ type: 'text', value: '+1,234t' }] }] },
+        { children: [{ children: [{ type: 'text', value: '5 K' }] }] },
+      ],
+    };
+    const result = extractTableData(tableNode, stubChineseCurrency);
+    expect(result!.dataSource[0].val).toBe(1200);
+    expect(result!.dataSource[1].val).toBe(3_000_000);
+    expect(result!.dataSource[2].val).toBe(-2_500_000_000);
+    expect(result!.dataSource[3].val).toBe(1_234_000_000_000_000);
+    expect(result!.dataSource[4].val).toBe(5000);
+  });
+
+  it('rejects malformed compact / percent strings and keeps them as raw text', () => {
+    // 非法形态应一路走到最后保留原字符串（除非命中 chinese currency stub）
+    const tableNode = {
+      children: [
+        {
+          children: [{ children: [{ type: 'text', value: 'col' }] }],
+        },
+        // 紧凑后缀后还跟内容 → 不命中
+        { children: [{ children: [{ type: 'text', value: '3M.5' }] }] },
+        // 不在 k/m/b/t 集合内 → 不命中
+        { children: [{ children: [{ type: 'text', value: '1.2x' }] }] },
+        // 双 % → 不命中
+        { children: [{ children: [{ type: 'text', value: '12%%' }] }] },
+        // ++ 前缀 → 防御递归后保留原值
+        { children: [{ children: [{ type: 'text', value: '++1' }] }] },
+      ],
+    };
+    const result = extractTableData(tableNode, stubChineseCurrency);
+    expect(result!.dataSource[0].col).toBe('3M.5');
+    expect(result!.dataSource[1].col).toBe('1.2x');
+    expect(result!.dataSource[2].col).toBe('12%%');
+    expect(result!.dataSource[3].col).toBe('++1');
+  });
+
+  it('parses chinese compact units like "1.5万" / "2亿" via injected parser', () => {
+    // 用真正的中文金额解析器 stub，覆盖 1.5万 / 2亿 路径
+    const richChineseCurrency = (val: string): number | null => {
+      const wan = val.match(/^(-?\d+(?:\.\d+)?)\s*万$/);
+      if (wan) return Number(wan[1]) * 10_000;
+      const yi = val.match(/^(-?\d+(?:\.\d+)?)\s*亿$/);
+      if (yi) return Number(yi[1]) * 100_000_000;
+      return null;
+    };
+    const tableNode = {
+      children: [
+        {
+          children: [{ children: [{ type: 'text', value: 'val' }] }],
+        },
+        { children: [{ children: [{ type: 'text', value: '1.5万' }] }] },
+        { children: [{ children: [{ type: 'text', value: '2亿' }] }] },
+      ],
+    };
+    const result = extractTableData(tableNode, richChineseCurrency);
+    expect(result!.dataSource[0].val).toBe(15_000);
+    expect(result!.dataSource[1].val).toBe(200_000_000);
+  });
 });
 
 describe('astExtract / extractLanguageFromClassName', () => {

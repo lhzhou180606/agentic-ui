@@ -23,10 +23,125 @@ export const extractCellText = (cell: any): string => {
 };
 
 /**
+ * "逗号分组数字"模式（宽松版千分位）：
+ * - 可选前缀负号
+ * - 必须包含至少一个逗号（中英文皆可）
+ * - 最后一段必须 ≥ 3 位数字（千分位的本质是 3 位分组；末段不足 3 位极不可能是数字）
+ * - 中间段不限位数（容错用户书写不规范的场景，如 `12,3456`、`1,2,3456`）
+ * - 可选小数部分
+ *
+ * 命中示例：`8,287.44`、`1,234`、`12,3456`、`-29,337.76`、`1，234.5`、`1,234,567`
+ * 不命中示例：`1,2`（末段 2 位）、`12,34`（末段 2 位）、`1,2,3`（末段 1 位）、`1,234,abc`（含非数字）
+ */
+const THOUSAND_SEPARATED_NUMBER_PATTERN =
+  /^-?\d+(?:[,，]\d+)*[,，]\d{3,}(?:\.\d+)?$/;
+
+/**
+ * 数字主体（含可选千分位 + 可选小数），不含正负号。
+ * 用作百分比 / 紧凑后缀模式的内部子片段。
+ */
+const NUMERIC_BODY_SOURCE = String.raw`\d+(?:[,，]\d+)*(?:\.\d+)?`;
+
+/**
+ * 百分比模式：`12.5%`、`-3%`、`+12,345.6%`、`100 %`。
+ *
+ * 设计取舍：百分比保留字面值（`12.5%` → `12.5`），不做 `/100` 转换；
+ * 因为 chart 场景下的 y 轴通常会以"百分比"为单位展示，做转换反而会误导。
+ */
+const PERCENT_PATTERN = new RegExp(
+  String.raw`^[+-]?${NUMERIC_BODY_SOURCE}\s*%$`,
+);
+
+/**
+ * 英文紧凑后缀（k/m/b/t，大小写均可）：`1.2k`、`3M`、`-2.5B`、`+1,234t`。
+ *
+ * 倍率：`k = 1e3`、`m = 1e6`、`b = 1e9`、`t = 1e12`。
+ */
+const COMPACT_SUFFIX_PATTERN = new RegExp(
+  String.raw`^([+-]?${NUMERIC_BODY_SOURCE})\s*([kKmMbBtT])$`,
+);
+
+const COMPACT_SUFFIX_MULTIPLIER: Record<string, number> = {
+  k: 1e3,
+  m: 1e6,
+  b: 1e9,
+  t: 1e12,
+};
+
+/**
+ * 把"逗号分组数字字符串"转为 number。
+ *
+ * 调用方必须先用 {@link THOUSAND_SEPARATED_NUMBER_PATTERN} 校验过格式，
+ * 否则可能误把 `1,2`、`1,2,3` 之类非千分位字符串解析为数字。
+ */
+const parseThousandSeparatedNumber = (val: string): number => {
+  return Number(val.replace(/[,，]/g, ''));
+};
+
+/**
+ * 表格单元格的"字符串 → 数字 or 原值"统一规则。
+ *
+ * 规则优先级（自上而下）：
+ * 1. 空串 → 直接返回空串
+ * 2. `Number(val)` 成功 → 直接返回 number（覆盖纯数字 `42` / `3.14` / `-1.5`）
+ * 3. 带正号前缀（`+1,234` / `+3.14`）→ 去掉 `+` 后递归
+ * 4. 千分位数字（`8,287.44` / `1,234` / `12,3456`）→ 去逗号转 number
+ * 5. 百分比（`12.5%` / `-3%`）→ 去 `%` 去逗号转 number（保留字面值，不除以 100）
+ * 6. 英文紧凑后缀（`1.2k` / `3M` / `-2.5B` / `+1,234t`）→ base × multiplier
+ * 7. 中文金额（`1.5万` / `2亿` / `5万元`）→ 走 `parseChineseCurrencyToNumber`
+ * 8. 都不命中 → 返回原字符串
+ *
+ * @param val - 单元格文本（已 trim）
+ * @param parseChineseCurrencyToNumber - 注入的中文金额解析器
+ */
+export const coerceTableCellValue = (
+  val: string,
+  parseChineseCurrencyToNumber: (val: string) => number | null,
+): string | number => {
+  if (val === '') return val;
+
+  const num = Number(val);
+  if (Number.isFinite(num)) return num;
+
+  // 带正号前缀：Number('+1,234') 会失败，但去掉 + 后能命中千分位/紧凑后缀
+  if (val.startsWith('+')) {
+    const rest = val.slice(1);
+    // 防御：避免 '++1' 这类无意义递归
+    if (rest && !rest.startsWith('+') && !rest.startsWith('-')) {
+      const recursed = coerceTableCellValue(rest, parseChineseCurrencyToNumber);
+      if (typeof recursed === 'number') return recursed;
+    }
+  }
+
+  if (THOUSAND_SEPARATED_NUMBER_PATTERN.test(val)) {
+    return parseThousandSeparatedNumber(val);
+  }
+
+  if (PERCENT_PATTERN.test(val)) {
+    const bare = val.replace(/%\s*$/, '').replace(/[,，]/g, '');
+    const n = Number(bare);
+    if (Number.isFinite(n)) return n;
+  }
+
+  const compactMatch = val.match(COMPACT_SUFFIX_PATTERN);
+  if (compactMatch) {
+    const [, base, suffix] = compactMatch;
+    const baseNum = Number(base.replace(/[,，]/g, ''));
+    const multiplier = COMPACT_SUFFIX_MULTIPLIER[suffix.toLowerCase()];
+    if (Number.isFinite(baseNum) && multiplier) {
+      return baseNum * multiplier;
+    }
+  }
+
+  const cn = parseChineseCurrencyToNumber(val);
+  return cn !== null ? cn : val;
+};
+
+/**
  * 从 mdast `table` 节点提取列定义和数据行。
  *
  * - 第一行视为表头，其余行作为数据
- * - 数据值优先尝试转为数字（含中文金额识别），失败则保留原字符串
+ * - 数据值的字符串 → 数字转换规则参见 {@link coerceTableCellValue}
  *
  * @returns 解析失败（缺表头 / 空表）时返回 `null`
  */
@@ -55,17 +170,10 @@ export const extractTableData = (
     row.children.forEach((cell: any, j: number) => {
       if (j < columns.length) {
         const val = extractCellText(cell);
-        if (val === '') {
-          record[columns[j].dataIndex] = val;
-        } else {
-          const num = Number(val);
-          if (Number.isFinite(num)) {
-            record[columns[j].dataIndex] = num;
-          } else {
-            const cn = parseChineseCurrencyToNumber(val);
-            record[columns[j].dataIndex] = cn !== null ? cn : val;
-          }
-        }
+        record[columns[j].dataIndex] = coerceTableCellValue(
+          val,
+          parseChineseCurrencyToNumber,
+        );
       }
     });
     dataSource.push(record);
