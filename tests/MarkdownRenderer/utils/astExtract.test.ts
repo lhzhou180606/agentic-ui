@@ -386,6 +386,88 @@ describe('astExtract / extractTableData', () => {
     expect(result!.dataSource[0].val).toBe(15_000);
     expect(result!.dataSource[1].val).toBe(200_000_000);
   });
+
+  /**
+   * 裸科学计数法应直接走 `Number(val)` 路径，无需特殊处理。
+   */
+  it('parses bare scientific notation via Number()', () => {
+    const tableNode = {
+      children: [
+        {
+          children: [{ children: [{ type: 'text', value: 'val' }] }],
+        },
+        { children: [{ children: [{ type: 'text', value: '1.2e3' }] }] },
+        { children: [{ children: [{ type: 'text', value: '+1.2e3' }] }] },
+        { children: [{ children: [{ type: 'text', value: '-3.14E+10' }] }] },
+        { children: [{ children: [{ type: 'text', value: '1e-5' }] }] },
+        { children: [{ children: [{ type: 'text', value: '1E0' }] }] },
+      ],
+    };
+    const result = extractTableData(tableNode, stubChineseCurrency);
+    expect(result!.dataSource[0].val).toBe(1200);
+    expect(result!.dataSource[1].val).toBe(1200);
+    expect(result!.dataSource[2].val).toBe(-3.14e10);
+    expect(result!.dataSource[3].val).toBe(1e-5);
+    expect(result!.dataSource[4].val).toBe(1);
+  });
+
+  /**
+   * 科学计数法可与百分比 / 紧凑后缀组合使用。
+   */
+  it('parses scientific notation combined with percent / compact suffix', () => {
+    const tableNode = {
+      children: [
+        {
+          children: [{ children: [{ type: 'text', value: 'val' }] }],
+        },
+        // 1.2e2 = 120 → 百分比保留字面值 → 120
+        { children: [{ children: [{ type: 'text', value: '1.2e2%' }] }] },
+        // 1.5e3 = 1500 → 紧凑后缀 k → 1500 * 1000
+        { children: [{ children: [{ type: 'text', value: '1.5e3k' }] }] },
+        // -2.5E3 = -2500 → 紧凑后缀 M → -2500 * 1e6
+        { children: [{ children: [{ type: 'text', value: '-2.5E3M' }] }] },
+        // 带正号 + 科学计数 + k
+        { children: [{ children: [{ type: 'text', value: '+1.5e2k' }] }] },
+        // 科学计数 + 负指数 + 百分比
+        { children: [{ children: [{ type: 'text', value: '1e-2%' }] }] },
+      ],
+    };
+    const result = extractTableData(tableNode, stubChineseCurrency);
+    expect(result!.dataSource[0].val).toBe(120);
+    expect(result!.dataSource[1].val).toBe(1_500_000);
+    expect(result!.dataSource[2].val).toBe(-2.5e9);
+    expect(result!.dataSource[3].val).toBe(150_000);
+    expect(result!.dataSource[4].val).toBe(0.01);
+  });
+
+  /**
+   * 残缺的科学计数法格式不应被识别为数字。
+   */
+  it('rejects malformed scientific notation strings', () => {
+    const tableNode = {
+      children: [
+        {
+          children: [{ children: [{ type: 'text', value: 'col' }] }],
+        },
+        // 指数缺位
+        { children: [{ children: [{ type: 'text', value: '1e' }] }] },
+        // 双 e
+        { children: [{ children: [{ type: 'text', value: '1.2ee3' }] }] },
+        // 缺底数
+        { children: [{ children: [{ type: 'text', value: 'e3' }] }] },
+        // 指数缺位 + %
+        { children: [{ children: [{ type: 'text', value: '1e%' }] }] },
+        // 指数缺位 + k
+        { children: [{ children: [{ type: 'text', value: '1ek' }] }] },
+      ],
+    };
+    const result = extractTableData(tableNode, stubChineseCurrency);
+    expect(result!.dataSource[0].col).toBe('1e');
+    expect(result!.dataSource[1].col).toBe('1.2ee3');
+    expect(result!.dataSource[2].col).toBe('e3');
+    expect(result!.dataSource[3].col).toBe('1e%');
+    expect(result!.dataSource[4].col).toBe('1ek');
+  });
 });
 
 describe('astExtract / extractLanguageFromClassName', () => {
