@@ -46,7 +46,7 @@ describe('CodeBlockToolbar', () => {
     ).toBeTruthy();
   });
 
-  it('shows a bottom border only in expanded state', () => {
+  it('applies a bottom border only in expanded state', () => {
     const { container, rerender } = render(
       <CodeBlockToolbar
         language="json"
@@ -59,7 +59,9 @@ describe('CodeBlockToolbar', () => {
     const expandedToolbar = container.querySelector(
       '[data-testid="code-toolbar"]',
     ) as HTMLElement;
-    expect(expandedToolbar.style.borderBottom).not.toBe('none');
+    // 展开态下应有非空的 border-bottom（jsdom 对 simple value vs shorthand 的 normalize 不稳定，
+    // 因此只断言其非空，不与字面量比较）
+    expect(expandedToolbar.style.borderBottom).not.toBe('');
 
     rerender(
       <CodeBlockToolbar
@@ -73,7 +75,8 @@ describe('CodeBlockToolbar', () => {
     const collapsedToolbar = container.querySelector(
       '[data-testid="code-toolbar"]',
     ) as HTMLElement;
-    expect(collapsedToolbar.style.borderBottom).toBe('none');
+    // 折叠态下：jsdom 会把 'none' 归一化为空字符串，断言宽度为空表示无可见边框
+    expect(collapsedToolbar.style.borderBottomWidth).toBe('');
   });
 
   it('invokes onCopy when copy button is clicked', () => {
