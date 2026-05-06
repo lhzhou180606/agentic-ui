@@ -16,24 +16,53 @@ import { parseSchemaJson } from './utils/parseJsonBody';
  * - ```apassify   → 同 apaasify（兼容旧版）
  * - ```agentar-card → SchemaRenderer
  */
+/**
+ * schema / apaasify 解析后的 JSON 形态由用户决定，无法静态收敛。
+ * 此处用 `Record<string, unknown>` 表示"任意键的对象"，比 any 更安全：
+ * - 调用方读取 `initialValues` 等已知字段时仍需做存在性检查
+ * - 下游 `SchemaRenderer` 接收 `LowCodeSchema` 类型，由其内部做更严格校验
+ */
+type SchemaValue = Record<string, unknown> | unknown[] | null;
+
+/** 从 schemaValue 安全提取 `initialValues`（仅当为对象且字段存在时返回） */
+const extractInitialValues = (value: SchemaValue): Record<string, unknown> => {
+  if (
+    value &&
+    !Array.isArray(value) &&
+    typeof (value as Record<string, unknown>).initialValues === 'object' &&
+    (value as Record<string, unknown>).initialValues !== null
+  ) {
+    return (value as Record<string, unknown>).initialValues as Record<
+      string,
+      unknown
+    >;
+  }
+  return {};
+};
+
 export const SchemaBlockRenderer: React.FC<
   RendererBlockProps & {
-    apaasifyRender?: (value: any) => React.ReactNode;
+    apaasifyRender?: (value: SchemaValue) => React.ReactNode;
     editorCodeProps?: MarkdownEditorProps['codeProps'];
   }
 > = (props) => {
   const { children, language, apaasifyRender, editorCodeProps } = props;
   const code = extractBlockTextContent(children);
 
-  // schema/apaasify 内容形态由用户决定，下游 SchemaRenderer 期望宽松类型，保留 any 兼容历史行为
-  const schemaValue = useMemo<any>(() => parseSchemaJson(code), [code]);
+  const schemaValue = useMemo<SchemaValue>(
+    () => parseSchemaJson(code) as SchemaValue,
+    [code],
+  );
 
   const applyCodeRender = (
     defaultDom: React.ReactNode,
-    valueForElement: any,
+    valueForElement: unknown,
   ): React.ReactNode => {
     const customRender = editorCodeProps?.render;
     if (!customRender) return defaultDom;
+    // customRender 接收 Slate-like 结构。MarkdownRenderer 不依赖 Slate，构造一个
+    // 形状兼容的对象即可；因 customRender 的 `props` 类型为 `CustomLeaf<...> & { children }`，
+    // 与此处 `element` 字段类型并不严格匹配，故在调用边界保留一次必要的类型断言。
     const slateLike = {
       attributes: {},
       children: null,
@@ -42,7 +71,7 @@ export const SchemaBlockRenderer: React.FC<
         value: valueForElement,
         language,
       },
-    } as any;
+    } as unknown as Parameters<typeof customRender>[0];
     try {
       const rendered = customRender(slateLike, defaultDom, editorCodeProps);
       if (rendered === undefined) return defaultDom;

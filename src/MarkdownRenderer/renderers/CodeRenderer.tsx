@@ -1,5 +1,6 @@
 import copy from 'copy-to-clipboard';
 import React, { useCallback, useMemo, useState } from 'react';
+import type { CodeNode } from '../../MarkdownEditor/el';
 import type { MarkdownEditorProps } from '../../MarkdownEditor/types';
 import { useDetectTheme } from '../../Plugins/chart/hooks';
 import { CodeContainer } from '../../Plugins/code/components/CodeContainer';
@@ -55,9 +56,9 @@ export const CodeBlockRenderer: React.FC<
 
   const code = useMemo(() => extractBlockTextContent(children), [children]);
 
-  const fakeElement = useMemo(
+  const fakeElement = useMemo<CodeNode>(
     () => ({
-      type: 'code' as const,
+      type: 'code',
       language: language || '',
       value: code,
       children: [{ text: code }],
@@ -81,7 +82,7 @@ export const CodeBlockRenderer: React.FC<
 
   const defaultDom = (
     <CodeContainer
-      element={fakeElement as any}
+      element={fakeElement}
       showBorder={false}
       hide={false}
       onEditorClick={() => {}}
@@ -112,11 +113,14 @@ export const CodeBlockRenderer: React.FC<
   }
 
   try {
+    // customRender 接受 Slate-like 结构。MarkdownRenderer 不依赖 Slate，
+    // 构造一个形状兼容的对象即可；因 customRender 的 `props` 类型为 `CustomLeaf<...> & { children }`，
+    // 与此处 `element` 字段类型并不严格匹配，故在调用边界保留一次必要的类型断言。
     const renderElementProps = {
       attributes: {},
       children: null,
       element: fakeElement,
-    } as any;
+    } as unknown as Parameters<typeof customRender>[0];
     const rendered = customRender(
       renderElementProps,
       defaultDom,
