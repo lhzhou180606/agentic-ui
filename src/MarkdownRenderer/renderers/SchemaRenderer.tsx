@@ -1,34 +1,10 @@
 import React, { useMemo } from 'react';
-import partialParse from '../../MarkdownEditor/editor/parser/json-parse';
 import type { MarkdownEditorProps } from '../../MarkdownEditor/types';
 import { SchemaRenderer } from '../../Schema';
 import { debugInfo } from '../../Utils/debugUtils';
+import { extractBlockTextContent } from '../extractBlockTextContent';
 import type { RendererBlockProps } from '../types';
-
-const extractTextContent = (children: React.ReactNode): string => {
-  if (typeof children === 'string') return children;
-  if (typeof children === 'number') return String(children);
-  if (Array.isArray(children)) return children.map(extractTextContent).join('');
-  if (React.isValidElement(children) && children.props?.children) {
-    return extractTextContent(children.props.children);
-  }
-  return '';
-};
-
-/**
- * 解析 schema/apaasify JSON 内容，与 Slate parseCode 的 processSchemaLanguage 对齐
- */
-const parseSchemaValue = (code: string): any => {
-  try {
-    return JSON.parse(code);
-  } catch {
-    try {
-      return partialParse(code || '[]');
-    } catch {
-      return null;
-    }
-  }
-};
+import { parseSchemaJson } from './utils/parseJsonBody';
 
 /**
  * Schema / Apaasify 渲染器
@@ -47,9 +23,10 @@ export const SchemaBlockRenderer: React.FC<
   }
 > = (props) => {
   const { children, language, apaasifyRender, editorCodeProps } = props;
-  const code = extractTextContent(children);
+  const code = extractBlockTextContent(children);
 
-  const schemaValue = useMemo(() => parseSchemaValue(code), [code]);
+  // schema/apaasify 内容形态由用户决定，下游 SchemaRenderer 期望宽松类型，保留 any 兼容历史行为
+  const schemaValue = useMemo<any>(() => parseSchemaJson(code), [code]);
 
   const applyCodeRender = (
     defaultDom: React.ReactNode,

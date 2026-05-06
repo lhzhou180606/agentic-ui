@@ -10,6 +10,7 @@ import type {
   MarkdownRemarkPlugin,
   MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
+import { debugInfo } from '../Utils/debugUtils';
 import {
   buildEditorAlignedComponents,
   createHastProcessor,
@@ -59,7 +60,9 @@ export const markdownToReactSync = (
       passNode: true,
     });
   } catch (error) {
-    console.error('Failed to render markdown:', error);
+    debugInfo('[MarkdownRenderer] markdownToReactSync failed', {
+      error: (error as Error)?.message || String(error),
+    });
     return null;
   }
 };

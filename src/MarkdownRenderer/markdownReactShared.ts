@@ -1,6 +1,6 @@
 import { Checkbox, Image } from 'antd';
 import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
-import React, { useContext } from 'react';
+import React from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
@@ -26,9 +26,9 @@ import {
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
 import type { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { parseChineseCurrencyToNumber } from '../Plugins/chart/utils';
+import { debugInfo } from '../Utils/debugUtils';
 import { rehypeSanitizeUserHtml } from '../Utils/rehypeSanitizeUserHtml';
 import { ToolUseBarThink } from '../ToolUseBarThink';
-import AnimationText from './AnimationText';
 import {
   FncRefForMarkdown,
   extractFootnoteRefFromSupChildren,
@@ -37,7 +37,7 @@ import {
   INITIAL_FENCE_STATE,
   updateFenceStateForLine,
 } from './streaming/fenceTracker';
-import { StreamingAnimationContext } from './StreamingAnimationContext';
+import { StreamAnimWrap } from './streaming/StreamAnimWrap';
 import type { MarkdownRendererEleProps, RendererBlockProps } from './types';
 
 const INLINE_MATH_WITH_SINGLE_DOLLAR = { singleDollarTextMath: true };
@@ -355,18 +355,16 @@ const buildEditorAlignedComponents = (
   const tableCls = `${prefixCls}-content-table`;
   const contentCls = prefixCls; // e.g. ant-agentic-md-editor-content
 
-  /** 仅当 streaming、末块动画上下文允许且未显式关闭段落动画时包 AnimationText */
-  const StreamAnimWrap = ({ children }: { children: any }) => {
-    const ctx = useContext(StreamingAnimationContext);
-    const animateBlock = ctx?.animateBlock ?? true;
-    const allow =
-      !!streaming && animateBlock && streamingParagraphAnimation !== false;
-    if (!allow) return children;
-    return jsx(AnimationText as any, { children });
-  };
-  StreamAnimWrap.displayName = 'StreamAnimWrap';
-
-  const wrapAnimation = (children: any) => jsx(StreamAnimWrap, { children });
+  /**
+   * 段落级流式淡入：通过模块级 StreamAnimWrap 组件实现，避免 buildEditorAlignedComponents
+   * 重建时 React 把 wrap 当作新组件类型导致整段子树卸载重挂。
+   */
+  const wrapAnimation = (children: any) =>
+    jsx(StreamAnimWrap, {
+      streaming,
+      streamingParagraphAnimation,
+      children,
+    });
 
   /**
    * 应用 eleRender 拦截：若用户返回非 undefined 值则使用，否则使用 defaultDom。
@@ -377,9 +375,8 @@ const buildEditorAlignedComponents = (
     tagName: string,
     props: any,
     defaultDom: React.ReactNode,
-    skip = false,
   ): React.ReactNode => {
-    if (!eleRender || skip) return defaultDom;
+    if (!eleRender) return defaultDom;
     const result = eleRender({ tagName, ...props }, defaultDom);
     return result !== undefined ? result : defaultDom;
   };
@@ -652,7 +649,7 @@ const buildEditorAlignedComponents = (
         'data-testid': 'markdown-link',
         target: openInNewTab ? '_blank' : undefined,
         rel: openInNewTab ? 'noopener noreferrer' : undefined,
-        onClick: (e: MouseEvent) => {
+        onClick: (e: React.MouseEvent<HTMLAnchorElement>) => {
           if (linkConfig?.onClick) {
             const res = linkConfig.onClick(href);
             if (res === false) {
@@ -1000,7 +997,18 @@ const buildEditorAlignedComponents = (
   };
 };
 
-/** markdown 片段 → React 元素 */
+const ERROR_FALLBACK_STYLE: React.CSSProperties = {
+  margin: '0.5em 0',
+  padding: '0.5em 0.75em',
+  background: 'var(--ant-color-error-bg, #fff2f0)',
+  border: '1px solid var(--ant-color-error-border, #ffccc7)',
+  borderRadius: 4,
+  fontSize: '0.85em',
+  whiteSpace: 'pre-wrap',
+  wordBreak: 'break-word',
+};
+
+/** markdown 片段 → React 元素；解析失败时降级为原文 <pre> 兜底，避免内容静默丢失。 */
 const renderMarkdownBlock = (
   blockContent: string,
   processor: Processor,
@@ -1017,8 +1025,16 @@ const renderMarkdownBlock = (
       components: components as any,
       passNode: true,
     });
-  } catch {
-    return null;
+  } catch (error) {
+    debugInfo('[MarkdownRenderer] renderMarkdownBlock failed', {
+      error: (error as Error)?.message || String(error),
+      blockContent,
+    });
+    return jsx('pre' as any, {
+      'data-testid': 'markdown-block-error-fallback',
+      style: ERROR_FALLBACK_STYLE,
+      children: blockContent,
+    });
   }
 };
 
@@ -1026,8 +1042,10 @@ const LIST_ITEM_PATTERN = /^(\s*)([-+*]|\d+[.)]) /;
 const BLOCKQUOTE_PATTERN = /^\s*>/;
 const HTML_COMMENT_PATTERN = /^\s*<!--/;
 const FOOTNOTE_DEF_PATTERN = /^\s*\[\^/;
+/** GFM 表格行：以 `|` 开头并以 `|` 结尾，至少一段内容（含分隔行 `| --- |`） */
+const TABLE_LINE_PATTERN = /^\s*\|.*\|\s*$/;
 
-/** 按单空行拆块，保留围栏代码块、列表、blockquote、HTML 注释+表格、脚注定义的连续性 */
+/** 按单空行拆块，保留围栏代码块、列表、blockquote、HTML 注释+表格、脚注定义、GFM 表格的连续性 */
 const splitMarkdownBlocks = (content: string): string[] => {
   const lines = content.split('\n');
   const blocks: string[] = [];
@@ -1035,6 +1053,7 @@ const splitMarkdownBlocks = (content: string): string[] => {
   let fenceState = { ...INITIAL_FENCE_STATE };
   let inList = false;
   let inBlockquote = false;
+  let inTable = false;
   let pendingBlankLines = 0;
 
   const lastNonEmptyLine = (): string => {
@@ -1066,9 +1085,11 @@ const splitMarkdownBlocks = (content: string): string[] => {
     if (pendingBlankLines > 0) {
       const nextIsListItem = LIST_ITEM_PATTERN.test(line);
       const nextIsBlockquote = BLOCKQUOTE_PATTERN.test(line);
+      const nextIsTableLine = TABLE_LINE_PATTERN.test(line);
       const nextIsContinuation =
         (inList && (nextIsListItem || /^\s+\S/.test(line))) ||
-        (inBlockquote && nextIsBlockquote);
+        (inBlockquote && nextIsBlockquote) ||
+        (inTable && nextIsTableLine);
 
       const prevIsHtmlComment = HTML_COMMENT_PATTERN.test(lastNonEmptyLine());
       const nextIsFootnoteDef = FOOTNOTE_DEF_PATTERN.test(line);
@@ -1083,6 +1104,7 @@ const splitMarkdownBlocks = (content: string): string[] => {
         current = [];
         inList = false;
         inBlockquote = false;
+        inTable = false;
       } else {
         for (let i = 0; i < pendingBlankLines; i++) current.push('');
       }
@@ -1091,6 +1113,7 @@ const splitMarkdownBlocks = (content: string): string[] => {
 
     inList = LIST_ITEM_PATTERN.test(line) || (inList && /^\s+\S/.test(line));
     inBlockquote = BLOCKQUOTE_PATTERN.test(line);
+    inTable = TABLE_LINE_PATTERN.test(line) || (inTable && /^\s+\S/.test(line));
 
     current.push(line);
   }

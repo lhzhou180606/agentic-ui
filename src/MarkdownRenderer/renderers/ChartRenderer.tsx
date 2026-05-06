@@ -5,17 +5,9 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { Loading } from '../../Components/Loading';
 import { ChartRender } from '../../Plugins/chart/ChartRender';
 import { parseChineseCurrencyToNumber } from '../../Plugins/chart/utils';
+import { debugInfo } from '../../Utils/debugUtils';
+import { extractBlockTextContent } from '../extractBlockTextContent';
 import type { RendererBlockProps } from '../types';
-
-const extractTextContent = (children: React.ReactNode): string => {
-  if (typeof children === 'string') return children;
-  if (typeof children === 'number') return String(children);
-  if (Array.isArray(children)) return children.map(extractTextContent).join('');
-  if (React.isValidElement(children) && children.props?.children) {
-    return extractTextContent(children.props.children);
-  }
-  return '';
-};
 
 interface ChartData {
   config?: any;
@@ -91,7 +83,7 @@ const ChartWithRetry: React.FC<{
 
   const handleChartError = React.useCallback(
     (error: Error, info: React.ErrorInfo) => {
-      console.error('[MarkdownRenderer ChartBlockRenderer] 渲染失败:', {
+      debugInfo('[MarkdownRenderer ChartBlockRenderer] 渲染失败', {
         chartType,
         title: rest?.title,
         x,
@@ -188,7 +180,7 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
   const [columnLength, setColumnLength] = useState(2);
   const [mounted, setMounted] = useState(false);
 
-  const code = extractTextContent(children);
+  const code = extractBlockTextContent(children);
   const chartData = useMemo(() => parseChartData(code), [code]);
 
   useEffect(() => {

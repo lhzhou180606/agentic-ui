@@ -9,17 +9,8 @@ import { CodeContainer } from '../../Plugins/code/components/CodeContainer';
 import { LoadImage } from '../../Plugins/code/components/LoadImage';
 import { langIconMap } from '../../Plugins/code/langIconMap';
 import { debugInfo } from '../../Utils/debugUtils';
+import { extractBlockTextContent } from '../extractBlockTextContent';
 import type { RendererBlockProps } from '../types';
-
-const extractTextContent = (children: React.ReactNode): string => {
-  if (typeof children === 'string') return children;
-  if (typeof children === 'number') return String(children);
-  if (Array.isArray(children)) return children.map(extractTextContent).join('');
-  if (React.isValidElement(children) && children.props?.children) {
-    return extractTextContent(children.props.children);
-  }
-  return '';
-};
 
 /**
  * 代码块渲染器——复用 MarkdownEditor 的 CodeContainer 和样式体系。
@@ -36,7 +27,7 @@ export const CodeBlockRenderer: React.FC<
   const [isExpanded, setIsExpanded] = useState(true);
   const i18n = useContext(I18nContext);
 
-  const code = useMemo(() => extractTextContent(children), [children]);
+  const code = useMemo(() => extractBlockTextContent(children), [children]);
 
   const fakeElement = useMemo(
     () => ({

@@ -4,6 +4,7 @@ import {
   JINJA_DOLLAR_PLACEHOLDER,
   preprocessNormalizeLeafToContainerDirective,
 } from '../../MarkdownEditor/editor/parser/constants';
+import { debugInfo } from '../../Utils/debugUtils';
 
 import {
   buildEditorAlignedComponents,
@@ -91,6 +92,8 @@ export const useStreamingMarkdownReact = (
 
       const elements = blocks.map((blockSource, index) => {
         const isLast = index === blocks.length - 1;
+        // 注意：key 必须与 variant 解耦——末块由 tail 晋升 sealed 时不能卸载重挂，
+        // 否则 chart / agentar-card 等重组件会重复初始化（见 streaming-chart-card-stability 回归测试）。
         const key = `b-${gen}-${index}`;
         return jsx(
           MarkdownBlockPiece,
@@ -107,7 +110,9 @@ export const useStreamingMarkdownReact = (
 
       return jsxs(Fragment, { children: elements });
     } catch (error) {
-      console.error('Failed to render markdown:', error);
+      debugInfo('[MarkdownRenderer] useStreamingMarkdownReact failed', {
+        error: (error as Error)?.message || String(error),
+      });
       return null;
     }
   }, [content, revisionSource, processor, components, options?.streaming]);
