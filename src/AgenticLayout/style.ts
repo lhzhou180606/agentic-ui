@@ -23,6 +23,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       [`${token.componentCls}-body`]: {
         display: 'flex',
         flex: 1,
+        minWidth: 0,
         boxShadow: token.boxShadowTertiary,
         borderRadius: token.borderRadiusLG,
         overflow: 'hidden',
