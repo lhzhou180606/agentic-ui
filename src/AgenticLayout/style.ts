@@ -132,6 +132,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           flex: 1,
           minHeight: 0,
           overflow: 'auto',
+          // 与 LayoutHeader 同款浅灰底色，避免 header / messages 区域颜色断层。
+          background: 'var(--color-gray-bg-page-light)',
         },
       },
 
