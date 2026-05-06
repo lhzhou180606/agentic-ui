@@ -754,4 +754,81 @@ describe('AgenticLayout', () => {
       document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
     });
   });
+
+  describe('main area corner radius', () => {
+    // 这一组用例锚定 style.ts 中的圆角策略：
+    // -main 默认仅圆角右上/右下，左上/左下交给左栏；
+    // 当无左栏时 -main 是 -body 的第一个直接子元素，靠 :first-child 补齐左侧圆角；
+    // 当左栏折叠时 -main 紧随 -sidebar-left-collapsed，靠相邻兄弟选择器补齐左侧圆角。
+    // 由于 jsdom 不解析 cssinjs 注入的样式，这里通过 DOM 结构关系断言来验证选择器的命中条件。
+
+    it('places main as the first child of body when no left sidebar exists', () => {
+      const { container } = render(
+        <AgenticLayout center={<div>Center content</div>} />,
+      );
+
+      const body = container.querySelector(
+        '.ant-agentic-layout-body',
+      ) as HTMLElement;
+      const main = container.querySelector(
+        '.ant-agentic-layout-main',
+      ) as HTMLElement;
+
+      expect(body).toBeInTheDocument();
+      expect(main).toBeInTheDocument();
+      // :first-child 选择器命中条件：-main 是 -body 的第一个直接子元素
+      expect(body.firstElementChild).toBe(main);
+    });
+
+    it('keeps main as a non-first child when left sidebar is rendered and expanded', () => {
+      const { container } = render(
+        <AgenticLayout
+          left={<div>Left content</div>}
+          center={<div>Center content</div>}
+        />,
+      );
+
+      const body = container.querySelector(
+        '.ant-agentic-layout-body',
+      ) as HTMLElement;
+      const leftSidebar = container.querySelector(
+        '.ant-agentic-layout-sidebar-left',
+      ) as HTMLElement;
+      const main = container.querySelector(
+        '.ant-agentic-layout-main',
+      ) as HTMLElement;
+
+      // 展开态：左栏不带 -collapsed 后缀类，-main 不是第一个子元素
+      expect(leftSidebar).not.toHaveClass(
+        'ant-agentic-layout-sidebar-left-collapsed',
+      );
+      expect(body.firstElementChild).toBe(leftSidebar);
+      expect(body.firstElementChild).not.toBe(main);
+    });
+
+    it('places collapsed left sidebar as the immediate previous sibling of main', () => {
+      const { container } = render(
+        <AgenticLayout
+          left={<div>Left content</div>}
+          center={<div>Center content</div>}
+          header={{ leftDefaultCollapsed: true }}
+        />,
+      );
+
+      const leftSidebar = container.querySelector(
+        '.ant-agentic-layout-sidebar-left',
+      ) as HTMLElement;
+      const main = container.querySelector(
+        '.ant-agentic-layout-main',
+      ) as HTMLElement;
+
+      // 折叠态相邻兄弟选择器命中条件：
+      // 1) 左栏带 -collapsed 后缀类
+      // 2) -main 是左栏的紧邻下一个兄弟元素
+      expect(leftSidebar).toHaveClass(
+        'ant-agentic-layout-sidebar-left-collapsed',
+      );
+      expect(leftSidebar.nextElementSibling).toBe(main);
+    });
+  });
 });

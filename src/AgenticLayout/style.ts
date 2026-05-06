@@ -8,7 +8,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
-      flexDirection: 'column',
+      flexDirection: 'row',
       height: '100%',
       minHeight: 600,
       backgroundColor: 'transparent',
@@ -105,21 +105,42 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       // 主内容区域：用 flex 自适应分配 LayoutHeader 与正文，
       // 避免历史上 height: calc(100% - 48px) 在没有 header 时少 48px 的问题。
+      //
+      // 圆角策略：
+      // - 默认仅设置「右上、右下」圆角（左上/左下交给左侧栏来呈现）；
+      // - 当 -main 是 -body 的第一个直接子元素时（未传 left），
+      //   补齐左上/左下圆角，避免与外层 -body 的圆角错位形成尖角；
+      // - 当左侧栏处于折叠态（width:0 不可见）时，-main 视觉上是最左可见块，
+      //   同样需要补齐左上/左下圆角；此时通过相邻兄弟选择器命中。
       [`${token.componentCls}-main`]: {
         flex: 1,
         minWidth: 0,
         display: 'flex',
         flexDirection: 'column',
         backgroundColor: token.colorBgLayout,
+        borderStartStartRadius: 0,
+        borderEndStartRadius: 0,
         borderStartEndRadius: token.borderRadiusLG,
         borderEndEndRadius: token.borderRadiusLG,
         overflow: 'hidden',
+        '&:first-child': {
+          borderStartStartRadius: token.borderRadiusLG,
+          borderEndStartRadius: token.borderRadiusLG,
+        },
         [`${token.componentCls}-main-content`]: {
           flex: 1,
           minHeight: 0,
           overflow: 'auto',
         },
       },
+
+      // 左栏折叠时，紧随其后的 -main 视觉上成为最左可见块，
+      // 此时需要补齐左上/左下圆角，避免顶部/底部出现直角缺口。
+      [`${token.componentCls}-sidebar-left-collapsed + ${token.componentCls}-main`]:
+        {
+          borderStartStartRadius: token.borderRadiusLG,
+          borderEndStartRadius: token.borderRadiusLG,
+        },
     },
   };
 };
