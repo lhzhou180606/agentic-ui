@@ -13,12 +13,11 @@ const CenterContent = () => (
           lineHeight: 1.6,
         }}
       >
-        你好！我是 AI 助手，可以帮你解答问题、生成代码、分析文档等。
+        你好！我是 AI 助手，可以帮你解答问题、分析数据、生成代码等。
       </div>
       <div
         style={{
           padding: '12px 16px',
-          background: 'transparent',
           borderRadius: 8,
           fontSize: 14,
           lineHeight: 1.6,
