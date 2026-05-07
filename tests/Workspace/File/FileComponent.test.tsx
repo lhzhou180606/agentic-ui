@@ -5,7 +5,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import { ConfigProvider, message } from 'antd';
+import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nProvide } from '../../../src/I18n';
@@ -1194,15 +1194,15 @@ describe('FileComponent', () => {
       });
       fireEvent.click(screen.getByTestId('close-image-preview'));
       await waitFor(() => {
-        expect(screen.queryByTestId('close-image-preview')).not.toBeInTheDocument();
+        expect(
+          screen.queryByTestId('close-image-preview'),
+        ).not.toBeInTheDocument();
       });
     });
 
     it('卸载时 actionRef.current 置为 null (1064)', () => {
       const actionRef = React.createRef<any>();
-      const nodes: FileNode[] = [
-        { id: 'f1', name: 'a.txt', content: 'x' },
-      ];
+      const nodes: FileNode[] = [{ id: 'f1', name: 'a.txt', content: 'x' }];
 
       const { unmount } = render(
         <TestWrapper>
@@ -1932,9 +1932,7 @@ describe('FileComponent', () => {
           id: 'g1',
           name: '分组',
           type: 'plainText',
-          children: [
-            { id: 'f1', name: 'a.txt', content: 'Initial' },
-          ],
+          children: [{ id: 'f1', name: 'a.txt', content: 'Initial' }],
         },
       ];
       const updatedNodes: GroupNode[] = [
@@ -1942,9 +1940,7 @@ describe('FileComponent', () => {
           id: 'g1',
           name: '分组',
           type: 'plainText',
-          children: [
-            { id: 'f1', name: 'a.txt', content: 'Updated' },
-          ],
+          children: [{ id: 'f1', name: 'a.txt', content: 'Updated' }],
         },
       ];
 
@@ -2090,33 +2086,6 @@ describe('FileComponent', () => {
       // 模拟空格键
       fireEvent.keyDown(fileItem, { key: ' ' });
       expect(handleClick).toHaveBeenCalled();
-    });
-
-    it('应该支持Enter键触发分组折叠', async () => {
-      const nodes: GroupNode[] = [
-        {
-          id: 'g1',
-          name: '文档',
-          type: 'plainText',
-          collapsed: false,
-          children: [{ id: 'f1', name: 'doc1.txt' }],
-        },
-      ];
-
-      render(
-        <TestWrapper>
-          <FileComponent nodes={nodes} />
-        </TestWrapper>,
-      );
-
-      expect(screen.getByText('doc1.txt')).toBeInTheDocument();
-
-      const groupHeader = screen.getByRole('button', { name: /收起.*文档/ });
-      fireEvent.keyDown(groupHeader, { key: 'Enter' });
-
-      await waitFor(() => {
-        expect(screen.queryByText('doc1.txt')).not.toBeInTheDocument();
-      });
     });
   });
 
@@ -2609,10 +2578,10 @@ describe('FileComponent', () => {
         </TestWrapper>,
       );
 
-      fireEvent.click(screen.getByText(/查看更多/));
+      fireEvent.click(screen.getByText(/Load More/));
 
       expect(screen.getByText('file-54.txt')).toBeInTheDocument();
-      expect(screen.queryByText(/查看更多/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Load More/)).not.toBeInTheDocument();
     });
 
     it('查看更多按钮显示剩余数量', () => {

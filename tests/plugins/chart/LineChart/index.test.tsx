@@ -9,6 +9,8 @@ import {
   it,
   vi,
 } from 'vitest';
+// Mock chart components
+import * as hooks from '../../../../src/Plugins/chart/hooks';
 
 // 使用动态导入来避免类型检查错误
 let LineChart: React.FC<any>;
@@ -94,9 +96,6 @@ vi.mock('antd', async () => {
     },
   };
 });
-
-// Mock chart components
-import * as hooks from '../../../../src/Plugins/chart/hooks';
 
 vi.mock('../../../../src/Plugins/chart/components', () => ({
   ChartContainer: ({ children }: any) => (

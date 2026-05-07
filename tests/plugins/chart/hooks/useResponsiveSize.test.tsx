@@ -167,8 +167,6 @@ describe('useResponsiveSize', () => {
   });
 
   it('在 SSR 环境中应该使用默认值', () => {
-    // 保存原始 window
-    const originalWindow = global.window;
     const originalInnerWidth = window.innerWidth;
 
     // 模拟 SSR 环境：hook 内部会检查 typeof window !== 'undefined'
@@ -211,4 +209,3 @@ describe('useResponsiveSize', () => {
     );
   });
 });
-
