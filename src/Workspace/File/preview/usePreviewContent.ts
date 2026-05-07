@@ -86,9 +86,7 @@ export const usePreviewContent = (
     if (dataSource.previewUrl) {
       setContentState({ status: 'loading', mdContent: '', rawContent: '' });
 
-      const abortController = new AbortController();
-
-      fetch(dataSource.previewUrl, { signal: abortController.signal })
+      fetch(dataSource.previewUrl)
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -97,7 +95,6 @@ export const usePreviewContent = (
         })
         .then(setReadyContent)
         .catch((err) => {
-          if (err instanceof DOMException && err.name === 'AbortError') return;
           const errorMessage =
             err instanceof Error
               ? err.message
@@ -105,9 +102,7 @@ export const usePreviewContent = (
           setContentState({ status: 'error', error: errorMessage });
           console.error('加载文本内容失败:', err);
         });
-
-      // 文件切换或卸载时取消进行中的请求，避免竞态写回
-      return () => abortController.abort();
+      return;
     }
 
     // 无数据源时回到 idle，避免显示旧内容

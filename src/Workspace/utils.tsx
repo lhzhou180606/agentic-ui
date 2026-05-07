@@ -22,15 +22,15 @@ export const formatFileSize = (size: number | string): string => {
 
 /**
  * 格式化最后修改时间
- * @param date 日期值（时间戳、字符串或 Date 对象）
- * @returns 格式化后的时间字符串 (MM-DD HH:mm:ss)
+ * @param timestamp 时间戳（毫秒）
+ * @returns 格式化后的时间字符串 (MM-DD HH:mm)
  */
 export const formatLastModified = (date: string | number | Date): string => {
-  const parsed = dayjs(date);
+  const formatted = dayjs(date)?.format('MM-DD HH:mm:ss');
 
-  if (!parsed.isValid()) {
-    return typeof date === 'string' ? date : '-';
-  }
-
-  return parsed.format('MM-DD HH:mm:ss');
+  return formatted?.match('Invalid')
+    ? typeof date === 'string'
+      ? date
+      : '-'
+    : formatted;
 };

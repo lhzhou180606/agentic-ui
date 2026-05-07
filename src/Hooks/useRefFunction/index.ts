@@ -27,14 +27,21 @@ import { useCallback, useLayoutEffect, useRef } from 'react';
  * - 用 useLayoutEffect 而非渲染期写 ref，避免 R18 并发渲染下被丢弃的渲染版本污染 ref
  */
 const useRefFunction = <T extends (...args: any[]) => any>(reFunction: T) => {
-  // 初始值设为 reFunction 以保证首次 render 期间包装器即可被调用（如在 useMemo 中）。
-  // useLayoutEffect 在后续每次 commit 阶段同步写入最新版本，保证 effect/事件
-  // 回调里读取的 ref 永远是最新的函数实现。
-  const ref = useRef<T>(reFunction);
+  // 用 null 初始化但通过 useLayoutEffect 在 commit 阶段同步写入，避免渲染期写 ref。
+  // useLayoutEffect 在 DOM 更新后、浏览器 paint 前同步执行，能保证 effect/事件
+  // 回调里读取的 ref 永远是最新版本。
+  const ref = useRef<T | null>(null);
   useLayoutEffect(() => {
     ref.current = reFunction;
   });
   return useCallback((...rest: Parameters<T>): ReturnType<T> => {
+    // 包装器在 mount 之前被同步调用是反模式（渲染期），此时 ref.current 为 null，
+    // 用类型断言抛出更明确的错误，避免静默返回 undefined 与签名声明的 ReturnType<T> 不符。
+    if (ref.current === null) {
+      throw new Error(
+        '[useRefFunction] called before mount — do not call the wrapper during render',
+      );
+    }
     return ref.current(...rest);
   }, []);
 };

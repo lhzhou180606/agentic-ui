@@ -114,7 +114,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         [`&-title-wrapper`]: {
           display: 'flex',
           flexDirection: 'column',
-          gap: 0,
+          gap: '-4px',
           flex: 1,
           minWidth: 0,
         },

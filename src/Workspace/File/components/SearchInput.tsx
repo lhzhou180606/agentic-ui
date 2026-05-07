@@ -1,7 +1,7 @@
 import { Search } from '@sofa-design/icons';
-import { Input } from 'antd';
+import { Input, type InputRef } from 'antd';
 import classNames from 'clsx';
-import React, { type FC } from 'react';
+import React, { type FC, useRef } from 'react';
 
 export interface SearchInputProps {
   keyword?: string;
@@ -23,9 +23,12 @@ const SearchInputComponent: FC<SearchInputProps> = ({
   hashId,
   locale,
 }) => {
+  const inputRef = useRef<InputRef>(null);
+
   return (
     <div className={classNames(`${prefixCls}-search`, hashId)}>
       <Input
+        ref={inputRef}
         key="file-search-input"
         allowClear
         placeholder={

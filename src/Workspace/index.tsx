@@ -18,7 +18,7 @@ import React, {
   useState,
 } from 'react';
 import { ActionIconBox } from '../Components/ActionIconBox';
-import { I18nContext, type LocalKeys } from '../I18n';
+import { I18nContext } from '../I18n';
 import Browser from './Browser';
 import { File, FileTree } from './File';
 import { RealtimeFollowList } from './RealtimeFollow';
@@ -48,9 +48,7 @@ enum ComponentType {
   CUSTOM = 'custom',
 }
 
-const DEFAULT_CONFIG = (
-  locale?: LocalKeys,
-): Record<ComponentType, TabItem> => ({
+const DEFAULT_CONFIG = (locale: any): Record<ComponentType, TabItem> => ({
   [ComponentType.REALTIME]: {
     key: ComponentType.REALTIME,
     icon: <MousePointerClick />,
