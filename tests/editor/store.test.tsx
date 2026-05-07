@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+﻿import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
@@ -196,16 +196,19 @@ describe('EditorStore', () => {
       editor.selection = selection;
 
       // 模拟 Editor.nodes 返回有效的节点
-      const editorNodesSpy = vi.spyOn(Editor, 'nodes').mockReturnValue([
-        [{ type: 'paragraph', children: [{ text: '' }] }, [0]],
-      ] as any);
+      const editorNodesSpy = vi
+        .spyOn(Editor, 'nodes')
+        .mockReturnValue([
+          [{ type: 'paragraph', children: [{ text: '' }] }, [0]],
+        ] as any);
 
       // 模拟 Path.next 返回有效路径
       const pathNextSpy = vi.spyOn(Path, 'next').mockReturnValue([1]);
 
       // 模拟 Transforms.insertNodes 实际执行插入
-      const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes').mockImplementation(
-        (editor) => {
+      const insertNodesSpy = vi
+        .spyOn(Transforms, 'insertNodes')
+        .mockImplementation((editor) => {
           if (
             editor.children &&
             editor.children[0] &&
@@ -216,8 +219,7 @@ describe('EditorStore', () => {
               url: 'file:///path/to/document.pdf',
             };
           }
-        },
-      );
+        });
 
       store.insertLink('file:///path/to/document.pdf');
 
@@ -2207,14 +2209,14 @@ describe('EditorStore', () => {
         focus: { path: [0, 0], offset: 0 },
       };
 
-      const editorNodesSpy = vi.spyOn(Editor, 'nodes').mockImplementation(
-        function* () {
+      const editorNodesSpy = vi
+        .spyOn(Editor, 'nodes')
+        .mockImplementation(function* () {
           yield [
             { type: 'code', language: 'js', children: [{ text: '' }] },
             [0],
           ] as any;
-        },
-      );
+        });
       const pathNextSpy = vi.spyOn(Path, 'next').mockReturnValue([1]);
       const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
 
@@ -2659,6 +2661,7 @@ describe('EditorStore', () => {
 
   describe('dragStart dragend 与进度回调异常', () => {
     it('RAF 进度回调抛错时不应中断流程', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const content = Array(120)
         .fill(0)
         .map(
@@ -2681,6 +2684,10 @@ describe('EditorStore', () => {
       });
       await result;
       expect(editor.children.length).toBeGreaterThan(0);
+      expect(warnSpy).toHaveBeenCalledWith(
+        'Progress callback failed:',
+        expect.objectContaining({ message: 'progress error' }),
+      );
       vi.restoreAllMocks();
     });
   });
@@ -2741,9 +2748,9 @@ describe('EditorStore', () => {
     });
 
     it('_getNodeFinished/_isNodeEqual/_replaceNodeAt 覆盖 hash+finished 分支', () => {
-      expect((store as any)._getNodeFinished({ otherProps: { finished: true } })).toBe(
-        true,
-      );
+      expect(
+        (store as any)._getNodeFinished({ otherProps: { finished: true } }),
+      ).toBe(true);
       expect(
         (store as any)._isNodeEqual(
           { hash: 'h1', otherProps: { finished: true } },
@@ -2809,22 +2816,47 @@ describe('EditorStore', () => {
         {
           type: 'table',
           children: [
-            { type: 'table-row', children: [{ type: 'table-cell', children: [{ text: '1' }] }] },
-            { type: 'table-row', children: [{ type: 'table-cell', children: [{ text: '2' }] }] },
-            { type: 'table-row', children: [{ type: 'table-cell', children: [{ text: '3' }] }] },
-            { type: 'table-row', children: [{ type: 'table-cell', children: [{ text: '4' }] }] },
+            {
+              type: 'table-row',
+              children: [{ type: 'table-cell', children: [{ text: '1' }] }],
+            },
+            {
+              type: 'table-row',
+              children: [{ type: 'table-cell', children: [{ text: '2' }] }],
+            },
+            {
+              type: 'table-row',
+              children: [{ type: 'table-cell', children: [{ text: '3' }] }],
+            },
+            {
+              type: 'table-row',
+              children: [{ type: 'table-cell', children: [{ text: '4' }] }],
+            },
           ],
         },
         {
           type: 'table',
-          children: [{ type: 'table-row', children: [{ type: 'table-cell', children: [{ text: '1' }] }] }],
+          children: [
+            {
+              type: 'table-row',
+              children: [{ type: 'table-cell', children: [{ text: '1' }] }],
+            },
+          ],
         },
         [0],
         ops,
       );
       (store as any)._updateTableRow(
-        { type: 'table-row', align: 'center', children: [{ type: 'table-cell', children: [{ text: 'a' }] }] },
-        { type: 'table-row', align: 'left', children: [{ type: 'table-cell', children: [{ text: 'a' }] }] },
+        {
+          type: 'table-row',
+          align: 'center',
+          children: [{ type: 'table-cell', children: [{ text: 'a' }] }],
+        },
+        {
+          type: 'table-row',
+          align: 'left',
+          children: [{ type: 'table-cell', children: [{ text: 'a' }] }],
+        },
         [0, 0],
         ops,
       );
@@ -2850,15 +2882,35 @@ describe('EditorStore', () => {
         {
           type: 'table',
           align: 'center',
-          children: [{ type: 'table-row', children: [{ type: 'table-cell', children: [{ text: 'a' }] }] }],
+          children: [
+            {
+              type: 'table-row',
+              children: [{ type: 'table-cell', children: [{ text: 'a' }] }],
+            },
+          ],
         },
         {
           type: 'table',
           align: 'left',
-          children: [{ type: 'table-row', children: [{ type: 'table-cell', children: [{ text: 'a' }] }] }],
+          children: [
+            {
+              type: 'table-row',
+              children: [{ type: 'table-cell', children: [{ text: 'a' }] }],
+            },
+          ],
         },
-        [{ type: 'table-row', children: [{ type: 'table-cell', children: [{ text: 'a' }] }] }],
-        [{ type: 'table-row', children: [{ type: 'table-cell', children: [{ text: 'a' }] }] }],
+        [
+          {
+            type: 'table-row',
+            children: [{ type: 'table-cell', children: [{ text: 'a' }] }],
+          },
+        ],
+        [
+          {
+            type: 'table-row',
+            children: [{ type: 'table-cell', children: [{ text: 'a' }] }],
+          },
+        ],
         [0],
         ops,
       );
@@ -2996,7 +3048,10 @@ describe('EditorStore', () => {
       const removeSpy = vi.spyOn(window, 'removeEventListener');
 
       store.dragStart(
-        { stopPropagation: vi.fn(), dataTransfer: { setDragImage: vi.fn() } } as any,
+        {
+          stopPropagation: vi.fn(),
+          dataTransfer: { setDragImage: vi.fn() },
+        } as any,
         container,
       );
       dragendHandler?.();
@@ -3037,13 +3092,18 @@ describe('EditorStore', () => {
       });
 
       let dragendHandler: (() => void) | undefined;
-      vi.spyOn(window, 'addEventListener').mockImplementation((event, handler) => {
-        if (event === 'dragend') dragendHandler = handler as () => void;
-      });
+      vi.spyOn(window, 'addEventListener').mockImplementation(
+        (event, handler) => {
+          if (event === 'dragend') dragendHandler = handler as () => void;
+        },
+      );
       const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       store.dragStart(
-        { stopPropagation: vi.fn(), dataTransfer: { setDragImage: vi.fn() } } as any,
+        {
+          stopPropagation: vi.fn(),
+          dataTransfer: { setDragImage: vi.fn() },
+        } as any,
         container,
       );
       dragendHandler?.();
@@ -3076,20 +3136,23 @@ describe('EditorStore', () => {
 
       const notAllowedEl = document.createElement('div');
       notAllowedEl.setAttribute('data-be', 'paragraph');
-      expect((store as any)._shouldIncludeElement(notAllowedEl, new Set())).toBe(
-        false,
-      );
-      expect((store as any)._shouldIncludeElement(el2, new Set(['paragraph']))).toBe(
-        false,
-      );
-      expect((store as any)._shouldIncludeElement(store.draggedElement, new Set(['head']))).toBe(
-        false,
-      );
+      expect(
+        (store as any)._shouldIncludeElement(notAllowedEl, new Set()),
+      ).toBe(false);
+      expect(
+        (store as any)._shouldIncludeElement(el2, new Set(['paragraph'])),
+      ).toBe(false);
+      expect(
+        (store as any)._shouldIncludeElement(
+          store.draggedElement,
+          new Set(['head']),
+        ),
+      ).toBe(false);
       const okEl = document.createElement('div');
       okEl.setAttribute('data-be', 'paragraph');
-      expect((store as any)._shouldIncludeElement(okEl, new Set(['paragraph']))).toBe(
-        true,
-      );
+      expect(
+        (store as any)._shouldIncludeElement(okEl, new Set(['paragraph'])),
+      ).toBe(true);
 
       const onPointFound = vi.fn();
       const handler = (store as any)._createDragOverHandler(
