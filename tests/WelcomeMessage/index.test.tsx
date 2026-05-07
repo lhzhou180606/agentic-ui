@@ -331,9 +331,7 @@ describe('WelcomeMessage 组件', () => {
   });
 
   it('应该正确处理事件处理', () => {
-    const handleClick = () => {
-      console.log('点击了');
-    };
+    const handleClick = vi.fn();
 
     const { container } = renderWelcomeMessage({
       title: (
@@ -347,7 +345,7 @@ describe('WelcomeMessage 组件', () => {
     expect(clickableTitle).toBeInTheDocument();
 
     fireEvent.click(clickableTitle);
-    // 这里只是测试渲染，实际的事件处理由 React 处理
+    expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
   it('应该支持条件渲染', () => {

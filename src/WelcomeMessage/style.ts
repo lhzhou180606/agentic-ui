@@ -23,7 +23,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       [`${token.componentCls}-description`]: {
-        color: 'var(--color-gray-text-default)',
+        color: 'var(--color-gray-text-secondary)',
         font: 'var(--font-text-body-lg)',
         letterSpacing: 'var(--letter-spacing-body-lg, normal)',
         textAlign: 'center',
