@@ -587,7 +587,7 @@ export { MermaidElement } from './Plugins/mermaid';
 export { AILabel, type AILabelProps, type AILabelStatus } from './AILabel';
 export { AnswerAlert, type AnswerAlertProps } from './AnswerAlert';
 export { BackTo, type BackBottomProps, type BackTopProps } from './BackTo';
-export { default as Quote } from './Quote';
+export { Quote } from './Quote';
 export type { QuoteProps } from './Quote';
 export {
   WelcomeMessage,

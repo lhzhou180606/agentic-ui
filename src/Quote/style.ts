@@ -22,12 +22,8 @@ const genQuoteStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       '&-container:hover': {
-        /* 圆角-控件-sm */
         borderRadius: 'var(--radius-control-sm)',
-        /* gray/gray-控件填充-悬停 */
-        /* 样式描述：--gray-a2 */
         background: 'var(--color-gray-control-fill-hover)',
-        /* 投影-描边-base */
         boxShadow: 'var(--shadow-border-base)',
       },
 
@@ -59,27 +55,22 @@ const genQuoteStyle: GenerateStyle<ChatTokenType> = (token) => {
         font: 'var(--font-text-body-sm)',
       },
 
-      // 弹出层样式
-
       '&-popup': {
         position: 'absolute',
-        bottom: '30px', // 保持原来的距离
+        bottom: 30,
         minWidth: '240px',
         maxWidth: '800px',
-        /* 圆角-卡片-base */
-
         borderRadius: 'var(--radius-card-base)',
         background: 'var(--color-gray-bg-page-light)',
         boxSizing: 'border-box',
         border: '1px solid var(--color-gray-border-light)',
         boxShadow: 'var(--shadow-popover-base)',
 
-        display: 'none', // 默认隐藏
+        display: 'none',
         flexDirection: 'column',
         gap: 4,
         zIndex: 1001,
         minHeight: 'auto',
-
         fontSize: '12px',
         fontWeight: 'normal',
         lineHeight: '20px',
@@ -87,7 +78,7 @@ const genQuoteStyle: GenerateStyle<ChatTokenType> = (token) => {
         color: 'var(--color-gray-text-secondary)',
         padding: 4,
 
-        // 扩展hover区域，填补与容器之间的空隙
+        // 伪元素填补 popup 与容器之间的空隙，防止鼠标移入时 hover 中断
         '&::before': {
           content: '""',
           position: 'absolute',
@@ -100,7 +91,6 @@ const genQuoteStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
 
-      // hover时显示弹框（包括hover到连接区域）
       '&-container:hover &-popup': {
         display: 'flex',
       },
@@ -109,15 +99,14 @@ const genQuoteStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'flex',
       },
 
-      /* gray/gray-背景-页面-浅 */
       '&-popup-content': {
         padding: '8px',
         whiteSpace: 'pre-wrap',
         wordBreak: 'break-word',
-        maxHeight: '70px', // 固定高度
+        maxHeight: 70,
         overflowY: 'auto',
         lineHeight: '20px',
-        boxSizing: 'border-box', // 确保 padding 包含在总高度内
+        boxSizing: 'border-box',
         letterSpacing: 'var(--letter-spacing-body-sm, normal)',
         borderRadius: 'var(--radius-card-base)',
         background: 'var(--color-gray-bg-card-white)',
