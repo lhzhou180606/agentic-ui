@@ -1,7 +1,4 @@
-import {
-  ChatLayout,
-  ChatLayoutRef,
-} from '@ant-design/agentic-ui';
+import { ChatLayout, ChatLayoutRef } from '@ant-design/agentic-ui';
 import { Button, Tag } from 'antd';
 import React, { useRef, useState } from 'react';
 

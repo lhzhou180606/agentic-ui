@@ -119,20 +119,51 @@ const QuoteComponent: React.FC<QuoteProps> = ({
     }
   }, [onFileClick, fileName, lineRange]);
 
-  const cls = useMemo(() => ({
-    container: classNames(`${prefixCls}-container`, hashId, customClassNames?.root, className),
-    description: classNames(`${prefixCls}-quoteDescription`, hashId, customClassNames?.description),
-    closeButton: classNames(`${prefixCls}-close-button`, hashId, customClassNames?.closeButton),
-    icon: classNames(`${prefixCls}-quote-icon`, hashId, customClassNames?.icon),
-    popup: classNames(`${prefixCls}-popup`, hashId, customClassNames?.popup),
-    popupHeader: classNames(`${prefixCls}-popup-header`, hashId, customClassNames?.popupHeader),
-    popupTitle: classNames(`${prefixCls}-popup-title`, hashId),
-    popupRange: classNames(`${prefixCls}-popup-range`, hashId),
-    popupContent: classNames(`${prefixCls}-popup-content`, hashId, customClassNames?.popupContent),
-  }), [prefixCls, hashId, customClassNames, className]);
+  const cls = useMemo(
+    () => ({
+      container: classNames(
+        `${prefixCls}-container`,
+        hashId,
+        customClassNames?.root,
+        className,
+      ),
+      description: classNames(
+        `${prefixCls}-quoteDescription`,
+        hashId,
+        customClassNames?.description,
+      ),
+      closeButton: classNames(
+        `${prefixCls}-close-button`,
+        hashId,
+        customClassNames?.closeButton,
+      ),
+      icon: classNames(
+        `${prefixCls}-quote-icon`,
+        hashId,
+        customClassNames?.icon,
+      ),
+      popup: classNames(`${prefixCls}-popup`, hashId, customClassNames?.popup),
+      popupHeader: classNames(
+        `${prefixCls}-popup-header`,
+        hashId,
+        customClassNames?.popupHeader,
+      ),
+      popupTitle: classNames(`${prefixCls}-popup-title`, hashId),
+      popupRange: classNames(`${prefixCls}-popup-range`, hashId),
+      popupContent: classNames(
+        `${prefixCls}-popup-content`,
+        hashId,
+        customClassNames?.popupContent,
+      ),
+    }),
+    [prefixCls, hashId, customClassNames, className],
+  );
 
   const popupStyle = useMemo(
-    (): React.CSSProperties => ({ [popupDirection]: 0, ...customStyles?.popup }),
+    (): React.CSSProperties => ({
+      [popupDirection]: 0,
+      ...customStyles?.popup,
+    }),
     [popupDirection, customStyles?.popup],
   );
 
@@ -142,7 +173,11 @@ const QuoteComponent: React.FC<QuoteProps> = ({
       style={{ ...style, ...customStyles?.root }}
       data-testid="quote-container"
     >
-      <div className={cls.icon} style={customStyles?.icon} data-testid="quote-icon">
+      <div
+        className={cls.icon}
+        style={customStyles?.icon}
+        data-testid="quote-icon"
+      >
         <QuoteBefore />
       </div>
       <span
@@ -164,11 +199,7 @@ const QuoteComponent: React.FC<QuoteProps> = ({
       )}
 
       {popupDetail && (
-        <div
-          className={cls.popup}
-          data-testid="quote-popup"
-          style={popupStyle}
-        >
+        <div className={cls.popup} data-testid="quote-popup" style={popupStyle}>
           {(fileName || lineRange) && (
             <div
               className={cls.popupHeader}
@@ -180,12 +211,18 @@ const QuoteComponent: React.FC<QuoteProps> = ({
                 <CornerLeftUp />
               </div>
               {fileName && (
-                <span className={cls.popupTitle} data-testid="quote-popup-title">
+                <span
+                  className={cls.popupTitle}
+                  data-testid="quote-popup-title"
+                >
                   {fileName}
                 </span>
               )}
               {lineRange && (
-                <span className={cls.popupRange} data-testid="quote-popup-range">
+                <span
+                  className={cls.popupRange}
+                  data-testid="quote-popup-range"
+                >
                   ({lineRange})
                 </span>
               )}

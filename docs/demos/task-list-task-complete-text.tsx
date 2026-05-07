@@ -31,7 +31,15 @@ const items: TaskItem[] = [
  */
 export default () => {
   return (
-    <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 480 }}>
+    <div
+      style={{
+        padding: 24,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 16,
+        maxWidth: 480,
+      }}
+    >
       {/* 1. 直接传字符串 */}
       <TaskList
         items={items}

@@ -7,8 +7,10 @@ import {
   useState,
 } from 'react';
 
-export interface UseIntersectionOnceOptions
-  extends Omit<IntersectionObserverInit, 'root'> {
+export interface UseIntersectionOnceOptions extends Omit<
+  IntersectionObserverInit,
+  'root'
+> {
   root?: RefObject<Element | null> | Element | null;
 }
 

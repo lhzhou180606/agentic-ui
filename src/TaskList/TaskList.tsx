@@ -89,49 +89,46 @@ export const TaskList = memo(
       };
     }, [simpleExpanded]);
 
-    const { summaryStatus, summaryText, hasError, lastItem } =
-      useMemo(() => {
-        const completedCount = items.filter(
-          (i) => i.status === 'success',
-        ).length;
-        const loadingItem = items.find((i) => i.status === 'loading');
-        const errorExists = items.some((i) => i.status === 'error');
-        const allDone = completedCount === items.length && items.length > 0;
+    const { summaryStatus, summaryText, hasError, lastItem } = useMemo(() => {
+      const completedCount = items.filter((i) => i.status === 'success').length;
+      const loadingItem = items.find((i) => i.status === 'loading');
+      const errorExists = items.some((i) => i.status === 'error');
+      const allDone = completedCount === items.length && items.length > 0;
 
-        let status: TaskStatus = 'pending';
-        let text: React.ReactNode = locale?.['taskList.taskList'] || '任务列表';
+      let status: TaskStatus = 'pending';
+      let text: React.ReactNode = locale?.['taskList.taskList'] || '任务列表';
 
-        if (allDone) {
-          status = 'success';
-          const customCompleteText =
-            typeof taskCompleteText === 'function'
-              ? taskCompleteText({ items })
-              : taskCompleteText;
-          text =
-            customCompleteText ?? locale?.['taskList.taskComplete'] ?? '任务完成';
-        } else if (loadingItem?.title) {
-          status = 'loading';
-          const tpl =
-            locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
-          const title = loadingItem.title;
-          const taskName =
-            typeof title === 'string' || typeof title === 'number'
-              ? String(title)
-              : '';
-          text = tpl.replace('${taskName}', taskName);
-        } else if (errorExists) {
-          status = 'error';
-          const tpl = locale?.['taskList.taskInProgress'] || '正在进行任务';
-          text = tpl.replace('${taskName}', '');
-        }
+      if (allDone) {
+        status = 'success';
+        const customCompleteText =
+          typeof taskCompleteText === 'function'
+            ? taskCompleteText({ items })
+            : taskCompleteText;
+        text =
+          customCompleteText ?? locale?.['taskList.taskComplete'] ?? '任务完成';
+      } else if (loadingItem?.title) {
+        status = 'loading';
+        const tpl =
+          locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
+        const title = loadingItem.title;
+        const taskName =
+          typeof title === 'string' || typeof title === 'number'
+            ? String(title)
+            : '';
+        text = tpl.replace('${taskName}', taskName);
+      } else if (errorExists) {
+        status = 'error';
+        const tpl = locale?.['taskList.taskInProgress'] || '正在进行任务';
+        text = tpl.replace('${taskName}', '');
+      }
 
-        return {
-          summaryStatus: status,
-          summaryText: text,
-          hasError: errorExists,
-          lastItem: items[items.length - 1] as TaskItem | undefined,
-        };
-      }, [items, locale, taskCompleteText]);
+      return {
+        summaryStatus: status,
+        summaryText: text,
+        hasError: errorExists,
+        lastItem: items[items.length - 1] as TaskItem | undefined,
+      };
+    }, [items, locale, taskCompleteText]);
 
     const renderItems = useCallback(
       (visibleItems: TaskItem[]) => {

@@ -29,8 +29,7 @@ export const useSpeechSynthesis = (
   const { text, defaultRate = 1, voiceURI, lang } = options;
 
   // 仅依赖宿主环境特性，无任何依赖；直接 const 即可，无需 useMemo
-  const isSupported =
-    typeof window !== 'undefined' && !!window.speechSynthesis;
+  const isSupported = typeof window !== 'undefined' && !!window.speechSynthesis;
 
   const [rate, setRate] = useState<number>(defaultRate);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -63,9 +62,7 @@ export const useSpeechSynthesis = (
     }
     if (voicesPendingHandlerRef.current) {
       // 能力检测：部分宿主 / 老浏览器 / mock 不暴露 removeEventListener
-      if (
-        typeof window.speechSynthesis.removeEventListener === 'function'
-      ) {
+      if (typeof window.speechSynthesis.removeEventListener === 'function') {
         try {
           window.speechSynthesis.removeEventListener(
             'voiceschanged',
@@ -126,7 +123,12 @@ export const useSpeechSynthesis = (
         typeof window.speechSynthesis.addEventListener === 'function' &&
         typeof window.speechSynthesis.removeEventListener === 'function';
       const voices = canQueryVoices ? window.speechSynthesis.getVoices() : [];
-      if (voiceURI && canQueryVoices && canListenVoices && voices.length === 0) {
+      if (
+        voiceURI &&
+        canQueryVoices &&
+        canListenVoices &&
+        voices.length === 0
+      ) {
         const handler = () => {
           // 句柄已被新 start / stop / 卸载撤销，跳过本次回调（防止竞态）
           if (voicesPendingHandlerRef.current !== handler) return;
@@ -228,9 +230,7 @@ export const useSpeechSynthesis = (
     return () => {
       // 撤销可能挂着的 voices 等待句柄 + 超时定时器，避免卸载后回调进入失效闭包
       if (voicesPendingHandlerRef.current) {
-        if (
-          typeof window.speechSynthesis.removeEventListener === 'function'
-        ) {
+        if (typeof window.speechSynthesis.removeEventListener === 'function') {
           try {
             window.speechSynthesis.removeEventListener(
               'voiceschanged',

@@ -111,12 +111,16 @@ const FileSizeInfo: React.FC<{
   const baseClassName = classNames(`${prefixCls}-file-size`, hashId);
 
   if (status === 'uploading' || status === 'pending') {
-    return <div className={baseClassName}>{locale?.uploading || 'Uploading...'}</div>;
+    return (
+      <div className={baseClassName}>{locale?.uploading || 'Uploading...'}</div>
+    );
   }
 
   if (status === 'error') {
     return (
-      <div className={classNames(baseClassName, `${prefixCls}-file-size-error`)}>
+      <div
+        className={classNames(baseClassName, `${prefixCls}-file-size-error`)}
+      >
         {file.errorMessage || locale?.uploadFailed || 'Upload failed'}
       </div>
     );

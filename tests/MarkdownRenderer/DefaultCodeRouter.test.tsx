@@ -20,7 +20,8 @@ vi.mock('../../src/MarkdownRenderer/renderers/MermaidRenderer', () => ({
 const DEFAULT_CHILDREN = 'router payload';
 
 const renderRouter = (
-  props: Partial<DefaultCodeRouterProps> & Pick<DefaultCodeRouterProps, 'language'>,
+  props: Partial<DefaultCodeRouterProps> &
+    Pick<DefaultCodeRouterProps, 'language'>,
 ) =>
   render(
     <DefaultCodeRouter
@@ -57,7 +58,9 @@ describe('DefaultCodeRouter', () => {
     expect(screen.getByTestId('mermaid-plugin')).toHaveTextContent(
       DEFAULT_CHILDREN,
     );
-    expect(screen.queryByTestId('lazy-mermaid-renderer')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('lazy-mermaid-renderer'),
+    ).not.toBeInTheDocument();
     expect(onRender).toHaveBeenCalledWith(
       expect.objectContaining({
         children: DEFAULT_CHILDREN,
@@ -78,9 +81,9 @@ describe('DefaultCodeRouter', () => {
     });
 
     expect(screen.getByText('graph TD;A-->B')).toBeInTheDocument();
-    expect(await screen.findByTestId('lazy-mermaid-renderer')).toHaveTextContent(
-      'mermaid:graph TD;A-->B',
-    );
+    expect(
+      await screen.findByTestId('lazy-mermaid-renderer'),
+    ).toHaveTextContent('mermaid:graph TD;A-->B');
   });
 
   it('forwards file map config to plugin file map renderers', () => {

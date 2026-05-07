@@ -77,10 +77,10 @@ export type AttachmentButtonProps = {
   removeFileOnUploadError?: boolean;
 };
 
-const ButtonContent: React.FC<{ title?: React.ReactNode; prefixCls: string }> = ({
-  title,
-  prefixCls,
-}) => {
+const ButtonContent: React.FC<{
+  title?: React.ReactNode;
+  prefixCls: string;
+}> = ({ title, prefixCls }) => {
   return (
     <>
       <Paperclip />

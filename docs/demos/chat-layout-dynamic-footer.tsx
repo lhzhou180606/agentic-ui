@@ -36,7 +36,8 @@ const DynamicFooterDemo = () => {
           footer 高度随内容自适应 — 输入多行文本
         </Tag>
         <p style={{ margin: '0 0 8px', fontSize: 13, color: '#666' }}>
-          ChatLayout 会自动检测 footer 实际高度并调整内容区底部留白，无需手动同步 footerHeight。
+          ChatLayout 会自动检测 footer
+          实际高度并调整内容区底部留白，无需手动同步 footerHeight。
         </p>
         <div style={{ height: 420 }}>
           <ChatLayout
@@ -71,10 +72,12 @@ const DynamicFooterDemo = () => {
       {/* 固定 footerHeight 对比 */}
       <div>
         <Tag color="orange" style={{ marginBottom: 8 }}>
-          footerHeight 最小高度约束 — footer 实际高度大于 footerHeight 时以实际为准
+          footerHeight 最小高度约束 — footer 实际高度大于 footerHeight
+          时以实际为准
         </Tag>
         <p style={{ margin: '0 0 8px', fontSize: 13, color: '#666' }}>
-          footerHeight=48（默认值），但 footer 实际内容更高时，布局仍能正确适配。
+          footerHeight=48（默认值），但 footer
+          实际内容更高时，布局仍能正确适配。
         </p>
         <div style={{ height: 300 }}>
           <ChatLayout
@@ -101,10 +104,7 @@ const DynamicFooterDemo = () => {
                   提示：footerHeight 仅设置最小高度，实际高度由内容撑开
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <Input
-                    placeholder="输入框"
-                    style={{ flex: 1 }}
-                  />
+                  <Input placeholder="输入框" style={{ flex: 1 }} />
                   <Button type="primary">发送</Button>
                 </div>
               </div>

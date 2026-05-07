@@ -68,12 +68,7 @@ const ErrorIcon: React.FC = () => (
       stroke="#842029"
       strokeWidth="2"
     />
-    <path
-      d="M12 8V12"
-      stroke="#842029"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
+    <path d="M12 8V12" stroke="#842029" strokeWidth="2" strokeLinecap="round" />
     <circle cx="12" cy="16" r="1" fill="#842029" />
   </svg>
 );

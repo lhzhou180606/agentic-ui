@@ -32,7 +32,9 @@ export interface BackTopProps extends ScrollVisibleButtonProps {
    * 按钮显示条件：数值表示距顶部超过该像素时显示，函数则自定义判断逻辑
    * @default 400
    */
-  shouldVisible?: number | ((scrollTop: number, container: HTMLElement | Window) => boolean);
+  shouldVisible?:
+    | number
+    | ((scrollTop: number, container: HTMLElement | Window) => boolean);
 }
 
 /**
@@ -106,7 +108,10 @@ const BackTopComponent = forwardRef<ScrollVisibleButtonRef, BackTopProps>(
     );
 
     // shouldVisible 是 ScrollVisibleButton 的内部 prop，通过类型断言注入
-    const scrollVisibleProps = { ...rest, shouldVisible } as ScrollVisibleButtonProps;
+    const scrollVisibleProps = {
+      ...rest,
+      shouldVisible,
+    } as ScrollVisibleButtonProps;
 
     return (
       <ScrollVisibleButton

@@ -64,7 +64,12 @@ const ScrollStateDemo = () => {
 
   return (
     <div
-      style={{ height: 520, display: 'flex', flexDirection: 'column', position: 'relative' }}
+      style={{
+        height: 520,
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+      }}
     >
       <ChatLayout
         ref={chatRef}
@@ -128,13 +133,17 @@ const ScrollStateDemo = () => {
       >
         <span>
           isAtBottom:{' '}
-          <strong style={{ color: scrollState.isAtBottom ? '#52c41a' : '#ff4d4f' }}>
+          <strong
+            style={{ color: scrollState.isAtBottom ? '#52c41a' : '#ff4d4f' }}
+          >
             {String(scrollState.isAtBottom)}
           </strong>
         </span>
         <span>
           isPinned:{' '}
-          <strong style={{ color: scrollState.isPinned ? '#52c41a' : '#ff4d4f' }}>
+          <strong
+            style={{ color: scrollState.isPinned ? '#52c41a' : '#ff4d4f' }}
+          >
             {String(scrollState.isPinned)}
           </strong>
         </span>

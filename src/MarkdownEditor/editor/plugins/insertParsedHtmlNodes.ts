@@ -814,7 +814,10 @@ export const insertParsedHtmlNodes = async (
   } catch (error) {
     // 区分预期的业务失败（return false）与非预期的内部错误：
     // 走到这里说明是解析/插入过程中的异常，而非"内容为空"等正常跳过情形。
-    console.error('[insertParsedHtmlNodes] 内部错误，HTML 节点插入失败:', error);
+    console.error(
+      '[insertParsedHtmlNodes] 内部错误，HTML 节点插入失败:',
+      error,
+    );
     debugInfo('insertParsedHtmlNodes - 内部错误', { error });
 
     return false;

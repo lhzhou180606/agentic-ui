@@ -12,9 +12,7 @@ const ARROW_STYLE_EXPANDED: React.CSSProperties = {
   transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
 };
 
-export const getArrowRotation = (
-  collapsed: boolean,
-): React.CSSProperties =>
+export const getArrowRotation = (collapsed: boolean): React.CSSProperties =>
   collapsed ? ARROW_STYLE_COLLAPSED : ARROW_STYLE_EXPANDED;
 
 export const hasTaskContent = (

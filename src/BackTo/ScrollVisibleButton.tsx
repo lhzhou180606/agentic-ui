@@ -90,88 +90,83 @@ type WithShouldVisible = ScrollVisibleButtonProps & {
 export const ScrollVisibleButton = forwardRef<
   ScrollVisibleButtonRef,
   ScrollVisibleButtonProps
->(
-  (props, ref) => {
-    // shouldVisible 是内部 prop，不在公开类型中暴露，通过内部类型读取
-    const {
-      className,
-      style,
-      shouldVisible: propsShouldVisible = DEFAULT_VISIBLE_THRESHOLD,
-      target,
-      onClick,
-      tooltip,
-      children,
-      'data-testid': dataTestId,
-      ...rest
-    } = props as WithShouldVisible;
-    const context = useContext(ConfigProvider.ConfigContext);
-    const baseCls = context?.getPrefixCls(prefixCls);
-    const { wrapSSR, hashId } = useStyle(baseCls);
+>((props, ref) => {
+  // shouldVisible 是内部 prop，不在公开类型中暴露，通过内部类型读取
+  const {
+    className,
+    style,
+    shouldVisible: propsShouldVisible = DEFAULT_VISIBLE_THRESHOLD,
+    target,
+    onClick,
+    tooltip,
+    children,
+    'data-testid': dataTestId,
+    ...rest
+  } = props as WithShouldVisible;
+  const context = useContext(ConfigProvider.ConfigContext);
+  const baseCls = context?.getPrefixCls(prefixCls);
+  const { wrapSSR, hashId } = useStyle(baseCls);
 
-    const internalRef = React.useRef<HTMLButtonElement | null>(null);
+  const internalRef = React.useRef<HTMLButtonElement | null>(null);
 
-    useImperativeHandle(ref, () => ({
-      nativeElement: internalRef.current,
-    }));
+  useImperativeHandle(ref, () => ({
+    nativeElement: internalRef.current,
+  }));
 
-    const getTarget = target || getDefaultTarget;
-    const shouldVisible = getShouldVisibleHandler(propsShouldVisible);
+  const getTarget = target || getDefaultTarget;
+  const shouldVisible = getShouldVisibleHandler(propsShouldVisible);
 
-    const { visible, currentContainer } = useScrollVisible({
-      target: getTarget,
-      shouldVisible,
-    });
+  const { visible, currentContainer } = useScrollVisible({
+    target: getTarget,
+    shouldVisible,
+  });
 
-    // 显隐动画：presence wrapper 始终保留在 DOM 中（fixed 定位，完全脱离文档流），
-    // 只通过 opacity + pointer-events 切换显隐，避免挂载/卸载触发文档流重排导致页面跳动。
-    const [dataState, setDataState] = useState<'enter' | 'exit'>(
-      visible ? 'enter' : 'exit',
-    );
+  // 显隐动画：presence wrapper 始终保留在 DOM 中（fixed 定位，完全脱离文档流），
+  // 只通过 opacity + pointer-events 切换显隐，避免挂载/卸载触发文档流重排导致页面跳动。
+  const [dataState, setDataState] = useState<'enter' | 'exit'>(
+    visible ? 'enter' : 'exit',
+  );
 
-    useEffect(() => {
-      if (visible) {
-        // 下一帧切到 enter，确保浏览器已完成一次 layout 后再触发 opacity 过渡
-        const raf = requestAnimationFrame(() => setDataState('enter'));
-        return () => cancelAnimationFrame(raf);
-      }
-      setDataState('exit');
-      return undefined;
-    }, [visible]);
+  useEffect(() => {
+    if (visible) {
+      // 下一帧切到 enter，确保浏览器已完成一次 layout 后再触发 opacity 过渡
+      const raf = requestAnimationFrame(() => setDataState('enter'));
+      return () => cancelAnimationFrame(raf);
+    }
+    setDataState('exit');
+    return undefined;
+  }, [visible]);
 
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-      onClick?.(e, currentContainer.current);
-    };
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    onClick?.(e, currentContainer.current);
+  };
 
-    const button = (
-      <button
-        ref={internalRef}
-        className={classNames(baseCls, className, hashId)}
-        data-testid={dataTestId ?? baseCls}
-        style={style}
-        type="button"
-        onClick={handleClick}
-        {...rest}
-      >
-        <div className={`${baseCls}-content ${hashId}`}>{children}</div>
-      </button>
-    );
+  const button = (
+    <button
+      ref={internalRef}
+      className={classNames(baseCls, className, hashId)}
+      data-testid={dataTestId ?? baseCls}
+      style={style}
+      type="button"
+      onClick={handleClick}
+      {...rest}
+    >
+      <div className={`${baseCls}-content ${hashId}`}>{children}</div>
+    </button>
+  );
 
-    const buttonWithTooltip = tooltip ? (
-      <Tooltip {...getTooltipProps(tooltip)}>{button}</Tooltip>
-    ) : (
-      button
-    );
+  const buttonWithTooltip = tooltip ? (
+    <Tooltip {...getTooltipProps(tooltip)}>{button}</Tooltip>
+  ) : (
+    button
+  );
 
-    // presence wrapper 始终挂载（position:fixed 脱离文档流），不会触发布局重排
-    return wrapSSR(
-      <>
-        <div
-          className={`${baseCls}-presence ${hashId}`}
-          data-state={dataState}
-        >
-          {buttonWithTooltip}
-        </div>
-      </>,
-    );
-  },
-);
+  // presence wrapper 始终挂载（position:fixed 脱离文档流），不会触发布局重排
+  return wrapSSR(
+    <>
+      <div className={`${baseCls}-presence ${hashId}`} data-state={dataState}>
+        {buttonWithTooltip}
+      </div>
+    </>,
+  );
+});
