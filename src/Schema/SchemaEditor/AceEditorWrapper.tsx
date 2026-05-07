@@ -3,19 +3,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { getAceLangs, modeMap } from '../../MarkdownEditor/editor/utils/ace';
 import { loadAceEditor } from '../../Plugins/code/loadAceEditor';
 
-// 确保 ResizeObserver 在测试环境中可用
-if (typeof window !== 'undefined' && !window.ResizeObserver) {
-  window.ResizeObserver = class ResizeObserver {
-    constructor(callback: any) {
-      this.callback = callback;
-    }
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-    private callback: any;
-  } as any;
-}
-
 interface AceEditorWrapperProps {
   /** 代码内容 */
   value: string;
@@ -183,4 +170,3 @@ export const AceEditorWrapper: React.FC<AceEditorWrapperProps> = ({
   );
 };
 
-export default AceEditorWrapper;

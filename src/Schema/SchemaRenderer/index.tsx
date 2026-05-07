@@ -3,6 +3,7 @@ import Mustache from 'mustache';
 import React, {
   Component,
   ErrorInfo,
+  memo,
   useEffect,
   useMemo,
   useRef,
@@ -18,6 +19,64 @@ import { LowCodeSchema } from '../types';
 import { mdDataSchemaValidator } from '../validator';
 import { TemplateEngine } from './templateEngine';
 export * from './templateEngine';
+
+// 错误 UI 公共样式常量
+const ERROR_CONTAINER_STYLE: React.CSSProperties = {
+  padding: '16px',
+  border: '1px solid #f5c2c7',
+  borderRadius: '8px',
+  background: '#f8d7da',
+  color: '#842029',
+  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+  margin: '10px 0',
+};
+
+const ERROR_HEADER_STYLE: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  marginBottom: '12px',
+};
+
+const ERROR_TITLE_STYLE: React.CSSProperties = {
+  margin: 0,
+  fontSize: '16px',
+  fontWeight: 600,
+};
+
+const ERROR_CONTENT_STYLE: React.CSSProperties = {
+  whiteSpace: 'pre-wrap',
+  background: 'rgba(255,255,255,0.5)',
+  padding: '8px',
+  borderRadius: '4px',
+  fontSize: '13px',
+  margin: 0,
+};
+
+const ERROR_ICON_STYLE: React.CSSProperties = { marginRight: '8px' };
+
+const ErrorIcon: React.FC = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    style={ERROR_ICON_STYLE}
+  >
+    <path
+      d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+      stroke="#842029"
+      strokeWidth="2"
+    />
+    <path
+      d="M12 8V12"
+      stroke="#842029"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+    <circle cx="12" cy="16" r="1" fill="#842029" />
+  </svg>
+);
 
 /**
  * 创建沙箱实例
@@ -286,10 +345,10 @@ export interface SchemaRendererProps {
  * - 支持默认值处理
  * - 响应式布局适配
  */
-export const SchemaRenderer: React.FC<SchemaRendererProps> = ({
+const SchemaRendererComponent: React.FC<SchemaRendererProps> = ({
   schema,
   values,
-  config,
+  config: _config,
   fallbackContent,
   debug = true,
   useDefaultValues = true,
@@ -412,23 +471,32 @@ export const SchemaRenderer: React.FC<SchemaRendererProps> = ({
   }, [properties, values, useDefaultValues, initialValues]);
 
   // 使用模板引擎渲染
-  const renderedHtml = useMemo(() => {
+  const renderResult = useMemo(() => {
     try {
+      let html = templateHtml;
       if (type === 'html') {
-        return TemplateEngine.render(templateHtml, templateData);
+        html = TemplateEngine.render(templateHtml, templateData);
+      } else if (type === 'mustache') {
+        html = Mustache.render(templateHtml, templateData);
       }
-      if (type === 'mustache') {
-        return Mustache.render(templateHtml, templateData);
-      }
-      return templateHtml;
+      return { html, error: null };
     } catch (error) {
-      console.error('模板渲染错误:', error);
-      setRenderError(
-        `Template rendering error: ${error instanceof Error ? error.message : String(error)}`,
-      );
-      return '';
+      console.error('Template rendering error:', error);
+      const errorMessage = `Template rendering error: ${error instanceof Error ? error.message : String(error)}`;
+      return { html: '', error: errorMessage };
     }
-  }, [templateHtml, templateData, type, config]);
+  }, [templateHtml, templateData, type]);
+
+  const renderedHtml = renderResult.html;
+
+  // 将模板渲染错误同步到 state（不在 useMemo 中调用 setState）
+  useEffect(() => {
+    if (renderResult.error) {
+      setRenderError(renderResult.error);
+    } else if (renderError) {
+      setRenderError(null);
+    }
+  }, [renderResult.error]);
 
   // 应用主题样式
   const containerStyle = useMemo(() => {
@@ -625,61 +693,12 @@ a:active {
   if (renderError && debug) {
     return (
       fallbackContent || (
-        <div
-          style={{
-            padding: '16px',
-            border: '1px solid #f5c2c7',
-            borderRadius: '8px',
-            background: '#f8d7da',
-            color: '#842029',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            margin: '10px 0',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              marginBottom: '8px',
-            }}
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              style={{ marginRight: '8px' }}
-            >
-              <path
-                d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                stroke="#842029"
-                strokeWidth="2"
-              />
-              <path
-                d="M12 8V12"
-                stroke="#842029"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <circle cx="12" cy="16" r="1" fill="#842029" />
-            </svg>
-            <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>
-              渲染错误
-            </h3>
+        <div style={ERROR_CONTAINER_STYLE}>
+          <div style={ERROR_HEADER_STYLE}>
+            <ErrorIcon />
+            <h3 style={ERROR_TITLE_STYLE}>渲染错误</h3>
           </div>
-          <pre
-            style={{
-              whiteSpace: 'pre-wrap',
-              background: 'rgba(255,255,255,0.5)',
-              padding: '8px',
-              borderRadius: '4px',
-              fontSize: '13px',
-              margin: 0,
-            }}
-          >
-            {renderError}
-          </pre>
+          <pre style={ERROR_CONTENT_STYLE}>{renderError}</pre>
         </div>
       )
     );
@@ -691,58 +710,12 @@ a:active {
 
     return (
       fallbackContent || (
-        <div
-          style={{
-            padding: '16px',
-            border: '1px solid #f5c2c7',
-            borderRadius: '8px',
-            background: '#f8d7da',
-            color: '#842029',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            margin: '10px 0',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              marginBottom: '12px',
-            }}
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              style={{ marginRight: '8px' }}
-            >
-              <path
-                d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                stroke="#842029"
-                strokeWidth="2"
-              />
-              <path
-                d="M12 8V12"
-                stroke="#842029"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <circle cx="12" cy="16" r="1" fill="#842029" />
-            </svg>
-            <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>
-              Schema 验证失败
-            </h3>
+        <div style={ERROR_CONTAINER_STYLE}>
+          <div style={ERROR_HEADER_STYLE}>
+            <ErrorIcon />
+            <h3 style={ERROR_TITLE_STYLE}>Schema 验证失败</h3>
           </div>
-
-          <div
-            style={{
-              background: 'rgba(255,255,255,0.5)',
-              padding: '12px',
-              borderRadius: '6px',
-              fontSize: '13px',
-            }}
-          >
+          <div style={ERROR_CONTENT_STYLE}>
             {Array.isArray(validationResult.errors) ? (
               <ul
                 style={{
@@ -808,3 +781,7 @@ a:active {
     </ErrorBoundary>
   );
 };
+
+SchemaRendererComponent.displayName = 'SchemaRenderer';
+
+export const SchemaRenderer = memo(SchemaRendererComponent);

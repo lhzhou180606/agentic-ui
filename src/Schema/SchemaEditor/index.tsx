@@ -29,8 +29,6 @@ export interface SchemaEditorProps {
   readonly?: boolean;
   /** 变更回调 */
   onChange?: (schema: LowCodeSchema, values: Record<string, any>) => void;
-  /** 错误回调 */
-  onError?: (error: Error) => void;
   /** 自定义样式 */
   className?: string;
   /** 是否显示预览 */
@@ -78,7 +76,7 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
       height = 600,
       readonly = false,
       onChange,
-      className = '',
+      className,
       showPreview = true,
       previewConfig,
       htmlActions,
@@ -456,5 +454,3 @@ SchemaEditorComponent.displayName = 'SchemaEditor';
 
 // 使用 React.memo 优化性能，避免不必要的重新渲染
 export const SchemaEditor = memo(SchemaEditorComponent);
-
-export default SchemaEditor;
