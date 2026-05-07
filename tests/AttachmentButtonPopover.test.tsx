@@ -21,10 +21,10 @@ describe('AttachmentButtonPopover', () => {
     it('should have default supported formats as object', () => {
       const formats = Object.values(SupportedFileFormats);
       expect(formats).toHaveLength(4);
-      expect(SupportedFileFormats.image.type).toBe('图片');
-      expect(SupportedFileFormats.document.type).toBe('文档');
-      expect(SupportedFileFormats.audio.type).toBe('音频');
-      expect(SupportedFileFormats.video.type).toBe('视频');
+      expect(SupportedFileFormats.image.type).toBe('image');
+      expect(SupportedFileFormats.document.type).toBe('document');
+      expect(SupportedFileFormats.audio.type).toBe('audio');
+      expect(SupportedFileFormats.video.type).toBe('video');
     });
 
     it('should have correct file extensions for images', () => {
@@ -53,7 +53,7 @@ describe('AttachmentButtonPopover', () => {
         />,
       );
 
-      expect(screen.getByText(/支持 jpg, jpeg, png, gif/)).toBeInTheDocument();
+      expect(screen.getByText(/Supports jpg, jpeg, png, gif/)).toBeInTheDocument();
       expect(screen.getByText(/webp, svg/)).toBeInTheDocument();
     });
 

@@ -488,15 +488,15 @@ describe('TaskRunning Component', () => {
     );
 
     let taskRunningElement = container.firstChild as HTMLElement;
-    expect(taskRunningElement).toHaveClass('ant-task-running-default');
-    expect(taskRunningElement).not.toHaveClass('ant-task-running-simple');
+    expect(taskRunningElement).toHaveClass('ant-agent-run-bar-default');
+    expect(taskRunningElement).not.toHaveClass('ant-agent-run-bar-simple');
 
     // 重新渲染为 simple variant
     rerender(<TaskRunning {...baseProps} variant="simple" />);
 
     taskRunningElement = container.firstChild as HTMLElement;
-    expect(taskRunningElement).toHaveClass('ant-task-running-simple');
-    expect(taskRunningElement).not.toHaveClass('ant-task-running-default');
+    expect(taskRunningElement).toHaveClass('ant-agent-run-bar-simple');
+    expect(taskRunningElement).not.toHaveClass('ant-agent-run-bar-default');
   });
 
   // 测试 variant 对操作按钮的影响
