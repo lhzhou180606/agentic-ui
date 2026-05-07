@@ -83,7 +83,6 @@ const extensionToLanguageMap: Record<string, string> = {
   pl: 'perl',
   pm: 'perl',
   r: 'r',
-  R: 'r',
   matlab: 'matlab',
   m: 'matlab',
   swift: 'swift',
@@ -99,14 +98,11 @@ const extensionToLanguageMap: Record<string, string> = {
   zig: 'zig',
   v: 'v',
 
-  // 特殊文件
+  // 特殊文件（特殊文件名如 Dockerfile/Makefile/CMakeLists.txt 在 getLanguageFromFilename 中单独处理）
   dockerfile: 'dockerfile',
-  Dockerfile: 'dockerfile',
   makefile: 'makefile',
-  Makefile: 'makefile',
   gradle: 'gradle',
   cmake: 'cmake',
-  'CMakeLists.txt': 'cmake',
 };
 
 /**
@@ -132,11 +128,12 @@ export const getLanguageFromFilename = (filename: string): string => {
     return 'cmake';
   }
 
-  // 提取文件扩展名
-  const extension = filename.split('.').pop()?.toLowerCase();
-  if (!extension) {
+  // 提取文件扩展名（基于已有的 lowerFileName 避免重复 toLowerCase）
+  const dotIndex = lowerFileName.lastIndexOf('.');
+  if (dotIndex === -1 || dotIndex === lowerFileName.length - 1) {
     return 'text';
   }
+  const extension = lowerFileName.slice(dotIndex + 1);
 
   // 从映射表中查找对应的语言
   const language = extensionToLanguageMap[extension];

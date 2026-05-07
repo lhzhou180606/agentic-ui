@@ -44,7 +44,9 @@ export const handleFileDownload = (file: FileNode) => {
     document.body.removeChild(link);
   } finally {
     if (blobUrl) {
-      URL.revokeObjectURL(blobUrl);
+      // 延迟回收 Blob URL，部分浏览器（如 Safari）需要在下一个事件循环才真正发起下载
+      const urlToRevoke = blobUrl;
+      window.setTimeout(() => URL.revokeObjectURL(urlToRevoke), 100);
     }
   }
 };
