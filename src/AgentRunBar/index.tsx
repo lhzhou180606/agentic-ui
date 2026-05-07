@@ -94,7 +94,11 @@ export const TASK_STATUS = {
  * 任务状态常量对象的类型（向后兼容）
  *
  * @deprecated 请直接使用 {@link TaskStatus} 联合类型
+ *
+ * 此处与同名常量 `TASK_STATUS` 共享名称，依赖 TypeScript 的"值/类型命名空间合并"
+ * 语义；ESLint 的 `no-redeclare` 不识别该模式，故在此显式禁用。
  */
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export type TASK_STATUS = TaskStatus;
 
 /**
@@ -113,7 +117,11 @@ export const TASK_RUNNING_STATUS = {
  * 任务运行状态常量对象的类型（向后兼容）
  *
  * @deprecated 请直接使用 {@link TaskRunningStatus} 联合类型
+ *
+ * 此处与同名常量 `TASK_RUNNING_STATUS` 共享名称，依赖 TypeScript 的"值/类型命名空间合并"
+ * 语义；ESLint 的 `no-redeclare` 不识别该模式，故在此显式禁用。
  */
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export type TASK_RUNNING_STATUS = TaskRunningStatus;
 
 /**
