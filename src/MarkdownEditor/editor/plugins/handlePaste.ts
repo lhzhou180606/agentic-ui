@@ -54,9 +54,7 @@ const isValidMediaUrl = (url: string, type: string): boolean => {
   const hasValidExtension = extensions.some((ext) => lowerUrl.includes(ext));
 
   const paths = MEDIA_PATHS[type as MediaType] ?? [];
-  const hasMediaPath = paths.some((mediaPath) =>
-    lowerUrl.includes(mediaPath),
-  );
+  const hasMediaPath = paths.some((mediaPath) => lowerUrl.includes(mediaPath));
 
   return hasValidExtension || hasMediaPath;
 };
@@ -169,9 +167,7 @@ export const handleFilesPaste = async (
     }
 
     const uploadResults = await Promise.all(
-      Array.from(fileList).map((file) =>
-        editorProps.image!.upload!([file]),
-      ),
+      Array.from(fileList).map((file) => editorProps.image!.upload!([file])),
     );
     const uploadedUrls = uploadResults.flat(1);
 

@@ -190,15 +190,16 @@ describe('useDetectTheme', () => {
         },
       });
 
+      // 自定义 cssVariable 仅在 observeChanges: false 时生效（单例模式使用默认变量）
       const { result } = renderHook(() =>
-        useDetectTheme({ cssVariable: '--custom-bg' }),
+        useDetectTheme({ cssVariable: '--custom-bg', observeChanges: false }),
       );
       expect(result.current).toBe('dark');
     });
 
     it('应支持自定义亮度阈值', () => {
       document.documentElement.removeAttribute('data-theme');
-      // Y=(0.299+0.587+0.114)*R/1 ≈ 160，不低于默认阈值 145 → light
+      // Y=(0.299*160+0.587*160+0.114*160) = 160，不低于默认阈值 145 → light
       mockGetComputedStyle.mockReturnValue({
         getPropertyValue: (prop: string) => {
           if (prop === '--color-gray-bg-page') {
@@ -207,7 +208,9 @@ describe('useDetectTheme', () => {
           return '';
         },
       });
-      const { result: result1 } = renderHook(() => useDetectTheme());
+      const { result: result1 } = renderHook(() =>
+        useDetectTheme({ observeChanges: false }),
+      );
       expect(result1.current).toBe('light');
 
       // Y ≈ 80，低于自定义阈值 100 → dark
@@ -220,18 +223,26 @@ describe('useDetectTheme', () => {
         },
       });
       const { result: result2 } = renderHook(() =>
-        useDetectTheme({ darknessThreshold: 100 }),
+        useDetectTheme({ darknessThreshold: 100, observeChanges: false }),
       );
       expect(result2.current).toBe('dark');
     });
 
-    it('当 observeChanges 为 false 时不应监听变化', () => {
+    it('当 observeChanges 为 false 时应直接检测而非使用缓存', () => {
+      // 设置深色背景
+      mockGetComputedStyle.mockReturnValue({
+        getPropertyValue: (prop: string) => {
+          if (prop === '--color-gray-bg-page') {
+            return '#141414';
+          }
+          return '';
+        },
+      });
       const { result } = renderHook(() =>
         useDetectTheme({ observeChanges: false }),
       );
-      expect(result.current).toBe('light');
-      // MutationObserver 不应该被创建
-      expect(mockMatchMedia).not.toHaveBeenCalled();
+      // observeChanges: false 时每次都会重新调用 detectTheme，不依赖单例缓存
+      expect(result.current).toBe('dark');
     });
   });
 

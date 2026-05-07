@@ -12,7 +12,7 @@ import React, {
 } from 'react';
 import { BaseEditor } from 'slate';
 import { ReactEditor, useSlate } from 'slate-react';
-import { SuggestionContext } from '../../../../MarkdownInputField/Suggestion';
+import { SuggestionContext } from '../../../../MarkdownInputField/Suggestion/SuggestionContext';
 
 type TagPopupItem = Array<{
   label: string;

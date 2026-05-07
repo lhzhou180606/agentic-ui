@@ -89,34 +89,6 @@ vi.mock('../../../src/Plugins/chart/ChartMark', () => ({
   )),
 }));
 
-// Mock the actual ChartMark components
-vi.mock('../../../src/Plugins/chart/ChartMark/index', () => ({
-  Pie: vi.fn().mockImplementation((props) => (
-    <div data-testid="pie-chart">
-      Pie Chart - {props.xField} vs {props.yField}
-    </div>
-  )),
-  Bar: vi.fn().mockImplementation((props) => (
-    <div data-testid="bar-chart">
-      Bar Chart - {props.xField} vs {props.yField}
-    </div>
-  )),
-  Line: vi.fn().mockImplementation((props) => (
-    <div data-testid="line-chart">
-      Line Chart - {props.xField} vs {props.yField}
-    </div>
-  )),
-  Column: vi.fn().mockImplementation((props) => (
-    <div data-testid="column-chart">
-      Column Chart - {props.xField} vs {props.yField}
-    </div>
-  )),
-  Area: vi.fn().mockImplementation((props) => (
-    <div data-testid="area-chart">
-      Area Chart - {props.xField} vs {props.yField}
-    </div>
-  )),
-}));
 
 // Mock ChartAttrToolBar
 vi.mock('../../../src/Plugins/chart/ChartAttrToolBar', () => ({
@@ -130,17 +102,6 @@ vi.mock('../../../src/Plugins/chart/ChartAttrToolBar', () => ({
   )),
 }));
 
-// Mock the actual ChartAttrToolBar component
-vi.mock('../../../src/Plugins/chart/ChartAttrToolBar/index', () => ({
-  ChartAttrToolBar: vi.fn().mockImplementation((props) => (
-    <div data-testid="chart-attr-toolbar">
-      {props.title}
-      {props.options?.map((option: any, index: number) => (
-        <div key={index}>{option.icon}</div>
-      ))}
-    </div>
-  )),
-}));
 
 const createRuntimeComponent =
   (testId: string) => (props: { title?: string; toolbarExtra?: React.ReactNode }) => (

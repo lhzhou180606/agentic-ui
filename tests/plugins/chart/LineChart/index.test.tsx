@@ -16,22 +16,19 @@ let LineChart: React.FC<any>;
 // 在测试套件开始前导入组件，避免在每个测试前重复导入
 beforeAll(async () => {
   try {
-    const LineChartModule = await import(
-      '../../../../src/Plugins/chart/LineChart/index'
-    );
+    const LineChartModule =
+      await import('../../../../src/Plugins/chart/LineChart/index');
     LineChart = LineChartModule.default;
   } catch (error) {
     // 如果上面的导入失败，尝试不带扩展名的导入
     try {
-      const LineChartModule = await import(
-        '../../../../src/Plugins/chart/LineChart/'
-      );
+      const LineChartModule =
+        await import('../../../../src/Plugins/chart/LineChart/');
       LineChart = LineChartModule.default;
     } catch (secondError) {
       // 如果都失败了，尝试从 Plugins 目录导入
-      const LineChartModule = await import(
-        '../../../../src/Plugins/chart/LineChart/index'
-      );
+      const LineChartModule =
+        await import('../../../../src/Plugins/chart/LineChart/index');
       LineChart = LineChartModule.default;
     }
   }
@@ -166,6 +163,7 @@ vi.mock('../../../../src/Plugins/chart/hooks', () => ({
     filteredDataByFilterLabel: [],
   }),
   useChartStatistics: () => null,
+  useDetectTheme: () => 'light',
 }));
 
 // Mock chart utils
@@ -276,19 +274,18 @@ describe('LineChart', () => {
           filteredDataByFilterLabel: [],
         }),
         useChartStatistics: () => null,
+        useDetectTheme: () => 'light',
       }));
 
       // 重新导入组件以应用新的mock
       let ReRenderedLineChart: React.FC<any>;
       try {
-        const LineChartModule = await import(
-          '../../../../src/Plugins/chart/LineChart/index'
-        );
+        const LineChartModule =
+          await import('../../../../src/Plugins/chart/LineChart/index');
         ReRenderedLineChart = LineChartModule.default;
       } catch (error) {
-        const LineChartModule = await import(
-          '../../../../src/Plugins/chart/LineChart/'
-        );
+        const LineChartModule =
+          await import('../../../../src/Plugins/chart/LineChart/');
         ReRenderedLineChart = LineChartModule.default;
       }
       render(<ReRenderedLineChart data={mockData} />);
@@ -471,11 +468,11 @@ describe('LineChart', () => {
         value: 100,
       };
 
-      vi.spyOn(hooks, 'useChartStatistics').mockReturnValue([statisticConfig] as any);
+      vi.spyOn(hooks, 'useChartStatistics').mockReturnValue([
+        statisticConfig,
+      ] as any);
 
-      render(
-        <LineChart data={mockData} statistic={statisticConfig} />,
-      );
+      render(<LineChart data={mockData} statistic={statisticConfig} />);
 
       // 检查是否有统计信息容器
       const chartContainer = screen.getByTestId('chart-container');
@@ -488,11 +485,11 @@ describe('LineChart', () => {
         { title: '平均值', value: 50 },
       ];
 
-      vi.spyOn(hooks, 'useChartStatistics').mockReturnValue(statisticConfigs as any);
-
-      render(
-        <LineChart data={mockData} statistic={statisticConfigs} />,
+      vi.spyOn(hooks, 'useChartStatistics').mockReturnValue(
+        statisticConfigs as any,
       );
+
+      render(<LineChart data={mockData} statistic={statisticConfigs} />);
 
       // 检查是否有统计信息容器
       const chartContainer = screen.getByTestId('chart-container');
@@ -570,19 +567,18 @@ describe('LineChart', () => {
           filteredDataByFilterLabel: [],
         }),
         useChartStatistics: () => null,
+        useDetectTheme: () => 'light',
       }));
 
       // 重新导入组件以应用新的mock
       let ReRenderedLineChart: React.FC<any>;
       try {
-        const LineChartModule = await import(
-          '../../../../src/Plugins/chart/LineChart/index'
-        );
+        const LineChartModule =
+          await import('../../../../src/Plugins/chart/LineChart/index');
         ReRenderedLineChart = LineChartModule.default;
       } catch (error) {
-        const LineChartModule = await import(
-          '../../../../src/Plugins/chart/LineChart/'
-        );
+        const LineChartModule =
+          await import('../../../../src/Plugins/chart/LineChart/');
         ReRenderedLineChart = LineChartModule.default;
       }
       render(<ReRenderedLineChart data={mockData} />);
@@ -655,9 +651,8 @@ describe('LineChart', () => {
       const downloadButton = screen.getByTestId('download-button');
       fireEvent.click(downloadButton);
 
-      const components = await import(
-        '../../../../src/Plugins/chart/components'
-      );
+      const components =
+        await import('../../../../src/Plugins/chart/components');
       expect(components.downloadChart).toHaveBeenCalled();
     });
   });
@@ -781,7 +776,7 @@ describe('LineChart', () => {
       } as any);
       vi.mocked(chartUtils.extractAndSortXValues).mockReturnValue([1, 2]);
       vi.mocked(chartUtils.findDataPointByXValue).mockImplementation(
-        (_, x) => ({ x, y: String(x * 10), type: 'A' } as any),
+        (_, x) => ({ x, y: String(x * 10), type: 'A' }) as any,
       );
 
       render(<LineChart data={filtered} />);
@@ -886,14 +881,12 @@ describe('LineChart', () => {
       // 重新导入组件以应用新的mock
       let ReRenderedLineChart: React.FC<any>;
       try {
-        const LineChartModule = await import(
-          '../../../../src/Plugins/chart/LineChart/index'
-        );
+        const LineChartModule =
+          await import('../../../../src/Plugins/chart/LineChart/index');
         ReRenderedLineChart = LineChartModule.default;
       } catch (error) {
-        const LineChartModule = await import(
-          '../../../../src/Plugins/chart/LineChart/'
-        );
+        const LineChartModule =
+          await import('../../../../src/Plugins/chart/LineChart/');
         ReRenderedLineChart = LineChartModule.default;
       }
       render(
@@ -914,11 +907,11 @@ describe('LineChart', () => {
         value: 1000,
       };
 
-      vi.spyOn(hooks, 'useChartStatistics').mockReturnValue([statisticConfig] as any);
+      vi.spyOn(hooks, 'useChartStatistics').mockReturnValue([
+        statisticConfig,
+      ] as any);
 
-      render(
-        <LineChart data={mockData} statistic={statisticConfig} />,
-      );
+      render(<LineChart data={mockData} statistic={statisticConfig} />);
 
       // 检查是否有统计信息容器
       const chartContainer = screen.getByTestId('chart-container');

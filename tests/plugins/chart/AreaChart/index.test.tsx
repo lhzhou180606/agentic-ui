@@ -109,6 +109,7 @@ vi.mock('../../../../src/Plugins/chart/hooks', () => ({
     safeData: [],
   })),
   useChartStatistics: vi.fn(() => null),
+  useDetectTheme: vi.fn(() => 'light'),
 }));
 
 // Mock utils

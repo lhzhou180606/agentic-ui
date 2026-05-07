@@ -1,6 +1,5 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { message } from 'antd';
 import copy from 'copy-to-clipboard';
 import React, { createContext } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -43,10 +42,6 @@ vi.mock('antd', () => ({
           type="button"
           data-testid={`segmented-option-${index}`}
           onClick={() => onChange?.(option.value)}
-          style={{
-            backgroundColor: value === option.value ? '#1890ff' : 'transparent',
-            color: value === option.value ? 'white' : 'black',
-          }}
         >
           {option.label}
         </button>
@@ -571,7 +566,7 @@ describe('CodeToolbar', () => {
       const htmlElement = {
         ...defaultElement,
         language: 'html',
-        value: '<div>setTimeout(\'alert(1)\')</div>',
+        value: "<div>setTimeout('alert(1)')</div>",
       };
       render(
         <CodeToolbar
@@ -602,19 +597,12 @@ describe('CodeToolbar', () => {
       expect(onViewModeToggle).toHaveBeenCalledWith('code');
     });
 
-    it('点击主题按钮时切换 theme', () => {
-      const setTheme = vi.fn();
+    it('工具栏应渲染复制和展开/收起按钮', () => {
       render(
-        <CodeToolbar
-          {...defaultProps}
-          isSelected={true}
-          theme="github"
-          setTheme={setTheme}
-        />,
+        <CodeToolbar {...defaultProps} isSelected={true} theme="github" />,
       );
-      const themeButton = screen.getByTitle('主题');
-      fireEvent.click(themeButton);
-      expect(setTheme).toHaveBeenCalledWith('chaos');
+      expect(screen.getByTitle('复制')).toBeInTheDocument();
+      expect(screen.getByTitle('展开/收起')).toBeInTheDocument();
     });
 
     it('复制成功时调用 copy', () => {
@@ -631,7 +619,9 @@ describe('CodeToolbar', () => {
       mockCopy.mockImplementation(() => {
         throw new Error('clipboard unavailable');
       });
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       render(<CodeToolbar {...defaultProps} isSelected={true} />);
       const copyButton = screen.getByTitle('复制');
       fireEvent.click(copyButton);

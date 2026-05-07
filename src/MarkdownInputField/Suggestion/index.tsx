@@ -2,8 +2,35 @@ import { Dropdown, Spin } from 'antd';
 import { useMergedState } from 'rc-util';
 import React, { useEffect, useRef, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
-import type { MarkdownEditorProps } from '../../MarkdownEditor';
-import type { TagPopupProps } from '../../MarkdownEditor/editor/elements/TagPopup';
+// SuggestionContext 提取到独立文件，打断与 TagPopup 的循环依赖
+import { SuggestionContext } from './SuggestionContext';
+
+export { SuggestionConnext, SuggestionContext } from './SuggestionContext';
+
+/**
+ * Suggestion 组件的 tagInputProps 类型定义
+ * 从 MarkdownEditorProps['tagInputProps'] 内联，避免循环依赖
+ */
+interface SuggestionTagInputProps {
+  enable?: boolean;
+  placeholder?: string;
+  type?: 'panel' | 'dropdown';
+  items?:
+    | Array<{ key: string | number; label: string }>
+    | ((
+        context: Record<string, any>,
+      ) => Promise<Array<{ key: string | number; label: string }>>);
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  dropdownRender?: (
+    content: React.ReactNode,
+    props: Record<string, any>,
+  ) => React.ReactNode;
+  menu?: React.ReactNode;
+  dropdownStyle?: React.CSSProperties;
+  notFoundContent?: React.ReactNode;
+  onChange?: (value: string) => void;
+}
 
 /**
  * Suggestion 内部维护的可点击菜单项形态
@@ -16,44 +43,6 @@ type SuggestionMenuItem = {
   key: string | number;
   onClick: () => void;
 };
-
-/**
- * 建议面板状态的 React 上下文
- *
- * 该上下文用于管理建议面板（Suggestion）的显示状态，允许组件树中的任何组件访问或修改面板的开关状态。
- *
- * @interface
- * @property {boolean} [open] - 控制建议面板是否打开的状态
- * @property {function} [setOpen] - 设置建议面板开关状态的函数
- * @example
- * // 在消费组件中使用此上下文
- * const { open, setOpen } = useContext(SuggestionContext);
- * // 打开建议面板
- * setOpen?.(true);
- */
-export const SuggestionContext = React.createContext<{
-  open?: boolean;
-  setOpen?: (open: boolean) => void;
-  isRender: true;
-  onSelectRef?: React.MutableRefObject<
-    ((value: string) => void | undefined) | undefined
-  >;
-  triggerNodeContext?: React.MutableRefObject<
-    | (TagPopupProps & {
-        text?: string;
-        placeholder?: string;
-      })
-    | undefined
-  >;
-}>({
-  isRender: true,
-});
-
-/**
- * @deprecated 拼写错误的旧名，请使用 `SuggestionContext`。
- * 保留作为向后兼容别名，将在下一个大版本移除。
- */
-export const SuggestionConnext = SuggestionContext;
 
 /**
  * Suggestion 组件 - 自动完成建议组件
@@ -101,13 +90,13 @@ export const SuggestionConnext = SuggestionContext;
  */
 export const Suggestion: React.FC<{
   children: React.ReactNode;
-  tagInputProps?: MarkdownEditorProps['tagInputProps'];
+  tagInputProps?: SuggestionTagInputProps;
 }> = (props) => {
   const onSelectRef =
     useRef<(value: string, path?: number[]) => void | undefined>(undefined);
 
   const triggerNodeContext = useRef<
-    TagPopupProps & { text?: string; placeholder?: string }
+    Record<string, any> & { text?: string; placeholder?: string }
   >(undefined);
   const {
     items = [],

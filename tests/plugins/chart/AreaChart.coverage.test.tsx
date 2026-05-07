@@ -84,6 +84,7 @@ vi.mock('../../../src/Plugins/chart/hooks', () => ({
     responsiveHeight: 240,
     isMobile: false,
   })),
+  useDetectTheme: vi.fn(() => 'light'),
 }));
 
 vi.mock('../../../src/Plugins/chart/components', () => ({

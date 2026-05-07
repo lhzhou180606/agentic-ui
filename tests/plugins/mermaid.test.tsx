@@ -16,24 +16,7 @@ vi.mock('mermaid', () => ({
   },
 }));
 
-// Mock dependencies
-vi.mock('../../src/MarkdownEditor/editor/store', () => ({
-  useEditorStore: vi.fn(() => ({
-    readonly: false,
-    markdownEditorRef: { current: null },
-  })),
-}));
-
-// Mock copy-to-clipboard at the top level
-const copyToClipboard = vi.fn().mockReturnValue(true);
-vi.mock('copy-to-clipboard', () => ({
-  default: copyToClipboard,
-}));
-
-vi.mock('../../src/MarkdownEditor/hooks/editor', () => ({
-  useSelStatus: vi.fn(() => [false, []]),
-}));
-
+// Mock copy-to-clipboard
 vi.mock('copy-to-clipboard', () => ({
   default: vi.fn(() => true),
 }));
@@ -284,12 +267,15 @@ describe('Mermaid Plugin', () => {
       });
     });
 
-    it('应该支持复制功能', () => {
+    it('应该支持复制功能', async () => {
+      const copyMod = await import('copy-to-clipboard');
+      const mockCopy = copyMod.default as ReturnType<typeof vi.fn>;
+
       const TestMermaidCopy = () => {
         const code = 'graph TD\nA --> B\nB --> C';
 
         const handleCopy = () => {
-          copyToClipboard(code);
+          mockCopy(code);
         };
 
         return (
@@ -311,7 +297,7 @@ describe('Mermaid Plugin', () => {
       const copyButton = screen.getByTestId('copy-button');
       fireEvent.click(copyButton);
 
-      expect(copyToClipboard).toHaveBeenCalledWith(
+      expect(mockCopy).toHaveBeenCalledWith(
         'graph TD\nA --> B\nB --> C',
       );
     });

@@ -13,23 +13,6 @@ vi.mock('katex', () => ({
   },
 }));
 
-// Mock dependencies
-vi.mock('../../src/MarkdownEditor/editor/store', () => ({
-  useEditorStore: vi.fn(() => ({
-    readonly: false,
-    markdownEditorRef: { current: null },
-  })),
-}));
-
-vi.mock('slate-react', () => ({
-  ReactEditor: {
-    isFocused: vi.fn(() => true),
-  },
-}));
-
-vi.mock('../../src/MarkdownEditor/hooks/editor', () => ({
-  useSelStatus: vi.fn(() => [false, []]),
-}));
 
 describe('Katex Plugin', () => {
   beforeEach(() => {
