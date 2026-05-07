@@ -15,7 +15,7 @@ vi.mock('lottie-react', () => ({
     ...props
   }: any) => (
     <div
-      data-testid="lottie-animation"
+      data-testid="lottie-mock"
       data-loop={loop}
       data-autoplay={autoplay}
       data-animation={animationData ? 'loaded' : 'empty'}
@@ -36,7 +36,7 @@ const voiceLotties = [
 describe.each(voiceLotties)('$name', ({ Component, hasAriaHidden }) => {
   it('should render with default props (autoplay=true, loop=true)', async () => {
     render(<Component />);
-    const el = await screen.findByTestId('lottie-animation');
+    const el = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(el).toHaveAttribute('data-animation', 'loaded');
     });
@@ -56,7 +56,7 @@ describe.each(voiceLotties)('$name', ({ Component, hasAriaHidden }) => {
         style={{ backgroundColor: 'green' }}
       />,
     );
-    const el = await screen.findByTestId('lottie-animation');
+    const el = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(el).toHaveAttribute('data-animation', 'loaded');
     });
@@ -67,7 +67,7 @@ describe.each(voiceLotties)('$name', ({ Component, hasAriaHidden }) => {
 
   it('should respect autoplay=false and loop=false', async () => {
     render(<Component autoplay={false} loop={false} />);
-    const el = await screen.findByTestId('lottie-animation');
+    const el = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(el).toHaveAttribute('data-animation', 'loaded');
     });

@@ -26,7 +26,7 @@ vi.mock('lottie-react', () => ({
     }
     return (
       <div
-        data-testid="lottie-animation"
+        data-testid="lottie-mock"
         data-loop={loop}
         data-autoplay={autoplay}
         data-animation={animationData ? 'loaded' : 'empty'}

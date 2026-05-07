@@ -15,7 +15,7 @@ vi.mock('lottie-react', () => ({
     ...props
   }: any) => (
     <div
-      data-testid="lottie-animation"
+      data-testid="lottie-mock"
       data-loop={loop}
       data-autoplay={autoplay}
       data-animation={animationData ? 'loaded' : 'empty'}
@@ -36,7 +36,7 @@ describe('DazingLottie Component', () => {
   it('should render with default props', async () => {
     render(<DazingLottie />);
 
-    const lottieAnimation = await screen.findByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
     });
@@ -50,7 +50,7 @@ describe('DazingLottie Component', () => {
   it('should render with custom autoplay prop', async () => {
     render(<DazingLottie autoplay={false} />);
 
-    const lottieAnimation = await screen.findByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
     });
@@ -60,7 +60,7 @@ describe('DazingLottie Component', () => {
   it('should render with custom loop prop', async () => {
     render(<DazingLottie loop={false} />);
 
-    const lottieAnimation = await screen.findByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
     });
@@ -71,7 +71,7 @@ describe('DazingLottie Component', () => {
     const customClassName = 'custom-dazing-lottie';
     render(<DazingLottie className={customClassName} />);
 
-    const lottieAnimation = await screen.findByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
     });
@@ -82,7 +82,7 @@ describe('DazingLottie Component', () => {
     const customSize = 64;
     render(<DazingLottie size={customSize} />);
 
-    const lottieAnimation = await screen.findByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
     });
@@ -97,7 +97,7 @@ describe('DazingLottie Component', () => {
     const customStyle = { border: '1px solid red', margin: '10px' };
     render(<DazingLottie style={customStyle} />);
 
-    const lottieAnimation = await screen.findByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
     });
@@ -113,7 +113,7 @@ describe('DazingLottie Component', () => {
     const customStyle = { backgroundColor: 'blue' };
     render(<DazingLottie size={customSize} style={customStyle} />);
 
-    const lottieAnimation = await screen.findByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
     });
@@ -142,7 +142,7 @@ describe('DazingLottie Component', () => {
       />,
     );
 
-    const lottieAnimation = await screen.findByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
     });
@@ -159,7 +159,7 @@ describe('DazingLottie Component', () => {
   it('should render without size prop', async () => {
     render(<DazingLottie autoplay={true} loop={true} />);
 
-    const lottieAnimation = await screen.findByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
     });
@@ -172,7 +172,7 @@ describe('DazingLottie Component', () => {
   it('should render with size 0', async () => {
     render(<DazingLottie size={0} />);
 
-    const lottieAnimation = await screen.findByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
     });
@@ -186,7 +186,7 @@ describe('DazingLottie Component', () => {
   it('should render without className prop', async () => {
     render(<DazingLottie size={32} />);
 
-    const lottieAnimation = await screen.findByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
     });
@@ -197,7 +197,7 @@ describe('DazingLottie Component', () => {
   it('should render without style prop', async () => {
     render(<DazingLottie size={32} />);
 
-    const lottieAnimation = await screen.findByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
     });
@@ -213,7 +213,7 @@ describe('DazingLottie Component', () => {
     const customStyle = { width: '100px', height: '100px' };
     render(<DazingLottie size={50} style={customStyle} />);
 
-    const lottieAnimation = await screen.findByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
     });
@@ -227,7 +227,7 @@ describe('DazingLottie Component', () => {
   it('should render with empty string className', async () => {
     render(<DazingLottie className="" />);
 
-    const lottieAnimation = await screen.findByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
     });
@@ -237,7 +237,7 @@ describe('DazingLottie Component', () => {
   it('should handle undefined autoplay and loop', async () => {
     render(<DazingLottie autoplay={undefined} loop={undefined} />);
 
-    const lottieAnimation = await screen.findByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
     });

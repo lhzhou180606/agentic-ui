@@ -77,6 +77,16 @@ export default defineConfig(({ mode }) => ({
     setupFiles: './tests/setupTests.ts',
     testTimeout: 500000,
     exclude: isFullSuite(mode) ? fullSuiteTestExcludes : defaultTestExcludes,
+    // 限制并发：full 模式文件多、内存占用大，降低并行度防止 OOM / 卡死
+    maxConcurrency: isFullSuite(mode) ? 5 : 10,
+    fileParallelism: !isFullSuite(mode),
+    // 每跑完一定数量的测试文件后回收 worker，释放内存
+    poolOptions: {
+      forks: {
+        maxForks: isFullSuite(mode) ? 2 : undefined,
+        minForks: 1,
+      },
+    },
     alias: [
       {
         find: '@ant-design/agentic-ui',

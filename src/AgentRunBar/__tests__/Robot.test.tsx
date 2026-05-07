@@ -14,7 +14,7 @@ vi.mock('lottie-react', () => ({
     ...props
   }: any) => (
     <div
-      data-testid="lottie-animation"
+      data-testid="lottie-mock"
       data-loop={loop}
       data-autoplay={autoplay}
       data-animation={animationData ? 'loaded' : 'empty'}
@@ -28,7 +28,7 @@ vi.mock('lottie-react', () => ({
 }));
 
 async function findLoadedLottie() {
-  const el = await screen.findByTestId('lottie-animation');
+  const el = await screen.findByTestId('lottie-mock');
   await waitFor(() => {
     expect(el).toHaveAttribute('data-animation', 'loaded');
   });
@@ -86,7 +86,7 @@ describe('Robot Component', () => {
     expect(screen.getByText('Custom Icon')).toBeInTheDocument();
 
     // 当有自定义图标时，不应该显示Lottie动画
-    expect(screen.queryByTestId('lottie-animation')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('lottie-mock')).not.toBeInTheDocument();
   });
 
   it('should render with custom icon and not apply size styles', async () => {
@@ -114,7 +114,7 @@ describe('Robot Component', () => {
     expect(robot).toHaveAttribute('src', customIconUrl);
 
     // 当有字符串图标时，不应该显示Lottie动画
-    expect(screen.queryByTestId('lottie-animation')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('lottie-mock')).not.toBeInTheDocument();
   });
 
   it('should apply custom className and style', async () => {
@@ -178,7 +178,7 @@ describe('Robot Component', () => {
     expect(screen.getByText('🤖')).toBeInTheDocument();
 
     // 当有自定义图标时，不应该显示Lottie动画
-    expect(screen.queryByTestId('lottie-animation')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('lottie-mock')).not.toBeInTheDocument();
   });
 
   // 测试记忆化功能
@@ -230,7 +230,7 @@ describe('Robot Component', () => {
     expect(img).toHaveAttribute('src', stringIcon);
 
     // 当有字符串图标时，不应该显示Lottie动画
-    expect(screen.queryByTestId('lottie-animation')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('lottie-mock')).not.toBeInTheDocument();
   });
 
   // 测试undefined icon
@@ -279,7 +279,7 @@ describe('Robot Component', () => {
     expect(screen.getByAltText('test')).toBeInTheDocument();
 
     // 当有复杂React元素图标时，不应该显示Lottie动画
-    expect(screen.queryByTestId('lottie-animation')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('lottie-mock')).not.toBeInTheDocument();
   });
 
   // 测试零尺寸

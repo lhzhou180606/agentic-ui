@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom/vitest';
+﻿import '@testing-library/jest-dom/vitest';
 import { MotionGlobalConfig } from 'framer-motion';
 import { JSDOM } from 'jsdom';
 import MockDate from 'mockdate';
@@ -104,8 +104,12 @@ const installCanvasMock = () => {
     mockContext.canvas = this;
     return mockContext;
   }) as any;
-  if (typeof (globalThis as any).window?.HTMLCanvasElement?.prototype !== 'undefined') {
-    (globalThis as any).window.HTMLCanvasElement.prototype.getContext = getContextFn;
+  if (
+    typeof (globalThis as any).window?.HTMLCanvasElement?.prototype !==
+    'undefined'
+  ) {
+    (globalThis as any).window.HTMLCanvasElement.prototype.getContext =
+      getContextFn;
   }
   if (typeof (globalThis as any).HTMLCanvasElement?.prototype !== 'undefined') {
     (globalThis as any).HTMLCanvasElement.prototype.getContext = getContextFn;
@@ -115,6 +119,13 @@ installCanvasMock();
 
 global.window.scrollTo = vi.fn();
 Element.prototype.scrollTo = vi.fn();
+
+// jsdom 未实现 window.open，调用处会抛「is not a function」
+Object.defineProperty(window, 'open', {
+  writable: true,
+  configurable: true,
+  value: vi.fn(() => null),
+});
 
 Object.defineProperty(global, 'navigator', {
   value: {
@@ -129,7 +140,10 @@ const idleCallbacks = new Map<number, () => void>();
 
 vi.stubGlobal(
   'requestIdleCallback',
-  vi.fn(function requestIdleCallbackStub(cb: () => void, options?: { timeout?: number }) {
+  vi.fn(function requestIdleCallbackStub(
+    cb: () => void,
+    options?: { timeout?: number },
+  ) {
     const id = ++idleCallbackIdCounter;
     idleCallbacks.set(id, cb);
     // 在测试环境中立即同步执行，避免异步操作阻塞测试
@@ -165,9 +179,18 @@ vi.stubGlobal(
   }),
 );
 
+/** React 等库常以 `console.error` / `console.warn` 输出 `Warning: ...`，测试输出里默认静默 */
+const shouldSuppressLeadingWarning = (...args: unknown[]): boolean => {
+  const first = args[0];
+  return typeof first === 'string' && first.startsWith('Warning:');
+};
+
 // 重写 console.error 来过滤 act() 警告和其他测试警告
 const originalError = console.error;
 console.error = (...args: any[]) => {
+  if (shouldSuppressLeadingWarning(...args)) {
+    return;
+  }
   if (
     (typeof args[0] === 'string' &&
       (args[0].includes('was not wrapped in act') ||
@@ -184,9 +207,12 @@ console.error = (...args: any[]) => {
   originalError.apply(console, args);
 };
 
-// 重写 console.error 来过滤 act() 警告
+// 重写 console.warn 来过滤 act() 警告
 const originalWarn = console.warn;
 console.warn = (...args: any[]) => {
+  if (shouldSuppressLeadingWarning(...args)) {
+    return;
+  }
   if (
     (typeof args[0] === 'string' &&
       (args[0].includes('was not wrapped in act') ||
@@ -206,14 +232,18 @@ Object.defineProperty(globalThis, 'cancelAnimationFrame', {
 
 // Mock requestAnimationFrame to prevent unhandled errors in tests
 Object.defineProperty(globalThis, 'requestAnimationFrame', {
-  value: vi.fn(function requestAnimationFrameStub(callback: FrameRequestCallback) {
+  value: vi.fn(function requestAnimationFrameStub(
+    callback: FrameRequestCallback,
+  ) {
     return setTimeout(callback, 16); // ~60fps
   }),
   writable: true,
 });
 
 Object.defineProperty(globalThis.window, 'requestAnimationFrame', {
-  value: vi.fn(function windowRequestAnimationFrameStub(callback: FrameRequestCallback) {
+  value: vi.fn(function windowRequestAnimationFrameStub(
+    callback: FrameRequestCallback,
+  ) {
     return setTimeout(callback, 16); // ~60fps
   }),
   writable: true,

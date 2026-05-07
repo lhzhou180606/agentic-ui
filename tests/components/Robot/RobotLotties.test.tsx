@@ -38,7 +38,7 @@ const robotLotties = [
 describe.each(robotLotties)('$name', ({ Component }) => {
   it('should render with default props (autoplay, loop, aria-hidden, size=32)', async () => {
     render(<Component />);
-    const el = await screen.findByTestId('lottie-animation');
+    const el = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(el).toHaveAttribute('data-animation', 'loaded');
     });
@@ -57,7 +57,7 @@ describe.each(robotLotties)('$name', ({ Component }) => {
         style={{ backgroundColor: 'blue' }}
       />,
     );
-    const el = await screen.findByTestId('lottie-animation');
+    const el = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(el).toHaveAttribute('data-animation', 'loaded');
     });
@@ -68,7 +68,7 @@ describe.each(robotLotties)('$name', ({ Component }) => {
 
   it('should respect autoplay=false and loop=false', async () => {
     render(<Component autoplay={false} loop={false} />);
-    const el = await screen.findByTestId('lottie-animation');
+    const el = await screen.findByTestId('lottie-mock');
     await waitFor(() => {
       expect(el).toHaveAttribute('data-animation', 'loaded');
     });
