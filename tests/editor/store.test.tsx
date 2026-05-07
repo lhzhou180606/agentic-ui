@@ -2274,17 +2274,24 @@ describe('EditorStore', () => {
 
   describe('setMDContent _setShortContent 解析失败', () => {
     it('parserMdToSchema 抛错时应向上抛出', () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       const parserSpy = vi.spyOn(parserMdToSchemaModule, 'parserMdToSchema');
       parserSpy.mockImplementationOnce(() => {
         throw new Error('parse error');
       });
       expect(() => store.setMDContent('# bad')).toThrow('parse error');
       parserSpy.mockRestore();
+      consoleErrorSpy.mockRestore();
     });
   });
 
   describe('setContent 与 setMDContent 同步长内容', () => {
     it('_setLongContentSync 解析失败时应抛出', () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       const parserSpy = vi.spyOn(parserMdToSchemaModule, 'parserMdToSchema');
       let callCount = 0;
       parserSpy.mockImplementation((md: string, plugins?: any) => {
@@ -2300,6 +2307,7 @@ describe('EditorStore', () => {
         store.setMDContent(longContent, undefined, { useRAF: false }),
       ).toThrow();
       parserSpy.mockRestore();
+      consoleErrorSpy.mockRestore();
     });
   });
 
