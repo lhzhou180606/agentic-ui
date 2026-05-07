@@ -2,20 +2,20 @@ import React from 'react';
 
 export const LOADING_SIZE = 16;
 
-export const COLLAPSE_VARIANTS = {
-  expanded: { height: 'auto', opacity: 1 },
-  collapsed: { height: 0, opacity: 0 },
-};
-
-export const COLLAPSE_TRANSITION = {
-  height: { duration: 0.35, ease: [0.4, 0, 0.2, 1] },
-  opacity: { duration: 0.25, ease: [0.4, 0, 0.2, 1] },
-};
-
-export const getArrowRotation = (collapsed: boolean): React.CSSProperties => ({
-  transform: collapsed ? 'rotate(0deg)' : 'rotate(180deg)',
+const ARROW_STYLE_COLLAPSED: React.CSSProperties = {
+  transform: 'rotate(0deg)',
   transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-});
+};
+
+const ARROW_STYLE_EXPANDED: React.CSSProperties = {
+  transform: 'rotate(180deg)',
+  transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+};
+
+export const getArrowRotation = (
+  collapsed: boolean,
+): React.CSSProperties =>
+  collapsed ? ARROW_STYLE_COLLAPSED : ARROW_STYLE_EXPANDED;
 
 export const hasTaskContent = (
   content: React.ReactNode | React.ReactNode[],

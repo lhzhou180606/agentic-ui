@@ -2,7 +2,14 @@ import { ChevronUp } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import { useMergedState } from 'rc-util';
-import React, { memo, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { ActionIconBox } from '../Components/ActionIconBox';
 import { useRefFunction } from '../Hooks/useRefFunction';
 import { I18nContext } from '../I18n';
@@ -81,13 +88,13 @@ export const TaskList = memo(
       };
     }, [simpleExpanded]);
 
-    const { summaryStatus, summaryText, isCancelled, lastItem } =
+    const { summaryStatus, summaryText, hasError, lastItem } =
       useMemo(() => {
         const completedCount = items.filter(
           (i) => i.status === 'success',
         ).length;
         const loadingItem = items.find((i) => i.status === 'loading');
-        const hasError = items.some((i) => i.status === 'error');
+        const errorExists = items.some((i) => i.status === 'error');
         const allDone = completedCount === items.length && items.length > 0;
 
         let status: TaskStatus = 'pending';
@@ -106,7 +113,7 @@ export const TaskList = memo(
               ? String(title)
               : '';
           text = tpl.replace('${taskName}', taskName);
-        } else if (hasError) {
+        } else if (errorExists) {
           status = 'error';
           const tpl = locale?.['taskList.taskInProgress'] || '正在进行任务';
           text = tpl.replace('${taskName}', '');
@@ -115,24 +122,27 @@ export const TaskList = memo(
         return {
           summaryStatus: status,
           summaryText: text,
-          isCancelled: hasError,
+          hasError: errorExists,
           lastItem: items[items.length - 1] as TaskItem | undefined,
         };
       }, [items, locale]);
 
-    const renderItems = (visibleItems: TaskItem[]) => {
-      return visibleItems.map((item, index) => (
-        <TaskListItem
-          key={item.key}
-          item={item}
-          isLast={index === visibleItems.length - 1}
-          prefixCls={prefixCls}
-          hashId={hashId}
-          expandedKeys={internalExpandedKeys}
-          onToggle={handleToggle}
-        />
-      ));
-    };
+    const renderItems = useCallback(
+      (visibleItems: TaskItem[]) => {
+        return visibleItems.map((item, index) => (
+          <TaskListItem
+            key={item.key}
+            item={item}
+            isLast={index === visibleItems.length - 1}
+            prefixCls={prefixCls}
+            hashId={hashId}
+            expandedKeys={internalExpandedKeys}
+            onToggle={handleToggle}
+          />
+        ));
+      },
+      [prefixCls, hashId, internalExpandedKeys, handleToggle],
+    );
 
     if (variant !== 'simple') {
       return wrapSSR(
@@ -148,7 +158,7 @@ export const TaskList = memo(
       : locale?.['taskList.expand'] || '展开';
 
     const visibleItems = simpleExpanded
-      ? isCancelled
+      ? hasError
         ? items.slice(-1)
         : items
       : lastItem

@@ -32,7 +32,6 @@ export const TaskListItem: React.FC<TaskListItemProps> = memo(
 
     return (
       <div
-        key={item.key}
         className={classNames(`${prefixCls}-thoughtChainItem`, hashId)}
         data-testid="task-list-thoughtChainItem"
       >
