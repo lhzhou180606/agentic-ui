@@ -8,6 +8,80 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('../BorderBeamAnimation', () => ({
+  BorderBeamAnimation: () => null,
+}));
+
+vi.mock('../Suggestion', () => ({
+  Suggestion: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+vi.mock('../SkillModeBar', () => ({
+  SkillModeBar: () => null,
+}));
+
+vi.mock('../TopOperatingArea', () => ({
+  default: () => null,
+}));
+
+vi.mock('../QuickActions', () => ({
+  QuickActions: React.forwardRef(() => null),
+}));
+
+vi.mock('../SendActions', () => ({
+  SendActions: ({
+    voiceRecognizer,
+    recording,
+    disabled,
+    onStartRecording,
+    onStopRecording,
+    onSend,
+  }: {
+    voiceRecognizer?: unknown;
+    recording?: boolean;
+    disabled?: boolean;
+    onStartRecording?: () => Promise<void>;
+    onStopRecording?: () => Promise<void>;
+    onSend?: () => void;
+  }) => {
+    return (
+      <div data-testid="send-actions-mock">
+        {voiceRecognizer ? (
+          <button
+            type="button"
+            data-testid="voice-input-button"
+            aria-pressed={recording ? 'true' : 'false'}
+            className={
+              disabled
+                ? 'ant-agentic-md-input-field-voice-button-disabled'
+                : recording
+                  ? 'ant-agentic-md-input-field-voice-button-recording'
+                  : ''
+            }
+            onClick={() => {
+              if (disabled) return;
+              if (recording) {
+                void onStopRecording?.();
+              } else {
+                void onStartRecording?.();
+              }
+            }}
+          >
+            Voice
+          </button>
+        ) : null}
+        <button
+          type="button"
+          data-testid="send-button"
+          onClick={() => onSend?.()}
+        >
+          Send
+        </button>
+      </div>
+    );
+  },
+}));
+
 describe('MarkdownInputField - toolsRender', () => {
   it('should render custom tools when toolsRender is provided', () => {
     const toolsRender = () => [
