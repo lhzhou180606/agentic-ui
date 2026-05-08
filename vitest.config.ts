@@ -2,13 +2,13 @@ import path from 'path';
 import { defineConfig } from 'vitest/config';
 
 /**
- * 默认排除「非单元」或「纯覆盖率补洞」测试，降低 `pnpm test` 用例数量与耗时。
+ * 默认排除「非单元」或「纯覆盖率补洞」测试，降低 pnpm test 用例数量与耗时。
  * 全量套件（与 Codecov 任务一致）用以下任一方式：
- * - `pnpm run test:full` / `pnpm run test:coverage:full`（推荐，使用 `--mode full`）
- * - `VITEST_FULL_SUITE=1 pnpm test`（兼容仅设环境变量、无 `--mode` 的场景）
+ * - pnpm run test:full / pnpm run test:coverage:full（推荐，使用 --mode full）
+ * - VITEST_FULL_SUITE=1 pnpm test（兼容仅设环境变量、无 --mode 的场景）
  *
- * 备注：所有测试文件已从 `tests/` 迁移到 `src/<Component>/__tests__/`，
- * 故路径模式从 `**/tests/X/**` 改为 `**/src/X/__tests__/**`。
+ * 备注：所有测试文件已从 tests/ 迁移到 src/Component/__tests__/，
+ * 故路径模式从 tests/X 改为 src/X/__tests__。
  */
 const defaultTestExcludes = [
   '**/node_modules/**',
