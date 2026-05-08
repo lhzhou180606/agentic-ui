@@ -362,7 +362,7 @@ const handleClick = (
 };
 
 export const TagPopup = (props: RenderProps) => {
-  const { onSelect, items, children, type } = props || {};
+  const { onSelect, items, children, type } = props;
   const editor = useSlate();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -391,7 +391,7 @@ export const TagPopup = (props: RenderProps) => {
   }, [props.text]);
 
   const [selectedItems, setSelectedItems] = useState(() => {
-    return typeof items === 'function' ? [] : items || [];
+    return typeof items === 'function' ? [] : items ?? [];
   });
 
   useEffect(() => {

@@ -183,6 +183,15 @@ export const ActionItemContainer = (props: ActionItemContainerProps) => {
     toEntries(props.children),
   );
 
+  // 提取 children 的 key 序列用于比较，避免 props.children 每次渲染新引用导致 effect 过度触发
+  const childrenKeys = useMemo(
+    () =>
+      React.Children.toArray(props.children)
+        .filter(React.isValidElement)
+        .map((child) => child.key),
+    [props.children],
+  );
+
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') return;
     let hasMissingKey = false;
@@ -200,7 +209,7 @@ export const ActionItemContainer = (props: ActionItemContainerProps) => {
         'ActionItemContainer: all children must include an explicit `key` prop.',
       );
     }
-  }, [props.children]);
+  }, [childrenKeys]);
 
   // keep ordered list in sync when children change; preserve existing order by key when possible
   useEffect(() => {
@@ -228,7 +237,7 @@ export const ActionItemContainer = (props: ActionItemContainerProps) => {
     // 数量对不上（例如批量替换）时直接采用 incoming
     setOrdered(merged.length === incoming.length ? merged : incoming);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.children]);
+  }, [childrenKeys]);
 
   // 辅助函数：重新排序数组
   const reorder = useRefFunction(

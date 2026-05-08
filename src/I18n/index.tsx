@@ -198,7 +198,7 @@ export const I18nProvide: React.FC<{
         saveUserLanguage(newLanguage);
       }
     }
-  }, [antdContext?.locale, autoDetect, language]);
+  }, [antdContext?.locale?.locale, autoDetect, language]);
 
   // 语言切换处理函数
   const setLanguage = useCallback((newLanguage: 'zh-CN' | 'en-US') => {

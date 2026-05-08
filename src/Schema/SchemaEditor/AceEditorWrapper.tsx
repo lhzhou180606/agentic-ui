@@ -38,6 +38,8 @@ export const AceEditorWrapper: React.FC<AceEditorWrapperProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<Ace.Editor>();
   const valueRef = useRef(value);
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
   const aceModuleRef = useRef<typeof import('ace-builds') | null>(null);
   const [aceLoaded, setAceLoaded] = useState(false);
 
@@ -94,12 +96,12 @@ export const AceEditorWrapper: React.FC<AceEditorWrapperProps> = ({
         }, 16);
 
         // 配置编辑器事件
-        if (!readonly && onChange) {
+        if (!readonly && onChangeRef.current) {
           codeEditor.on('change', () => {
             const newValue = codeEditor.getValue();
             if (newValue !== valueRef.current) {
               valueRef.current = newValue;
-              onChange(newValue);
+              onChangeRef.current?.(newValue);
             }
           });
         }

@@ -8,6 +8,8 @@ import React, {
   useState,
 } from 'react';
 import ButtonTab from './ButtonTab';
+
+const EMPTY_ITEMS: ButtonTabGroupProps['items'] = [];
 import { useStyle } from './ButtonTabGroupStyle';
 
 export interface ButtonTabItem {
@@ -39,7 +41,7 @@ export interface ButtonTabGroupProps {
 }
 
 const ButtonTabGroupComponent: React.FC<ButtonTabGroupProps> = ({
-  items = [],
+  items = EMPTY_ITEMS,
   activeKey,
   defaultActiveKey,
   onChange,

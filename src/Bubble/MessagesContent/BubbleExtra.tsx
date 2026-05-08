@@ -365,7 +365,7 @@ export const BubbleExtra = ({
 
   useEffect(() => {
     props.onRenderExtraNull?.(!dom && !reSend);
-  }, [dom, reSend]);
+  }, [dom, reSend, props.onRenderExtraNull]);
 
   // 检查是否有任何内容需要渲染
   const hasLeftContent = (typing && originalData.content !== '...') || reSend;

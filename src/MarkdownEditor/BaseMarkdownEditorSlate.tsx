@@ -80,6 +80,11 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
 
   const [editorMountStatus, setMountedStatus] = useState(false);
   const [isEditorFocused, setIsEditorFocused] = useState(false);
+  const isEditorFocusedRef = useRef(false);
+  const setEditorFocused = useCallback((focused: boolean) => {
+    isEditorFocusedRef.current = focused;
+    setIsEditorFocused(focused);
+  }, []);
   const keyTask$ = useMemo(
     () =>
       new Subject<{
@@ -110,7 +115,7 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
 
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        isEditorFocused &&
+        isEditorFocusedRef.current &&
         markdownContainerRef.current &&
         !markdownContainerRef.current.contains(event.target as Node)
       ) {
@@ -125,14 +130,14 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
           markdownEditorRef.current?.children,
           event as any,
         );
-        setIsEditorFocused(false);
+        setEditorFocused(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [readonly, rest?.onBlur, props.plugins, isEditorFocused]);
+  }, [readonly, rest?.onBlur, props.plugins, setEditorFocused]);
 
   useEffect(() => {
     const handleEditorFocus = () => {
@@ -140,7 +145,7 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
         markdownContainerRef.current?.contains(document.activeElement) ||
         markdownContainerRef.current === document.activeElement
       ) {
-        setIsEditorFocused(true);
+        setEditorFocused(true);
       }
     };
 

@@ -15,6 +15,8 @@ import React, {
 import { I18nContext, compileTemplate } from '../../I18n';
 import { LowCodeSchema, SchemaProperty } from '../types';
 
+const EMPTY_COMPONENT = { properties: {} };
+
 export interface SchemaFormProps {
   schema: LowCodeSchema;
   onValuesChange?: (
@@ -83,7 +85,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
   readonly = false,
 }) => {
   const [form] = Form.useForm();
-  const { properties = {} } = schema?.component || {};
+  const { properties = {} } = schema?.component ?? EMPTY_COMPONENT;
   const { locale } = useContext(I18nContext);
 
   // 生成表单验证规则

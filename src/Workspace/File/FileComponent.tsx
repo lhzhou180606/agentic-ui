@@ -154,7 +154,7 @@ export const FileComponent: FC<{
       handleBackToList();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetKey]);
+  }, [resetKey, previewFile]);
 
   // nodes 变化 → 同步更新 previewFile（保持预览内容跟随外部数据）
   useEffect(() => {

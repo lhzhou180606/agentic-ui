@@ -17,6 +17,10 @@ import {
 } from '../../Utils/proxySandbox';
 import { LowCodeSchema } from '../types';
 import { mdDataSchemaValidator } from '../validator';
+
+const EMPTY_SCHEMA: LowCodeSchema = {} as LowCodeSchema;
+const EMPTY_COMPONENT = {};
+const EMPTY_INITIAL_VALUES = {};
 import { TemplateEngine } from './templateEngine';
 export * from './templateEngine';
 
@@ -358,10 +362,10 @@ const SchemaRendererComponent: React.FC<SchemaRendererProps> = ({
   const [renderError, setRenderError] = useState<string | null>(null);
 
   // 安全地获取 schema 属性
-  const safeSchema = schema || {};
-  const safeComponent = safeSchema.component || {};
+  const safeSchema = schema ?? EMPTY_SCHEMA;
+  const safeComponent = safeSchema.component ?? EMPTY_COMPONENT;
 
-  const initialValues = safeSchema.initialValues || {};
+  const initialValues = safeSchema.initialValues ?? EMPTY_INITIAL_VALUES;
 
   // 验证 schema
   const validationResult = useMemo(() => {

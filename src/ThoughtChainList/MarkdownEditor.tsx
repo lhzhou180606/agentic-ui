@@ -18,7 +18,7 @@ export const MarkdownEditorUpdate = (
     editorRef.current?.store?.updateNodeList(
       parserMdToSchema(formatted.trim(), props.plugins).schema,
     );
-  }, [props.initValue]);
+  }, [props.initValue, props.plugins]);
 
   useEffect(() => {
     if (props.isFinished) {
@@ -27,7 +27,7 @@ export const MarkdownEditorUpdate = (
         props.plugins,
       );
     }
-  }, [props.isFinished]);
+  }, [props.isFinished, props.initValue, props.plugins]);
 
   return (
     <MarkdownEditor

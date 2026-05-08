@@ -267,7 +267,7 @@ const Workspace: FC<WorkspaceProps> & {
       const firstKey = availableTabs[0].key;
       if (!isControlled) setInternalActiveTab(firstKey);
       onTabChange?.(firstKey);
-    } else if (isControlled) {
+    } else if (isControlled && currentKey !== internalActiveTab) {
       setInternalActiveTab(currentKey!);
     }
   }, [availableTabs, activeTabKey, internalActiveTab, onTabChange]);

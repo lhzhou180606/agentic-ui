@@ -155,6 +155,8 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
   const [currentRightWidth, setCurrentRightWidth] = useState<number>(() =>
     clampRightWidthMaxOnly(rightWidth, computeMaxRightWidth()),
   );
+  const currentRightWidthRef = useRef(currentRightWidth);
+  currentRightWidthRef.current = currentRightWidth;
   const isResizingRef = useRef(false);
   const resizeStartX = useRef<number>(0);
   const resizeStartWidth = useRef<number>(rightWidth);
@@ -174,7 +176,7 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
   useEffect(() => {
     const handleWindowResize = () => {
       const maxWidth = getMaxRightWidth();
-      if (currentRightWidth > maxWidth) {
+      if (currentRightWidthRef.current > maxWidth) {
         setCurrentRightWidth(maxWidth);
       }
     };
@@ -183,7 +185,7 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
     return () => {
       window.removeEventListener('resize', handleWindowResize);
     };
-  }, [currentRightWidth, getMaxRightWidth]);
+  }, [getMaxRightWidth]);
 
   // 持有最近一次注册到 document 的 listener 引用，用于卸载时清理。
   // 不放入依赖数组，避免拖拽过程中 callback 引用变化引发 effect 反复 re-bind。

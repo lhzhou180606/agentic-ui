@@ -572,5 +572,5 @@ export const useSystemKeyboard = (
     return () => {
       markdownContainerRef?.current?.removeEventListener('keydown', keydown);
     };
-  }, []);
+  }, [store, props.readonly, keydown, markdownContainerRef]);
 };
