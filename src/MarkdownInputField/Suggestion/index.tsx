@@ -1,3 +1,4 @@
+import type { MenuProps } from 'antd';
 import { Dropdown, Spin } from 'antd';
 import { useMergedState } from 'rc-util';
 import React, { useEffect, useRef, useState } from 'react';
@@ -26,7 +27,11 @@ interface SuggestionTagInputProps {
     content: React.ReactNode,
     props: Record<string, any>,
   ) => React.ReactNode;
-  menu?: React.ReactNode;
+  /**
+   * 直接透传给 antd `Dropdown.menu`，与 antd 类型保持一致。
+   * 之前误标为 `React.ReactNode` 导致下游使用处 TS 报错。
+   */
+  menu?: MenuProps;
   dropdownStyle?: React.CSSProperties;
   notFoundContent?: React.ReactNode;
   onChange?: (value: string) => void;
