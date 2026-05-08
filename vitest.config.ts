@@ -17,29 +17,18 @@ const defaultTestExcludes = [
   '**/e2e/**',
   '**/*.spec.ts',
   '**/*.spec.tsx',
-  /** 性能 / 基准，按需：`pnpm run bench:parsemd` 或 `VITEST_FULL_SUITE=1` */
+  /**
+   * 性能 / 基准（按需：`pnpm run bench:parsemd` 或 `pnpm run test:full`）
+   * 已统一为 .benchmark 后缀
+   */
   '**/*.benchmark.test.ts',
   '**/*.benchmark.test.tsx',
-  '**/*.performance.test.ts',
-  '**/*.performance.test.tsx',
-  /** 覆盖率定向 / 大而全的重复场景，全量 CI 再跑 */
-  '**/*targeted-coverage*.test.ts',
-  '**/*targeted-coverage*.test.tsx',
-  '**/*comprehensive*.test.ts',
-  '**/*comprehensive*.test.tsx',
-  /** 分支 / 覆盖率补洞 / 增强断言等重复套件 */
+  /**
+   * 分支补洞（统一后缀，原 .coverage / .targeted / .targeted-coverage /
+   * .comprehensive / .disabled-coverage / .enhanced 已合并到 .branches）
+   */
   '**/*.branches.test.ts',
   '**/*.branches.test.tsx',
-  '**/*.coverage.test.ts',
-  '**/*.coverage.test.tsx',
-  '**/*.enhanced.test.ts',
-  '**/*.enhanced.test.tsx',
-  '**/*.assertions.test.ts',
-  '**/*.assertions.test.tsx',
-  '**/*.targeted.test.ts',
-  '**/*.targeted.test.tsx',
-  '**/*missing-coverage.test.ts',
-  '**/*missing-coverage.test.tsx',
   /** 迁移产生的冲突保留文件：与原 src/__tests__ 重复，全量再跑 */
   '**/*.from-tests.test.ts',
   '**/*.from-tests.test.tsx',

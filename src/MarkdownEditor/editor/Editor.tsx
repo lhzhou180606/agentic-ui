@@ -394,7 +394,8 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     if (nodeRef.current !== props.instance) {
       initialNote();
     }
-  }, [props.instance, markdownEditorRef.current]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- markdownEditorRef.current 是可变 ref，此处需在编辑器实例变化时重新执行
+  }, [props.instance]);
 
   useEffect(() => {
     const footnoteDefinitionList = markdownEditorRef.current.children
@@ -409,7 +410,8 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
         };
       });
     props?.fncProps?.onFootnoteDefinitionChange?.(footnoteDefinitionList);
-  }, [markdownEditorRef.current?.children]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- markdownEditorRef.current?.children 是可变 ref，Slate 编辑器内容变化时需重新执行
+  }, [props?.fncProps?.onFootnoteDefinitionChange]);
 
   // 非hook变量声明
   const { prefixCls = '$' } = props.tagInputProps || {};

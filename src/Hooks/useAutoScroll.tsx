@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
 const SCROLL_TOLERANCE = 20;
 /** 视为"已脱离底部"的阈值，区别于 SCROLL_TOLERANCE，用于跟随判定的滞回区 */
@@ -124,7 +124,7 @@ export const useAutoScroll = <T extends HTMLDivElement>(
   const onResizeRef = useRef(props.onResize);
   const onScrollStateChangeRef = useRef(props.onScrollStateChange);
   const scrollBehaviorRef = useRef(props.scrollBehavior);
-  useEffect(() => {
+  useLayoutEffect(() => {
     onResizeRef.current = props.onResize;
     onScrollStateChangeRef.current = props.onScrollStateChange;
     scrollBehaviorRef.current = props.scrollBehavior;
