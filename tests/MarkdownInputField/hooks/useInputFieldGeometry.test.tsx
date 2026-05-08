@@ -64,39 +64,40 @@ describe('useInputFieldGeometry', () => {
     });
   });
 
-  describe('返回值结构与 setter', () => {
-    it('暴露 inputRef、collapseSendActions、3 个 setter 与样式派生值', () => {
+  describe('返回值结构与稳定回调', () => {
+    it('暴露 inputRef、collapseSendActions、2 个稳定回调与样式派生值', () => {
       const { result } = renderHook(() => useInputFieldGeometry(baseParams));
 
       expect(result.current).toHaveProperty('inputRef');
       expect(result.current).toHaveProperty('collapseSendActions');
-      expect(result.current).toHaveProperty('setRightPadding');
-      expect(result.current).toHaveProperty('setTopRightPadding');
-      expect(result.current).toHaveProperty('setQuickRightOffset');
+      // 由原 3 个内部 setter 合并为 2 个稳定回调，直接传给子组件 onResize。
+      expect(result.current).toHaveProperty('onSendActionsResize');
+      expect(result.current).toHaveProperty('onQuickActionsResize');
+      expect(typeof result.current.onSendActionsResize).toBe('function');
+      expect(typeof result.current.onQuickActionsResize).toBe('function');
       expect(result.current).toHaveProperty('computedRightPadding');
       expect(result.current).toHaveProperty('collapsedHeightPx');
       expect(result.current).toHaveProperty('computedMinHeight');
       expect(result.current).toHaveProperty('enlargedStyle');
     });
 
-    it('setRightPadding 更新后 computedRightPadding 同步变化', () => {
+    it('onSendActionsResize 更新后 computedRightPadding 同步变化', () => {
       const { result } = renderHook(() => useInputFieldGeometry(baseParams));
 
       act(() => {
-        result.current.setRightPadding(100);
+        result.current.onSendActionsResize(100);
       });
 
       // hasTools=false 时 bottomOverlay = rightPadding(100)，topOverlay = 0
       expect(result.current.computedRightPadding).toBe(100);
     });
 
-    it('setTopRightPadding + setQuickRightOffset 累加进入 topOverlay', () => {
+    it('onSendActionsResize + onQuickActionsResize 累加进入 topOverlay', () => {
       const { result } = renderHook(() => useInputFieldGeometry(baseParams));
 
       act(() => {
-        result.current.setRightPadding(20);
-        result.current.setTopRightPadding(40);
-        result.current.setQuickRightOffset(30);
+        result.current.onSendActionsResize(20);
+        result.current.onQuickActionsResize(40, 30);
       });
 
       // bottomOverlay=20, topOverlay=70 → 取较大值
@@ -109,8 +110,8 @@ describe('useInputFieldGeometry', () => {
       );
 
       act(() => {
-        result.current.setRightPadding(200);
-        result.current.setTopRightPadding(35);
+        result.current.onSendActionsResize(200);
+        result.current.onQuickActionsResize(35, 0);
       });
 
       expect(result.current.computedRightPadding).toBe(35);
@@ -120,7 +121,7 @@ describe('useInputFieldGeometry', () => {
       const { result } = renderHook(() => useInputFieldGeometry(baseParams));
 
       act(() => {
-        result.current.setRightPadding(0);
+        result.current.onSendActionsResize(0);
       });
 
       // bottomOverlay = rightPadding || 52 → 52，topOverlay 默认 0

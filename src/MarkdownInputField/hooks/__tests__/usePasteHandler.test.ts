@@ -50,7 +50,10 @@ describe('usePasteHandler', () => {
     const { result } = renderHook(() => usePasteHandler(params));
     const e = { clipboardData: { items: [] } } as any;
     await result.current.handlePaste(e);
-    expect(mockGetFileListFromDataTransferItems).toHaveBeenCalledWith(e);
+    // 源码现在传的是 e.clipboardData，而非整个事件对象（与 DOM API 签名一致）。
+    expect(mockGetFileListFromDataTransferItems).toHaveBeenCalledWith(
+      e.clipboardData,
+    );
     expect(mockUpLoadFileToServer).toHaveBeenCalled();
   });
 
