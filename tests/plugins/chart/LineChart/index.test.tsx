@@ -250,19 +250,11 @@ describe('LineChart', () => {
         { x: 2, y: 20, type: 'Series 1' },
       ];
 
-      // 重新mock useChartDataFilter 以返回特定数据
-      vi.mock('../../../../src/Plugins/chart/hooks', () => ({
-        useResponsiveSize: () => ({
-          responsiveWidth: 600,
-          responsiveHeight: 400,
-          isMobile: false,
-        }),
-        useChartTheme: () => ({
-          axisTextColor: '#333',
-          gridColor: '#ccc',
-          isLight: true,
-        }),
-        useChartDataFilter: () => ({
+      // 通过 spy 临时替换 useChartDataFilter 的返回值，
+      // 避免在 it() 内部调用 vi.mock（会被提升到顶层并触发 vitest 警告）
+      const filterSpy = vi
+        .spyOn(hooks, 'useChartDataFilter')
+        .mockReturnValue({
           filteredData: mockFilteredData,
           filterOptions: ['All', 'Series 1'],
           filterLabels: [],
@@ -271,25 +263,13 @@ describe('LineChart', () => {
           selectedFilterLabel: '',
           setSelectedFilterLabel: vi.fn(),
           filteredDataByFilterLabel: [],
-        }),
-        useChartStatistics: () => null,
-        useDetectTheme: () => 'light',
-      }));
+        } as any);
 
-      // 重新导入组件以应用新的mock
-      let ReRenderedLineChart: React.FC<any>;
-      try {
-        const LineChartModule =
-          await import('../../../../src/Plugins/chart/LineChart/index');
-        ReRenderedLineChart = LineChartModule.default;
-      } catch (error) {
-        const LineChartModule =
-          await import('../../../../src/Plugins/chart/LineChart/');
-        ReRenderedLineChart = LineChartModule.default;
-      }
-      render(<ReRenderedLineChart data={mockData} />);
+      render(<LineChart data={mockData} />);
 
       expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+
+      filterSpy.mockRestore();
     });
 
     it('应该正确处理x值提取和排序', async () => {
@@ -543,46 +523,21 @@ describe('LineChart', () => {
 
   describe('响应式设计测试', () => {
     it('应该正确处理移动端显示', async () => {
-      // 重新mock useResponsiveSize 以返回移动端配置
-      vi.mock('../../../../src/Plugins/chart/hooks', () => ({
-        useResponsiveSize: () => ({
+      // 通过 spy 临时替换 useResponsiveSize 的返回值为移动端配置，
+      // 避免在 it() 内部调用 vi.mock（会被提升到顶层并触发 vitest 警告）
+      const responsiveSpy = vi
+        .spyOn(hooks, 'useResponsiveSize')
+        .mockReturnValue({
           responsiveWidth: 300,
           responsiveHeight: 200,
           isMobile: true,
-        }),
-        useChartTheme: () => ({
-          axisTextColor: '#333',
-          gridColor: '#ccc',
-          isLight: true,
-        }),
-        useChartDataFilter: () => ({
-          filteredData: [],
-          filterOptions: [],
-          filterLabels: [],
-          selectedFilter: '',
-          setSelectedFilter: vi.fn(),
-          selectedFilterLabel: '',
-          setSelectedFilterLabel: vi.fn(),
-          filteredDataByFilterLabel: [],
-        }),
-        useChartStatistics: () => null,
-        useDetectTheme: () => 'light',
-      }));
+        } as any);
 
-      // 重新导入组件以应用新的mock
-      let ReRenderedLineChart: React.FC<any>;
-      try {
-        const LineChartModule =
-          await import('../../../../src/Plugins/chart/LineChart/index');
-        ReRenderedLineChart = LineChartModule.default;
-      } catch (error) {
-        const LineChartModule =
-          await import('../../../../src/Plugins/chart/LineChart/');
-        ReRenderedLineChart = LineChartModule.default;
-      }
-      render(<ReRenderedLineChart data={mockData} />);
+      render(<LineChart data={mockData} />);
 
       expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+
+      responsiveSpy.mockRestore();
     });
 
     it('应该正确处理尺寸配置', () => {

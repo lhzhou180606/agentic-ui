@@ -1795,6 +1795,11 @@ describe('Editor branches - decorateFn', () => {
       throw new Error('hasPath error');
     });
 
+    // 源码在高亮计算失败时会通过 console.error 输出
+    // "[highlight] 高亮计算失败:"，本用例正是构造该异常路径，需要静默
+    const errorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     renderEditor({
@@ -1820,6 +1825,7 @@ describe('Editor branches - decorateFn', () => {
 
     expect(result).toEqual([]);
     consoleSpy.mockRestore();
+    errorSpy.mockRestore();
   });
 });
 

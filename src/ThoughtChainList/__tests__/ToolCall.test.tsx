@@ -541,6 +541,13 @@ describe('ToolCall Component', () => {
 
   describe('错误处理测试', () => {
     it('应该处理 JSON.stringify 错误', () => {
+      // 当组件渲染抛错时 React 会通过 console.error 打印
+      // "The above error occurred in the <ToolCall> component"，
+      // 此处刻意构造循环引用触发异常，静默该日志避免污染测试输出
+      const errorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
       const circularProps = {
         ...mockProps,
         input: {
@@ -560,6 +567,8 @@ describe('ToolCall Component', () => {
         // 如果抛出错误，也是可以接受的，因为这是预期的行为
         expect(error).toBeDefined();
       }
+
+      errorSpy.mockRestore();
     });
     it('应该处理无效的 markdownRenderProps', () => {
       const invalidProps = {

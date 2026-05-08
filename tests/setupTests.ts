@@ -113,6 +113,31 @@ Object.defineProperty(window, 'open', {
   value: vi.fn(() => null),
 });
 
+// happy-dom 的 HTMLAnchorElement.prototype.click 会 dispatch 一个 PointerEvent，
+// 并在 anchor 自身的 dispatchEvent override 里调用 window.open(href, ...)，
+// 而 detached frame 中的 URL 构造函数无法工作，导致 stderr 抛出 "URL is not a constructor"。
+// 测试环境里我们只关心点击事件被触发，不关心导航行为，因此用一个 MouseEvent 模拟点击，
+// 跳过 happy-dom 的 navigate 副作用。
+if (typeof globalThis.HTMLAnchorElement !== 'undefined') {
+  globalThis.HTMLAnchorElement.prototype.click =
+    function patchedAnchorClick() {
+      const event =
+        typeof MouseEvent === 'function'
+          ? new MouseEvent('click', {
+              bubbles: true,
+              cancelable: true,
+              composed: true,
+            })
+          : new Event('click', { bubbles: true, cancelable: true });
+      // 直接走 Node.prototype.dispatchEvent，避免触发 happy-dom HTMLAnchorElement
+      // 覆写的 dispatchEvent 中调用 window.open 的逻辑
+      Object.getPrototypeOf(HTMLElement.prototype).dispatchEvent.call(
+        this,
+        event,
+      );
+    };
+}
+
 Object.defineProperty(global, 'navigator', {
   value: {
     userAgent: 'node.js',

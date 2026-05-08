@@ -246,6 +246,12 @@ describe('TableSql 分支覆盖', () => {
 
   describe('复制查询结果', () => {
     it('点击查询结果区域复制按钮调用 copy + JSON.stringify', () => {
+      // 该用例下游代码若复制失败会通过 console.error 输出"复制失败:"，
+      // 这里属于预期行为，静默以避免污染测试输出
+      const errorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
       render(
         <Wrapper>
           <TableSql {...baseProps} />
@@ -261,6 +267,8 @@ describe('TableSql 分支覆盖', () => {
       expect(mockCopy).toHaveBeenCalledWith(
         JSON.stringify(baseProps.output.tableData, null, 2),
       );
+
+      errorSpy.mockRestore();
     });
 
     it('查询结果复制失败时 console.error 被调用', () => {
@@ -297,6 +305,12 @@ describe('TableSql 分支覆盖', () => {
     };
 
     it('错误状态下点击复制按钮复制 errorMsg', () => {
+      // 该用例下游代码若复制失败会通过 console.error 输出"复制失败:"，
+      // 这里属于预期行为，静默以避免污染测试输出
+      const errorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
       render(
         <Wrapper>
           <TableSql {...errorProps} />
@@ -309,6 +323,8 @@ describe('TableSql 分支覆盖', () => {
       fireEvent.click(errorCopyBtn);
 
       expect(mockCopy).toHaveBeenCalledWith('Syntax error near SELECT');
+
+      errorSpy.mockRestore();
     });
 
     it('错误信息复制失败时 console.error 被调用', () => {
