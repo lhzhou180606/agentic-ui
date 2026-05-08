@@ -892,7 +892,9 @@ describe('EditorUtils', () => {
 
   describe('isDirtLeaf extended', () => {
     it('should detect code leaf', () => {
-      expect(EditorUtils.isDirtLeaf({ text: 'test', code: true } as any)).toBe(true);
+      expect(EditorUtils.isDirtLeaf({ text: 'test', code: true } as any)).toBe(
+        true,
+      );
     });
 
     it('should detect strikethrough leaf', () => {
@@ -970,9 +972,7 @@ describe('EditorUtils', () => {
     it('should skip items without children', () => {
       const listNode = {
         type: 'list' as const,
-        children: [
-          { type: 'list-item' as const },
-        ],
+        children: [{ type: 'list-item' as const }],
       } as any;
       const result = EditorUtils.listToParagraph(editor, listNode);
       expect(result).toEqual([]);
@@ -982,16 +982,16 @@ describe('EditorUtils', () => {
   describe('checkEnd extended', () => {
     it('should return false for empty editor', () => {
       editor.children = [];
-      const spy = vi.spyOn(Editor, 'nodes').mockReturnValue([][Symbol.iterator]());
+      const spy = vi
+        .spyOn(Editor, 'nodes')
+        .mockReturnValue([][Symbol.iterator]());
       const result = EditorUtils.checkEnd(editor);
       expect(result).toBe(false);
       spy.mockRestore();
     });
 
     it('should return false for empty paragraph at end', () => {
-      editor.children = [
-        { type: 'paragraph', children: [{ text: '' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
       const result = EditorUtils.checkEnd(editor);
       expect(result).toBe(false);
     });
@@ -1087,9 +1087,7 @@ describe('EditorUtils', () => {
 
   describe('checkSelEnd extended', () => {
     it('should return true for last path in editor', () => {
-      editor.children = [
-        { type: 'paragraph', children: [{ text: 'only' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: 'only' }] }];
       const result = EditorUtils.checkSelEnd(editor, [0]);
       expect(result).toBe(true);
     });
@@ -1374,10 +1372,22 @@ describe('Utility functions', () => {
       const consoleSpy = vi
         .spyOn(console, 'error')
         .mockImplementation(() => {});
-      const result = createSelectionFromNodes({} as any, 0, {} as any, 1);
+      // happy-dom 下 setBaseAndExtent 传入假节点不抛错，
+      // 需要 mock getSelection 让 setBaseAndExtent 强制抛出异常
+      const originalGetSelection = window.getSelection;
+      window.getSelection = vi.fn(() => ({
+        removeAllRanges: vi.fn(),
+        setBaseAndExtent: vi.fn(() => {
+          throw new Error('mock setBaseAndExtent error');
+        }),
+      })) as any;
+      const anchor = document.createTextNode('a');
+      const focus = document.createTextNode('b');
+      const result = createSelectionFromNodes(anchor, 0, focus, 1);
       expect(result).toBeNull();
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
+      window.getSelection = originalGetSelection;
     });
   });
 
@@ -1978,9 +1988,7 @@ describe('Utility functions', () => {
       const consoleSpy = vi
         .spyOn(console, 'error')
         .mockImplementation(() => {});
-      editor.children = [
-        { type: 'paragraph', children: [{ text: 'hello' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: 'hello' }] }];
       const nodesSpy = vi.spyOn(Editor, 'nodes').mockImplementation(() => {
         throw new Error('nodes error');
       });
