@@ -143,7 +143,7 @@ describe('RealtimeFollow Component', () => {
 
       await waitFor(() => {
         expect(
-          document.querySelector('.ant-agentic-md-editor'),
+          document.querySelector('.ant-agentic-agentic-md-editor'),
         ).toBeInTheDocument();
       });
     });
@@ -268,7 +268,7 @@ describe('RealtimeFollow Component', () => {
       expect(screen.getByTestId('custom-node-fn')).toBeInTheDocument();
       // 不应渲染编辑器或 iframe（优先 customContent）
       expect(
-        container.querySelector('.ant-agentic-md-editor') ||
+        container.querySelector('.ant-agentic-agentic-md-editor') ||
           container.querySelector('iframe'),
       ).toBeNull();
     });
@@ -290,7 +290,7 @@ describe('RealtimeFollow Component', () => {
 
       // 在测试环境中，空状态不会特殊处理，直接显示编辑器
       expect(
-        container.querySelector('.ant-agentic-md-editor'),
+        container.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
     });
 
@@ -312,7 +312,7 @@ describe('RealtimeFollow Component', () => {
 
       // 测试环境中自定义渲染不生效
       expect(
-        container.querySelector('.ant-agentic-md-editor'),
+        container.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
     });
 
@@ -331,7 +331,7 @@ describe('RealtimeFollow Component', () => {
 
       // 测试环境中不显示 overlay
       expect(
-        container.querySelector('.ant-workspace-realtime-overlay'),
+        container.querySelector('.ant-agentic-workspace-realtime-overlay'),
       ).not.toBeInTheDocument();
     });
   });
@@ -357,13 +357,13 @@ describe('RealtimeFollow Component', () => {
         </TestWrapper>,
       );
       const overlay = container.querySelector(
-        '.ant-workspace-realtime-overlay',
+        '.ant-agentic-workspace-realtime-overlay',
       );
       expect(overlay).toBeInTheDocument();
       expect(
-        overlay?.classList.contains('ant-workspace-realtime-overlay--loading'),
+        overlay?.classList.contains('ant-agentic-workspace-realtime-overlay--loading'),
       ).toBe(true);
-      expect(container.querySelector('.ant-spin')).toBeInTheDocument();
+      expect(container.querySelector('.ant-agentic-spin')).toBeInTheDocument();
     });
 
     it('非测试环境下 status=loading 且 loadingRender 为函数时使用其返回值', () => {
@@ -400,11 +400,11 @@ describe('RealtimeFollow Component', () => {
         </TestWrapper>,
       );
       const overlay = container.querySelector(
-        '.ant-workspace-realtime-overlay',
+        '.ant-agentic-workspace-realtime-overlay',
       );
       expect(overlay).toBeInTheDocument();
       expect(
-        overlay?.classList.contains('ant-workspace-realtime-overlay--error'),
+        overlay?.classList.contains('ant-agentic-workspace-realtime-overlay--error'),
       ).toBe(true);
       expect(screen.getByText('页面渲染失败')).toBeInTheDocument();
     });
@@ -444,9 +444,9 @@ describe('RealtimeFollow Component', () => {
         </TestWrapper>,
       );
       expect(
-        container.querySelector('.ant-workspace-realtime-empty'),
+        container.querySelector('.ant-agentic-workspace-realtime-empty'),
       ).toBeInTheDocument();
-      expect(container.querySelector('.ant-empty')).toBeInTheDocument();
+      expect(container.querySelector('.ant-agentic-empty')).toBeInTheDocument();
     });
 
     it('非测试环境下空内容且 emptyRender 为函数时使用其返回值', () => {
@@ -480,7 +480,7 @@ describe('RealtimeFollow Component', () => {
         </TestWrapper>,
       );
       expect(screen.getByTestId('custom-fn')).toHaveTextContent('来自函数');
-      expect(container.querySelector('.ant-agentic-md-editor')).toBeNull();
+      expect(container.querySelector('.ant-agentic-agentic-md-editor')).toBeNull();
     });
   });
 
@@ -611,7 +611,7 @@ describe('RealtimeFollow Component', () => {
       );
 
       expect(
-        document.querySelector('.ant-agentic-md-editor'),
+        document.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
     });
 
@@ -632,14 +632,14 @@ describe('RealtimeFollow Component', () => {
       );
       // 当前为代码视图
       expect(
-        document.querySelector('.ant-agentic-md-editor'),
+        document.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
       // 点击“预览”
       fireEvent.click(screen.getByText('预览'));
       expect(onViewModeChange).toHaveBeenCalledWith('preview');
       // 仍应保持代码视图（未受控更新）
       expect(
-        document.querySelector('.ant-agentic-md-editor'),
+        document.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
       // 外部受控切换后应变更为 iframe
       rerender(
@@ -681,7 +681,7 @@ describe('RealtimeFollow Component', () => {
 
       await waitFor(() => {
         expect(
-          document.querySelector('.ant-agentic-md-editor'),
+          document.querySelector('.ant-agentic-agentic-md-editor'),
         ).toBeInTheDocument();
       });
     });
@@ -826,7 +826,7 @@ describe('RealtimeFollow Component', () => {
 
       // 测试环境中直接显示编辑器
       expect(
-        container.querySelector('.ant-agentic-md-editor'),
+        container.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
     });
 
@@ -882,7 +882,7 @@ describe('RealtimeFollow Component', () => {
 
       // 测试环境中不显示自定义空状态渲染
       expect(
-        container.querySelector('.ant-agentic-md-editor'),
+        container.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
     });
 
@@ -1035,7 +1035,7 @@ describe('RealtimeFollow Component', () => {
 
       expect(screen.queryByText('test')).not.toBeInTheDocument();
       expect(
-        container.querySelector('.ant-agentic-md-editor'),
+        container.querySelector('.ant-agentic-agentic-md-editor'),
       ).not.toBeInTheDocument();
     });
 
@@ -1106,7 +1106,7 @@ describe('RealtimeFollow Component', () => {
 
       // 空内容应该显示编辑器或空状态
       expect(
-        container.querySelector('.ant-agentic-md-editor') ||
+        container.querySelector('.ant-agentic-agentic-md-editor') ||
           container.querySelector('iframe') ||
           container.firstChild,
       ).toBeTruthy();
@@ -1130,7 +1130,7 @@ describe('RealtimeFollow Component', () => {
 
       // DiffContent 会被当作对象处理
       expect(
-        container.querySelector('.ant-agentic-md-editor') ||
+        container.querySelector('.ant-agentic-agentic-md-editor') ||
           container.querySelector('iframe') ||
           container.firstChild,
       ).toBeTruthy();
@@ -1362,7 +1362,7 @@ describe('RealtimeFollow Component', () => {
       );
 
       expect(
-        document.querySelector('.ant-agentic-md-editor'),
+        document.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
     });
 
@@ -1430,7 +1430,7 @@ describe('RealtimeFollow Component', () => {
       await waitFor(
         () => {
           expect(
-            document.querySelector('.ant-agentic-md-editor'),
+            document.querySelector('.ant-agentic-agentic-md-editor'),
           ).toBeInTheDocument();
         },
         { timeout: 3000 },
@@ -1451,7 +1451,7 @@ describe('RealtimeFollow Component', () => {
 
       // 重新渲染后编辑器应该仍然存在
       expect(
-        document.querySelector('.ant-agentic-md-editor'),
+        document.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
     });
 
@@ -1491,7 +1491,7 @@ describe('RealtimeFollow Component', () => {
       await waitFor(
         () => {
           expect(
-            document.querySelector('.ant-agentic-md-editor'),
+            document.querySelector('.ant-agentic-agentic-md-editor'),
           ).toBeInTheDocument();
         },
         { timeout: 5000 },
@@ -1620,7 +1620,7 @@ describe('RealtimeFollow Component', () => {
         </TestWrapper>,
       );
       expect(
-        shellResult.container.querySelector('.ant-agentic-md-editor'),
+        shellResult.container.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
       shellResult.unmount();
 
@@ -1637,7 +1637,7 @@ describe('RealtimeFollow Component', () => {
         </TestWrapper>,
       );
       expect(
-        mdResult.container.querySelector('.ant-agentic-md-editor'),
+        mdResult.container.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
       mdResult.unmount();
 
@@ -1654,7 +1654,7 @@ describe('RealtimeFollow Component', () => {
         </TestWrapper>,
       );
       expect(
-        mdTypeResult.container.querySelector('.ant-agentic-md-editor'),
+        mdTypeResult.container.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
       mdTypeResult.unmount();
 
@@ -1756,7 +1756,7 @@ describe('RealtimeFollow Component', () => {
       );
 
       expect(
-        document.querySelector('.ant-agentic-md-editor'),
+        document.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
     });
 
@@ -1774,7 +1774,7 @@ describe('RealtimeFollow Component', () => {
       );
 
       expect(
-        document.querySelector('.ant-agentic-md-editor'),
+        document.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
     });
 
@@ -1799,7 +1799,7 @@ describe('RealtimeFollow Component', () => {
       // 在测试环境中，编辑器可能不会立即更新，但组件应该能正常渲染
       await waitFor(
         () => {
-          const editor = container.querySelector('.ant-agentic-md-editor');
+          const editor = container.querySelector('.ant-agentic-agentic-md-editor');
           const iframe = container.querySelector('iframe');
           // 应该至少渲染其中一个
           expect(editor || iframe || container.firstChild).toBeTruthy();
@@ -2037,7 +2037,7 @@ describe('RealtimeFollow Component', () => {
       // null 会被 renderNode 返回，然后显示为 null
       // 但实际应该显示编辑器内容
       expect(
-        container.querySelector('.ant-agentic-md-editor'),
+        container.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
     });
 
@@ -2056,7 +2056,7 @@ describe('RealtimeFollow Component', () => {
 
       // 测试环境中，loading 状态不显示 overlay，直接显示编辑器
       expect(
-        container.querySelector('.ant-agentic-md-editor'),
+        container.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
     });
 
@@ -2075,7 +2075,7 @@ describe('RealtimeFollow Component', () => {
 
       // 测试环境中，error 状态不显示 overlay，直接显示编辑器
       expect(
-        container.querySelector('.ant-agentic-md-editor'),
+        container.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
     });
 
@@ -2110,7 +2110,7 @@ describe('RealtimeFollow Component', () => {
 
       // undefined 会被转换为字符串 'undefined'
       expect(
-        document.querySelector('.ant-agentic-md-editor'),
+        document.querySelector('.ant-agentic-agentic-md-editor'),
       ).toBeInTheDocument();
     });
 

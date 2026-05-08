@@ -6,14 +6,14 @@
 import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { RealtimeFollow } from '../../RealtimeFollow';
-import { TestWrapper } from '../../../../_test_helpers/testUtils';
+import { RealtimeFollow } from '../../../RealtimeFollow';
+import { TestWrapper } from '../../../../../_test_helpers/testUtils';
 
-vi.mock('../../RealtimeFollow/style', () => ({
+vi.mock('../../../RealtimeFollow/style', () => ({
   useRealtimeFollowStyle: vi.fn(() => undefined),
 }));
 
-vi.mock('../../HtmlPreview', () => {
+vi.mock('../../../HtmlPreview', () => {
   const React = require('react');
   return {
     HtmlPreview: (props: { onViewModeChange?: (mode: 'preview' | 'code') => void }) => {
