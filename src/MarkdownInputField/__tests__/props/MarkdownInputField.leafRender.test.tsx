@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { MarkdownInputField } from '../MarkdownInputField';
+import { MarkdownInputField } from '../../MarkdownInputField';
 
 describe('MarkdownInputField - leafRender', () => {
   it('should render custom leaf when leafRender is provided', async () => {

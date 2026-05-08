@@ -1,11 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { MarkdownInputField } from '../MarkdownInputField';
+import { MarkdownInputField } from '../../MarkdownInputField';
 
 // Mock SendButton 组件
-vi.mock('../SendButton', async () => {
-  const actual = await vi.importActual('../SendButton');
+vi.mock('../../SendButton', async () => {
+  const actual = await vi.importActual('../../SendButton');
   return {
     ...actual,
     SendButton: vi.fn((props) => (

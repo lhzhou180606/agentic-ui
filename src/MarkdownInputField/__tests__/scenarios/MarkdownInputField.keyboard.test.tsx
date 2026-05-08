@@ -1,8 +1,8 @@
 import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import * as AttachmentUtils from '../AttachmentButton/utils';
-import { MarkdownInputField } from '../MarkdownInputField';
+import * as AttachmentUtils from '../../AttachmentButton/utils';
+import { MarkdownInputField } from '../../MarkdownInputField';
 
 // Mock BaseMarkdownEditor to avoid complex slate initialization but we need to ensure refs work.
 // Actually, using the real component seems to work in other tests, but let's check if we need to mock isMobileDevice.

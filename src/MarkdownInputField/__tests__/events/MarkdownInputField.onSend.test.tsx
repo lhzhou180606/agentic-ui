@@ -5,9 +5,9 @@
  */
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useSendHandler } from '../hooks/useSendHandler';
+import { useSendHandler } from '../../hooks/useSendHandler';
 
-vi.mock('../../Hooks/useRefFunction', () => ({
+vi.mock('../../../Hooks/useRefFunction', () => ({
   useRefFunction: (fn: any) => fn,
 }));
 

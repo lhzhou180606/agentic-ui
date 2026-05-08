@@ -27,7 +27,7 @@ describe('RefinePromptButton', () => {
   describe('SSR / 非浏览器环境', () => {
     it('isBrowserEnv 为 false 时应 return null', async () => {
       const { isBrowserEnv } = await import(
-        '../src/MarkdownInputField/RefinePromptButton/env'
+        '../RefinePromptButton/env'
       );
       vi.mocked(isBrowserEnv).mockReturnValueOnce(false);
 
