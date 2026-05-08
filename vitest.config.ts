@@ -55,11 +55,7 @@ const defaultTestExcludes = [
   '**/tests/utils/language.test.ts',
 ];
 
-const fullSuiteTestExcludes = [
-  '**/node_modules/**',
-  '**/dist/**',
-  '**/e2e/**',
-];
+const fullSuiteTestExcludes = ['**/node_modules/**', '**/dist/**', '**/e2e/**'];
 
 const isFullSuite = (mode: string | undefined) =>
   mode === 'full' || process.env.VITEST_FULL_SUITE === '1';
@@ -80,13 +76,9 @@ export default defineConfig(({ mode }) => ({
     // 限制并发：full 模式文件多、内存占用大，降低并行度防止 OOM / 卡死
     maxConcurrency: isFullSuite(mode) ? 5 : 10,
     fileParallelism: !isFullSuite(mode),
-    // 每跑完一定数量的测试文件后回收 worker，释放内存
-    poolOptions: {
-      forks: {
-        maxForks: isFullSuite(mode) ? 2 : undefined,
-        minForks: 1,
-      },
-    },
+    // Vitest 4: poolOptions 已移除，改用顶层 worker 配置
+    maxWorkers: isFullSuite(mode) ? 2 : undefined,
+    minWorkers: 1,
     alias: [
       {
         find: '@ant-design/agentic-ui',

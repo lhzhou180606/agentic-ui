@@ -14,9 +14,9 @@ export const mockLottie = vi
     });
   });
 
-// 设置 lottie-react 的 mock
-export const setupLottieMock = () => {
-  vi.mock('lottie-react', () => ({
-    default: mockLottie,
-  }));
-};
+vi.mock('lottie-react', () => ({
+  default: mockLottie,
+}));
+
+// 与旧调用兼容，保留空函数
+export const setupLottieMock = () => {};
