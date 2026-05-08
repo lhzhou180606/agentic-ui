@@ -254,6 +254,10 @@ describe('Chart Components Index', () => {
       );
 
       consoleSpy.mockRestore();
+      // mockAppendChild 是用 vi.fn() 直接创建的，不会被 vi.restoreAllMocks() 复位，
+      // 需要在用例结束时手动重置，避免污染后续用例（导致它们走 catch 分支
+      // 输出 "Error downloading chart:" 的 stderr）
+      mockAppendChild.mockReset();
     });
 
     it('应该处理不同的质量参数', () => {
