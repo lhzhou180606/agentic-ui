@@ -315,7 +315,7 @@ describe('SchemaEditor', () => {
       );
 
       // 应该有复制按钮（HTML和JSON各一个）
-      const copyButtons = container.querySelectorAll('[aria-label*="复制"]');
+      const _copyButtons = container.querySelectorAll('[aria-label*="复制"]');
       const allButtons = screen.getAllByRole('button');
 
       // 应该至少有运行按钮和复制按钮
@@ -594,7 +594,7 @@ describe('SchemaEditor', () => {
 
       // 如果有验证错误，应该显示
       await waitFor(() => {
-        const errorElements = screen.queryAllByText(/⚠️/);
+        const _errorElements = screen.queryAllByText(/⚠️/);
         // 验证组件已运行
         expect(screen.getByTestId('schema-renderer')).toBeInTheDocument();
       });

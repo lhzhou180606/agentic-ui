@@ -118,7 +118,7 @@ describe('AttachmentButtonPopover 分支覆盖', () => {
       const modalBody = galleryBtn.closest('div[style]') as HTMLElement;
       if (modalBody) {
         const event = new MouseEvent('click', { bubbles: true });
-        const stopSpy = vi.spyOn(event, 'stopPropagation');
+        const _stopSpy = vi.spyOn(event, 'stopPropagation');
         modalBody.dispatchEvent(event);
         // 验证事件不会继续冒泡导致问题
       }
@@ -184,7 +184,7 @@ describe('AttachmentButtonPopover 分支覆盖', () => {
 
       const { container } = render(
         <AttachmentButtonPopover>
-          <button>Upload</button>
+          <button type="button">Upload</button>
         </AttachmentButtonPopover>,
       );
 
@@ -203,7 +203,7 @@ describe('AttachmentButtonPopover 分支覆盖', () => {
 
       render(
         <AttachmentButtonPopover>
-          <button>Upload</button>
+          <button type="button">Upload</button>
         </AttachmentButtonPopover>,
       );
 

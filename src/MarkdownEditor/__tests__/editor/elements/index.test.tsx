@@ -481,7 +481,7 @@ describe('Elements Index', () => {
       });
 
       it('应该处理 fncProps.render 功能', () => {
-        const mockRender = vi.fn((leaf, dom) => (
+        const mockRender = vi.fn((leaf, _dom) => (
           <div data-testid="custom-render">Custom: {leaf.text}</div>
         ));
         const props = {
@@ -519,7 +519,7 @@ describe('Elements Index', () => {
       });
 
       it('应该处理 identifier render 功能', () => {
-        const mockRender = vi.fn((leaf, dom) => (
+        const mockRender = vi.fn((leaf, _dom) => (
           <div data-testid="identifier-render">ID: {leaf.children}</div>
         ));
         const props = {
@@ -823,18 +823,14 @@ describe('Elements Index', () => {
       expect(screen.getByText('Test Content')).toBeInTheDocument();
 
       rerender(
-        <MLeaf
-          {...leafBase}
-          children={<div>Test Content 1</div>}
-          hashId="test-hash-1"
-        />,
+        <MLeaf {...leafBase} hashId="test-hash-1">
+          <div>Test Content 1</div>
+        </MLeaf>,
       );
       rerender(
-        <MLeaf
-          {...leafBase}
-          children={<div>Test Content 2</div>}
-          hashId="test-hash-2"
-        />,
+        <MLeaf {...leafBase} hashId="test-hash-2">
+          <div>Test Content 2</div>
+        </MLeaf>,
       );
       expect(screen.getByText('Test Content 2')).toBeInTheDocument();
 

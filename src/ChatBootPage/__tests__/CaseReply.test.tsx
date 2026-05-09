@@ -5,7 +5,11 @@ import { describe, expect, it, vi } from 'vitest';
 import CaseReply from '../CaseReply';
 
 describe('CaseReply 组件', () => {
-  const TestButton = () => <button data-testid="test-button">测试按钮</button>;
+  const TestButton = () => (
+    <button type="button" data-testid="test-button">
+      测试按钮
+    </button>
+  );
 
   it('应该渲染基本的案例回复组件', () => {
     render(
@@ -259,8 +263,8 @@ describe('CaseReply 组件', () => {
   it('应该正确处理复杂的按钮栏内容', () => {
     const complexButtonBar = (
       <div>
-        <button>按钮1</button>
-        <button>按钮2</button>
+        <button type="button">按钮1</button>
+        <button type="button">按钮2</button>
       </div>
     );
 

@@ -30,8 +30,9 @@ describe('AgenticUiTaskBlock / AgenticUiToolUseBarBlock', () => {
             },
           } as any
         }
-        children={<span>hidden</span>}
-      />,
+      >
+        <span>hidden</span>
+      </AgenticUiTaskBlock>,
     );
     expect(screen.getByTestId('agentic-ui-task-block')).toBeInTheDocument();
     expect(screen.getByTestId('task-list-mock')).toBeInTheDocument();
@@ -59,8 +60,9 @@ describe('AgenticUiTaskBlock / AgenticUiToolUseBarBlock', () => {
             },
           } as any
         }
-        children={<span>hc</span>}
-      />,
+      >
+        <span>hc</span>
+      </AgenticUiToolUseBarBlock>,
     );
     expect(
       screen.getByTestId('agentic-ui-toolusebar-block'),

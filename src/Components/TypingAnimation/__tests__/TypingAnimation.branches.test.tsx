@@ -7,18 +7,18 @@ vi.mock('framer-motion', () => ({
   motion: (Component: any) => {
     return React.forwardRef((props: any, ref: any) => {
       const {
-        forwardMotionProps,
-        initial,
-        animate,
-        exit,
-        transition,
-        variants,
-        whileHover,
-        whileTap,
-        whileFocus,
-        whileInView,
-        onAnimationStart,
-        onAnimationComplete,
+        forwardMotionProps: _forwardMotionProps,
+        initial: _initial,
+        animate: _animate,
+        exit: _exit,
+        transition: _transition,
+        variants: _variants,
+        whileHover: _whileHover,
+        whileTap: _whileTap,
+        whileFocus: _whileFocus,
+        whileInView: _whileInView,
+        onAnimationStart: _onAnimationStart,
+        onAnimationComplete: _onAnimationComplete,
         ...rest
       } = props;
       return <Component ref={ref} {...rest} />;

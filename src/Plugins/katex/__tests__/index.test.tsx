@@ -338,7 +338,7 @@ describe('KatexElement', () => {
       const customChildren = <span data-testid="custom-children">Custom</span>;
 
       const { container } = render(
-        <KatexElement {...defaultProps} children={customChildren} />,
+        <KatexElement {...defaultProps}>{customChildren}</KatexElement>,
       );
 
       const hiddenContent = container.querySelector(

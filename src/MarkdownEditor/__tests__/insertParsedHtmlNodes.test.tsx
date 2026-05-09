@@ -1278,7 +1278,7 @@ describe('insertParsedHtmlNodes', () => {
   });
 
   describe('htmlToFragmentList 默认映射', () => {
-    it('非 table 与非 \"paragraph\" 类型应原样返回（576）', () => {
+    it('非 table 与非 "paragraph" 类型应原样返回（576）', () => {
       vi.mocked(docxDeserializerModule.docxDeserializer).mockReturnValueOnce([
         {
           type: 'paragraph',

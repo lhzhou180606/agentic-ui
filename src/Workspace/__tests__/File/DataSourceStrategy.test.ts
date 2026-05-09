@@ -164,7 +164,7 @@ describe('DataSourceStrategy', () => {
       originalURL = (globalThis as any).URL;
 
       // 创建 mock 函数
-      mockCreateObjectURL = vi.fn((blob: Blob) => 'blob:mock-url');
+      mockCreateObjectURL = vi.fn((_blob: Blob) => 'blob:mock-url');
       mockRevokeObjectURL = vi.fn();
 
       // 设置 mock URL
@@ -489,7 +489,7 @@ describe('DataSourceStrategy', () => {
     it('应该支持注册自定义策略', () => {
       const customStrategy = {
         canHandle: (file: any) => file.custom === true,
-        process: (file: any) => ({
+        process: (_file: any) => ({
           sourceType: DataSourceType.URL,
           previewCapability: PreviewCapability.FULL,
           previewUrl: 'custom://url',

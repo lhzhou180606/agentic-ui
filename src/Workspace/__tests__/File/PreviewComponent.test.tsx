@@ -844,7 +844,7 @@ describe('PreviewComponent', () => {
         content: '<p>Hello</p>',
       };
 
-      const { container } = render(
+      const { container: _container } = render(
         <TestWrapper>
           <PreviewComponent file={file} onBack={vi.fn()} />
         </TestWrapper>,

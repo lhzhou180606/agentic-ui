@@ -11,7 +11,7 @@ import DonutChart from '../../DonutChart';
 // Mock react-chartjs-2 - 支持 ref 回调
 const mockChartInstances: any[] = [];
 vi.mock('react-chartjs-2', () => ({
-  Doughnut: React.forwardRef(({ data, options, plugins }: any, ref: any) => {
+  Doughnut: React.forwardRef(({ data, options, plugins: _plugins }: any, ref: any) => {
     React.useEffect(() => {
       if (ref) {
         // 创建模拟的 Chart.js 实例；测试可设 __donutChartMockNoCanvas 使 canvas 为 null
@@ -88,13 +88,13 @@ vi.mock('../../utils', () => ({
 
 // Mock hooks - 使用函数形式以便在测试中动态修改返回值
 const mockUseMobile = vi.fn(() => ({ isMobile: false, windowWidth: 1920 }));
-const mockUseFilterLabels = vi.fn((data: any) => ({
+const mockUseFilterLabels = vi.fn((_data: any) => ({
   filterLabels: [] as string[],
-  filteredDataByFilterLabel: data,
+  filteredDataByFilterLabel: _data,
   selectedFilterLabel: null as string | null,
   setSelectedFilterLabel: vi.fn(),
 }));
-const mockUseAutoCategory = vi.fn((data: any) => ({
+const mockUseAutoCategory = vi.fn((_data: any) => ({
   autoCategoryData: null as { categories: string[]; allData: any[] } | null,
   internalSelectedCategory: null as string | null,
   setInternalSelectedCategory: vi.fn(),
@@ -131,6 +131,7 @@ vi.mock('../../DonutChart/Legend', () => ({
     <div data-testid="legend">
       {chartData.map((_, i) => (
         <button
+          type="button"
           key={i}
           data-testid={`legend-item-${i}`}
           onClick={() => onLegendItemClick(i)}
@@ -160,6 +161,7 @@ vi.mock('../../components', () => ({
     <div data-testid="chart-filter">
       {filterOptions?.map((f: any, i: number) => (
         <button
+          type="button"
           key={i}
           onClick={() => onFilterChange?.(f.value)}
           data-selected={selectedFilter === f.value}
@@ -169,6 +171,7 @@ vi.mock('../../components', () => ({
       ))}
       {customOptions?.map((opt: any, i: number) => (
         <button
+          type="button"
           key={`custom-${i}`}
           onClick={() => onSelectionChange?.(opt.key)}
           data-selected={selectedCustomSelection === opt.key}
@@ -187,7 +190,9 @@ vi.mock('../../components', () => ({
   ),
   ChartToolBar: ({ onDownload, toolbarExtra, filter }: any) => (
     <div data-testid="chart-toolbar">
-      <button onClick={onDownload}>Download</button>
+      <button type="button" onClick={onDownload}>
+        Download
+      </button>
       {toolbarExtra}
       {filter}
     </div>
@@ -211,13 +216,13 @@ describe('DonutChart', () => {
     mockChartInstances.length = 0; // 清空图表实例数组
     // 重置 mock 函数返回值
     mockUseMobile.mockReturnValue({ isMobile: false, windowWidth: 1920 });
-    mockUseFilterLabels.mockImplementation((data: any) => ({
+    mockUseFilterLabels.mockImplementation((_data: any) => ({
       filterLabels: [],
-      filteredDataByFilterLabel: data,
+      filteredDataByFilterLabel: _data,
       selectedFilterLabel: null,
       setSelectedFilterLabel: vi.fn(),
     }));
-    mockUseAutoCategory.mockImplementation((data: any) => ({
+    mockUseAutoCategory.mockImplementation((_data: any) => ({
       autoCategoryData: null,
       internalSelectedCategory: null,
       setInternalSelectedCategory: vi.fn(),
@@ -1026,7 +1031,7 @@ describe('DonutChart', () => {
       // 直接导入 mock 的模块
       const componentsModule =
         await import('../../../../../src/Plugins/chart/components');
-      const downloadSpy = vi.spyOn(componentsModule, 'downloadChart');
+      const _downloadSpy = vi.spyOn(componentsModule, 'downloadChart');
 
       render(
         <TestWrapper>
@@ -1538,7 +1543,7 @@ describe('DonutChart', () => {
   describe('Chart.js 注册', () => {
     it('应该只在首次渲染时注册 Chart.js 组件', () => {
       const { Chart } = require('chart.js');
-      const registerSpy = vi.spyOn(Chart, 'register');
+      const _registerSpy = vi.spyOn(Chart, 'register');
 
       const { unmount: unmount1 } = render(
         <TestWrapper>

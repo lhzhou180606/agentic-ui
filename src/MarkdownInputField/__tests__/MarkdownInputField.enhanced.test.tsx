@@ -619,7 +619,7 @@ describe('MarkdownInputField Enhanced Tests', () => {
 
     describe('beforeToolsRender 与 attachment.upload 分支覆盖', () => {
       it('应渲染 beforeToolsRender 返回值', () => {
-        const beforeToolsRender = vi.fn((p: any) => (
+        const beforeToolsRender = vi.fn((_p: any) => (
           <div data-testid="before-tools-custom">before tools</div>
         ));
 

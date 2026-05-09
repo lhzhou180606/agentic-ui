@@ -17,7 +17,7 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 // Mock requestAnimationFrame
-const mockRaf = vi.fn((cb: FrameRequestCallback) => {
+const mockRaf = vi.fn((_cb: FrameRequestCallback) => {
   return 1;
 });
 const mockCancelRaf = vi.fn();
@@ -51,7 +51,7 @@ describe('useDetectTheme', () => {
       removeEventListener: vi.fn(),
     });
     // requestAnimationFrame 默认不执行回调
-    mockRaf.mockImplementation((cb: FrameRequestCallback) => {
+    mockRaf.mockImplementation((_cb: FrameRequestCallback) => {
       return 1;
     });
   });

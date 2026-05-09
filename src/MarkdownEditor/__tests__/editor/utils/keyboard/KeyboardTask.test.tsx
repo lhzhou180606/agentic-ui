@@ -458,7 +458,7 @@ describe('KeyboardTask', () => {
       const mockFiles = [new File([''], 'test.jpg', { type: 'image/jpeg' })];
       mockProps.image.upload = undefined;
 
-      const { message } = await import('antd');
+      const { message: _message } = await import('antd');
 
       keyboardTask.uploadImage();
 

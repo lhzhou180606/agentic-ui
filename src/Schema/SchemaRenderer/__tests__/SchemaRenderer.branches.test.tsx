@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { SchemaRenderer } from '..';
 
 // 共享的 validator mock：被本文件两段 describe 共用。
 // 由于 vi.mock 是文件级 hoist，无法做到段间相互隔离的 mock。
@@ -1046,7 +1047,7 @@ describe('SchemaRenderer - Comprehensive Tests', () => {
         configurable: true,
       });
 
-      const { container } = render(<SchemaRenderer {...props} />);
+      const { container: _container } = render(<SchemaRenderer {...props} />);
       // innerHTML 设置错误时组件可能无法正常渲染，但错误应该被捕获
       expect(errorSpy).toHaveBeenCalled();
       errorSpy.mockRestore();
@@ -1318,8 +1319,6 @@ vi.mock('../../../Utils/proxySandbox', () => ({
   ProxySandbox: class {},
 }));
 
-import { SchemaRenderer } from '..';
-
 const baseSchema: any = {
   version: '1.0.0',
   name: 'Schema',
@@ -1434,7 +1433,7 @@ describe('SchemaRenderer targeted coverage', () => {
     mockTemplateRender.mockImplementation(() => {
       throw new Error('template failed');
     });
-    const { container } = render(
+    const { container: _container } = render(
       <SchemaRenderer schema={baseSchema} values={{}} debug />,
     );
     expect(console.error).toHaveBeenCalled();
@@ -1476,7 +1475,7 @@ describe('SchemaRenderer targeted coverage', () => {
           ...baseSchema,
           component: {
             ...baseSchema.component,
-            schema: '<div>ok<script src=\"https://a.com/a.js\"></script></div>',
+            schema: '<div>ok<script src="https://a.com/a.js"></script></div>',
           },
         }}
         values={{}}

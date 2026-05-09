@@ -73,7 +73,7 @@ describe('BackBottom 组件', () => {
   it('应该支持函数形式的可见判断', async () => {
     const shouldVisible = vi.fn((scrollTop) => scrollTop < 1600);
 
-    const { container } = render(
+    const { container: _container } = render(
       <BackTo.Bottom shouldVisible={shouldVisible} />,
     );
 

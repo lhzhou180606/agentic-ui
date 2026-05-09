@@ -472,7 +472,7 @@ describe('useToolBarLogic', () => {
       (props: UseToolBarLogicProps) => useToolBarLogic(props),
       { initialProps: defaultProps },
     );
-    const nodeBefore = result.current.currentNode;
+    const _nodeBefore = result.current.currentNode;
     rerender({ ...defaultProps, domRect: new DOMRect(0, 0, 1, 1) });
     expect(result.current.currentNode).toBeDefined();
   });

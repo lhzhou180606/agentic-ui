@@ -370,7 +370,7 @@ describe('RealtimeFollow Component', () => {
 
     it('非测试环境下 status=loading 且 loadingRender 为函数时使用其返回值', () => {
       process.env.NODE_ENV = 'development';
-      const { container } = render(
+      const { container: _container } = render(
         <TestWrapper>
           <RealtimeFollow
             data={{
@@ -2179,7 +2179,7 @@ describe('RealtimeFollow Component', () => {
 
       expect(screen.getByText('自定义标题')).toBeInTheDocument();
       // 当有自定义 title 时，应该显示自定义标题而不是默认标题
-      const defaultTitle = screen.queryByText('终端执行');
+      const _defaultTitle = screen.queryByText('终端执行');
       // 由于自定义标题存在，默认标题可能不会显示（取决于实现）
       // 这里主要验证自定义标题能正确显示
       expect(screen.getByText('自定义标题')).toBeInTheDocument();

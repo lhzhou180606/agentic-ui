@@ -24,11 +24,9 @@ const renderRouter = (
     Pick<DefaultCodeRouterProps, 'language'>,
 ) =>
   render(
-    <DefaultCodeRouter
-      pluginComponents={{}}
-      {...props}
-      children={props.children ?? DEFAULT_CHILDREN}
-    />,
+    <DefaultCodeRouter pluginComponents={{}} {...props}>
+      {props.children ?? DEFAULT_CHILDREN}
+    </DefaultCodeRouter>,
   );
 
 const createPluginProbe = (

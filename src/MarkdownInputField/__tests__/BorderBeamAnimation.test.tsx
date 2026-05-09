@@ -50,7 +50,7 @@ describe('BorderBeamAnimation', () => {
     const origNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'development';
 
-    const { unmount, container } = render(
+    const { unmount, container: _container } = render(
       <BorderBeamAnimation isVisible={true} borderRadius={16} />,
     );
 

@@ -391,7 +391,7 @@ describe('DocInfoList', () => {
       const user = userEvent.setup();
       const longContent = 'A'.repeat(25);
       const docName = 'LongDocInPopover';
-      const { container } = render(
+      const { container: _container } = render(
         <DocInfoList
           {...defaultProps}
           options={[
@@ -426,7 +426,7 @@ describe('DocInfoList', () => {
     it('传入 render 时使用自定义渲染 (396)', () => {
       const longContent =
         'Custom content that is long enough to trigger Popover';
-      const renderItem = vi.fn((item: any, dom: React.ReactNode) => (
+      const renderItem = vi.fn((item: any, _dom: React.ReactNode) => (
         <div data-testid="custom-render">{item?.content}</div>
       ));
       render(

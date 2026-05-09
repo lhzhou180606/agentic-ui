@@ -127,7 +127,7 @@ const measureIncrementalAppendScenario = (
   warmup: number,
 ): BenchmarkResult => {
   for (let i = 0; i < warmup; i += 1) {
-    parserMdToSchema(baseMarkdown).schema.length;
+    void parserMdToSchema(baseMarkdown).schema.length;
   }
 
   const durations: number[] = [];
@@ -167,7 +167,7 @@ const measureScenario = (
   warmup: number,
 ): BenchmarkResult => {
   for (let i = 0; i < warmup; i += 1) {
-    parserMdToSchema(scenario.markdown).schema.length;
+    void parserMdToSchema(scenario.markdown).schema.length;
   }
 
   const durations: number[] = [];

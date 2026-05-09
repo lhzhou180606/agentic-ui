@@ -30,7 +30,7 @@ vi.mock('slate-react', () => ({
 }));
 
 vi.mock('../../../MarkdownEditor/hooks/editor', () => ({
-  useMEditor: () => [, mockUpdate],
+  useMEditor: () => [undefined, mockUpdate],
 }));
 
 vi.mock('../ChartRender', () => ({

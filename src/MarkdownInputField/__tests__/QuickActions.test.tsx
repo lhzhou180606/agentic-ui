@@ -58,19 +58,24 @@ vi.mock('../Enlargement', () => ({
 let capturedOnResize: ((e: { offsetWidth: number }) => void) | null = null;
 vi.mock('rc-resize-observer', () => {
   const React = require('react');
-  return {
-    default: ({ children, onResize }: any) => {
+  const ResizeObserverMock = ({ children, onResize }: any) => {
+    React.useEffect(() => {
       if (onResize) {
-        capturedOnResize = onResize;
-        try {
-          onResize({ offsetWidth: 100 });
-        } catch (_) {}
-        React.useEffect(() => {
-          onResize({ offsetWidth: 200 });
-        }, []);
+        onResize({ offsetWidth: 200 });
       }
-      return children;
-    },
+    }, [onResize]);
+
+    if (onResize) {
+      capturedOnResize = onResize;
+      try {
+        onResize({ offsetWidth: 100 });
+      } catch (_) {}
+    }
+    return children;
+  };
+
+  return {
+    default: ResizeObserverMock,
   };
 });
 

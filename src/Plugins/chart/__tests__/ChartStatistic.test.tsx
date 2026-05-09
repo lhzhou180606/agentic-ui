@@ -333,7 +333,11 @@ describe('ChartStatistic', () => {
         <ChartStatistic
           title="总销售额"
           value={1000}
-          extra={<button data-testid="extra-button">详情</button>}
+          extra={
+            <button type="button" data-testid="extra-button">
+              详情
+            </button>
+          }
         />,
       );
 
@@ -418,7 +422,7 @@ describe('ChartStatistic', () => {
           theme="dark"
           size="large"
           block
-          extra={<button>查看详情</button>}
+          extra={<button type="button">查看详情</button>}
         />,
       );
 
@@ -448,7 +452,7 @@ describe('ChartStatistic', () => {
 
   describe('组合场景测试', () => {
     it('应该支持多个统计组件并排显示', () => {
-      const { container } = render(
+      const { container: _container } = render(
         <div>
           <ChartStatistic title="指标1" value={100} />
           <ChartStatistic title="指标2" value={200} />

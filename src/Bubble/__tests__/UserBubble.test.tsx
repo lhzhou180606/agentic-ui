@@ -63,6 +63,7 @@ describe('UserBubble', () => {
       const { setMessage } = useContext(MessagesContext);
       return (
         <button
+          type="button"
           data-testid="trigger-set-message"
           onClick={() => setMessage?.({ content: 'updated' })}
         >

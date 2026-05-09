@@ -509,7 +509,7 @@ describe('Table Components', () => {
     });
 
     it('应该处理空的 children', () => {
-      const { container } = render(<Th {...defaultThProps} children={[]} />);
+      const { container } = render(<Th {...defaultThProps}>{[]}</Th>);
       const th = container.querySelector('th');
       expect(th).toBeInTheDocument();
     });
@@ -519,8 +519,8 @@ describe('Table Components', () => {
         <div key="1">First</div>,
         <div key="2">Second</div>,
       ];
-      const { container } = render(
-        <Th {...defaultThProps} children={multipleChildren} />,
+      const { container: _container } = render(
+        <Th {...defaultThProps}>{multipleChildren}</Th>,
       );
       expect(screen.getByText('First')).toBeInTheDocument();
       expect(screen.getByText('Second')).toBeInTheDocument();
@@ -843,7 +843,7 @@ describe('Table Components', () => {
           attributes: defaultAttributes,
           children,
         };
-        const { container } = render(tableRenderElement(props) as any);
+        const { container: _container } = render(tableRenderElement(props) as any);
         expect(screen.getByText(`Test Content ${index}`)).toBeInTheDocument();
       });
     });

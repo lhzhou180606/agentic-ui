@@ -739,7 +739,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
 
       // Mock ReactEditor.toDOMNode 返回带有 mock setAttribute 的元素
       // 需要在每次调用时返回新的元素，因为 handleClick 会遍历所有单元格
-      vi.mocked(ReactEditor.toDOMNode).mockImplementation((editor, node) => {
+      vi.mocked(ReactEditor.toDOMNode).mockImplementation((_editor, _node) => {
         const mockElement = document.createElement('td');
         mockElement.setAttribute = mockSetAttribute;
         return mockElement;

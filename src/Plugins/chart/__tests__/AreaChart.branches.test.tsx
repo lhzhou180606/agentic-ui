@@ -104,7 +104,11 @@ vi.mock('../components', () => ({
     lastToolBarProps = props;
     return (
       <div data-testid="area-chart-toolbar">
-        <button data-testid="area-download" onClick={() => props.onDownload()}>
+        <button
+          type="button"
+          data-testid="area-download"
+          onClick={() => props.onDownload()}
+        >
           download
         </button>
         {props.filter}

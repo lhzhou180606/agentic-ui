@@ -18,9 +18,10 @@ describe('Break Component', () => {
     render(
       <Break
         attributes={mockAttributes}
-        children={mockChildren}
         element={{ type: 'break', children: [] } as any}
-      />,
+      >
+        {mockChildren}
+      </Break>,
     );
 
     const breakElement = screen.getByText('Test content').parentElement;
@@ -33,9 +34,10 @@ describe('Break Component', () => {
     render(
       <Break
         attributes={mockAttributes}
-        children={mockChildren}
         element={{ type: 'break', children: [] } as any}
-      />,
+      >
+        {mockChildren}
+      </Break>,
     );
 
     const brElement = screen
@@ -54,9 +56,10 @@ describe('Break Component', () => {
     render(
       <Break
         attributes={customAttributes}
-        children={mockChildren}
         element={{ type: 'break', children: [] } as any}
-      />,
+      >
+        {mockChildren}
+      </Break>,
     );
 
     const breakElement = screen.getByText('Test content').parentElement;
@@ -70,9 +73,10 @@ describe('Break Component', () => {
     render(
       <Break
         attributes={mockAttributes}
-        children={customChildren}
         element={{ type: 'break', children: [] } as any}
-      />,
+      >
+        {customChildren}
+      </Break>,
     );
 
     expect(screen.getByTestId('child-content')).toBeInTheDocument();
@@ -83,9 +87,10 @@ describe('Break Component', () => {
     render(
       <Break
         attributes={mockAttributes}
-        children={null}
         element={{ type: 'break', children: [] } as any}
-      />,
+      >
+        {null}
+      </Break>,
     );
 
     const breakElement = document.querySelector(
@@ -99,9 +104,10 @@ describe('Break Component', () => {
     render(
       <ReadonlyBreak
         attributes={mockAttributes}
-        children={<span>ro</span>}
         element={{ type: 'break', children: [] } as any}
-      />,
+      >
+        <span>ro</span>
+      </ReadonlyBreak>,
     );
     expect(
       screen.getByText('ro').parentElement?.querySelector('br'),

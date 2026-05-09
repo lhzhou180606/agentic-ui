@@ -255,7 +255,7 @@ describe('parseHtml', () => {
 
     it('块级：注释为 chartType 对象时 handleHtml 应转为数组格式', () => {
       const el = { value: '<!-- {"chartType":"bar"} -->' };
-      const r = handleHtml(el, null, [], undefined);
+      const _r = handleHtml(el, null, [], undefined);
       expect(el.value).toContain('[{"chartType":"bar"}]');
     });
 

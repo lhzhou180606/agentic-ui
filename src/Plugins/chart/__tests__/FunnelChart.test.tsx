@@ -65,7 +65,7 @@ vi.mock('../components', () => ({
     filterOptions,
     onFilterChange,
     customOptions,
-    selectedCustomSelection,
+    selectedCustomSelection: _selectedCustomSelection,
     onSelectionChange,
   }: any) => (
     <div data-testid="chart-filter">

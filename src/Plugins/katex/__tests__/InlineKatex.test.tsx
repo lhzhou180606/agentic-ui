@@ -320,7 +320,7 @@ describe('InlineKatex', () => {
 
   describe('编辑模式测试', () => {
     beforeEach(() => {
-      const previousEnv = process.env.NODE_ENV;
+      const _previousEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'development';
       // 恢复在 afterEach
     });

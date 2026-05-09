@@ -834,7 +834,11 @@ describe('Workspace Component', () => {
 
     it('应该在关闭按钮之前渲染 headerExtra', () => {
       const onClose = vi.fn();
-      const customContent = <button data-testid="custom-button">操作</button>;
+      const customContent = (
+        <button type="button" data-testid="custom-button">
+          操作
+        </button>
+      );
 
       const { container } = render(
         <TestWrapper>
@@ -870,7 +874,7 @@ describe('Workspace Component', () => {
     it('应该支持 headerExtra 中的交互操作', () => {
       const handleClick = vi.fn();
       const customContent = (
-        <button data-testid="action-button" onClick={handleClick}>
+        <button type="button" data-testid="action-button" onClick={handleClick}>
           执行操作
         </button>
       );
@@ -894,8 +898,12 @@ describe('Workspace Component', () => {
     it('应该支持 headerExtra 渲染多个元素', () => {
       const customContent = (
         <>
-          <button data-testid="button-1">按钮1</button>
-          <button data-testid="button-2">按钮2</button>
+          <button type="button" data-testid="button-1">
+            按钮1
+          </button>
+          <button type="button" data-testid="button-2">
+            按钮2
+          </button>
           <span data-testid="text">文本</span>
         </>
       );
@@ -952,7 +960,7 @@ describe('Workspace Component', () => {
       const onClose = vi.fn();
       const handleAction = vi.fn();
       const customContent = (
-        <button data-testid="custom-action" onClick={handleAction}>
+        <button type="button" data-testid="custom-action" onClick={handleAction}>
           自定义操作
         </button>
       );

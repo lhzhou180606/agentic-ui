@@ -58,7 +58,7 @@ describe('ReadonlyImage Component', () => {
   });
 
   it('应该在加载失败时显示链接', async () => {
-    const { container, rerender } = render(
+    const { container, rerender: _rerender } = render(
       <ReadonlyImage src="invalid-url.jpg" alt="Failed Image" />,
     );
 

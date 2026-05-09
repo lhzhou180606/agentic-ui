@@ -14,6 +14,7 @@ const Consumer: React.FC = () => {
   const { setDeleteIconPosition } = useContext(TablePropsContext);
   return (
     <button
+      type="button"
       data-testid="set-pos"
       onClick={() => setDeleteIconPosition?.({ rowIndex: 1, columnIndex: 0 })}
     >

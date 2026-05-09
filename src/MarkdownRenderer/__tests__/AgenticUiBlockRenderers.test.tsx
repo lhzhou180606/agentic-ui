@@ -48,7 +48,7 @@ describe('AgenticUiTaskBlockRenderer', () => {
     const json = JSON.stringify({
       items: [{ key: '1', title: 'T', content: 'c' }],
     });
-    render(<AgenticUiTaskBlockRenderer children={json} />);
+    render(<AgenticUiTaskBlockRenderer>{json}</AgenticUiTaskBlockRenderer>);
 
     expect(screen.getByTestId('agentic-ui-task-block')).toBeInTheDocument();
     expect(screen.getByTestId('task-list-mock')).toBeInTheDocument();
@@ -56,14 +56,18 @@ describe('AgenticUiTaskBlockRenderer', () => {
 
   it('应在 json5 失败且 partial-json 可解析时使用部分 JSON 渲染 TaskList', () => {
     const incomplete = '{"items":[{"key":"1","title":"T"';
-    render(<AgenticUiTaskBlockRenderer children={incomplete} />);
+    render(
+      <AgenticUiTaskBlockRenderer>{incomplete}</AgenticUiTaskBlockRenderer>,
+    );
 
     expect(screen.getByTestId('agentic-ui-task-block')).toBeInTheDocument();
     expect(screen.getByTestId('task-list-mock')).toBeInTheDocument();
   });
 
   it('应在 json5 与 partial-json 均失败时渲染 fallback', () => {
-    render(<AgenticUiTaskBlockRenderer children="__PARSE_FAIL__" />);
+    render(
+      <AgenticUiTaskBlockRenderer>__PARSE_FAIL__</AgenticUiTaskBlockRenderer>,
+    );
 
     expect(screen.getByTestId('agentic-ui-task-fallback')).toBeInTheDocument();
     expect(screen.queryByTestId('task-list-mock')).not.toBeInTheDocument();
@@ -71,32 +75,36 @@ describe('AgenticUiTaskBlockRenderer', () => {
 
   it('应从多种子节点提取代码文本', () => {
     render(
-      <AgenticUiTaskBlockRenderer
-        children={['{"items":[{"key":"a","title":"', 'nested', '"}]}']}
-      />,
+      <AgenticUiTaskBlockRenderer>
+        {['{"items":[{"key":"a","title":"', 'nested', '"}]}']}
+      </AgenticUiTaskBlockRenderer>,
     );
 
     expect(screen.getByTestId('agentic-ui-task-block')).toBeInTheDocument();
   });
 
   it('应支持数字子节点（转为字符串后参与解析）', () => {
-    render(<AgenticUiTaskBlockRenderer children={42} />);
+    render(<AgenticUiTaskBlockRenderer>{42}</AgenticUiTaskBlockRenderer>);
 
     expect(screen.getByTestId('agentic-ui-task-block')).toBeInTheDocument();
   });
 
   it('应从嵌套 React 元素提取文本并解析 JSON', () => {
     render(
-      <AgenticUiTaskBlockRenderer
-        children={<span>{'{"items":[{"key":"x","title":"y"}]}'}</span>}
-      />,
+      <AgenticUiTaskBlockRenderer>
+        <span>{'{"items":[{"key":"x","title":"y"}]}'}</span>
+      </AgenticUiTaskBlockRenderer>,
     );
 
     expect(screen.getByTestId('agentic-ui-task-block')).toBeInTheDocument();
   });
 
   it('应在无文本子节点时走 extractTextContent 空分支', () => {
-    render(<AgenticUiTaskBlockRenderer children={<span />} />);
+    render(
+      <AgenticUiTaskBlockRenderer>
+        <span />
+      </AgenticUiTaskBlockRenderer>,
+    );
 
     expect(screen.getByTestId('agentic-ui-task-block')).toBeInTheDocument();
   });
@@ -107,7 +115,9 @@ describe('AgenticUiToolUseBarBlockRenderer', () => {
     const json = JSON.stringify({
       tools: [{ id: 'a', toolName: 'n', toolTarget: '' }],
     });
-    render(<AgenticUiToolUseBarBlockRenderer children={json} />);
+    render(
+      <AgenticUiToolUseBarBlockRenderer>{json}</AgenticUiToolUseBarBlockRenderer>,
+    );
 
     expect(
       screen.getByTestId('agentic-ui-toolusebar-block'),
@@ -117,7 +127,11 @@ describe('AgenticUiToolUseBarBlockRenderer', () => {
 
   it('应在 json5 失败且 partial-json 可解析时使用部分 JSON 渲染 ToolUseBar', () => {
     const incomplete = '{"tools":[{"id":"a","toolName":"x"';
-    render(<AgenticUiToolUseBarBlockRenderer children={incomplete} />);
+    render(
+      <AgenticUiToolUseBarBlockRenderer>
+        {incomplete}
+      </AgenticUiToolUseBarBlockRenderer>,
+    );
 
     expect(
       screen.getByTestId('agentic-ui-toolusebar-block'),
@@ -126,7 +140,11 @@ describe('AgenticUiToolUseBarBlockRenderer', () => {
   });
 
   it('应在 json5 与 partial-json 均失败时渲染 fallback', () => {
-    render(<AgenticUiToolUseBarBlockRenderer children="__PARSE_FAIL__" />);
+    render(
+      <AgenticUiToolUseBarBlockRenderer>
+        __PARSE_FAIL__
+      </AgenticUiToolUseBarBlockRenderer>,
+    );
 
     expect(
       screen.getByTestId('agentic-ui-toolusebar-fallback'),
@@ -136,9 +154,9 @@ describe('AgenticUiToolUseBarBlockRenderer', () => {
 
   it('应从多种子节点提取代码文本（ToolUseBar）', () => {
     render(
-      <AgenticUiToolUseBarBlockRenderer
-        children={['{"tools":[{"id":"a","toolName":"', 'x', '"}]}']}
-      />,
+      <AgenticUiToolUseBarBlockRenderer>
+        {['{"tools":[{"id":"a","toolName":"', 'x', '"}]}']}
+      </AgenticUiToolUseBarBlockRenderer>,
     );
 
     expect(
@@ -147,7 +165,9 @@ describe('AgenticUiToolUseBarBlockRenderer', () => {
   });
 
   it('应支持数字子节点并解析（ToolUseBar）', () => {
-    render(<AgenticUiToolUseBarBlockRenderer children={42} />);
+    render(
+      <AgenticUiToolUseBarBlockRenderer>{42}</AgenticUiToolUseBarBlockRenderer>,
+    );
 
     expect(
       screen.getByTestId('agentic-ui-toolusebar-block'),
@@ -156,9 +176,9 @@ describe('AgenticUiToolUseBarBlockRenderer', () => {
 
   it('应从嵌套 React 元素提取文本（ToolUseBar）', () => {
     render(
-      <AgenticUiToolUseBarBlockRenderer
-        children={<span>{'{"tools":[{"id":"a","toolName":"b"}]}'}</span>}
-      />,
+      <AgenticUiToolUseBarBlockRenderer>
+        <span>{'{"tools":[{"id":"a","toolName":"b"}]}'}</span>
+      </AgenticUiToolUseBarBlockRenderer>,
     );
 
     expect(
@@ -167,7 +187,11 @@ describe('AgenticUiToolUseBarBlockRenderer', () => {
   });
 
   it('应在无文本子节点时走 extractTextContent 空分支并解析默认 {}', () => {
-    render(<AgenticUiToolUseBarBlockRenderer children={<span />} />);
+    render(
+      <AgenticUiToolUseBarBlockRenderer>
+        <span />
+      </AgenticUiToolUseBarBlockRenderer>,
+    );
 
     expect(
       screen.getByTestId('agentic-ui-toolusebar-block'),

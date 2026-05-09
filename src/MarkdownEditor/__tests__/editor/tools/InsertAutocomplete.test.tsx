@@ -31,7 +31,7 @@ const InsertAutocomplete = ({ onSelect, onCancel, suggestions = [] }: any) => (
         </li>
       ))}
     </ul>
-    <button data-testid="cancel-button" onClick={onCancel}>
+    <button type="button" data-testid="cancel-button" onClick={onCancel}>
       取消
     </button>
   </div>

@@ -464,7 +464,7 @@ describe('FileMapView', () => {
       const fileMap = new Map();
       fileMap.set('video-1', createMockFile('clip.mp4', 'video/mp4'));
 
-      const { container } = render(
+      const { container: _container } = render(
         <FileMapView fileMap={fileMap} onPreview={onPreview} />,
       );
 
@@ -482,7 +482,7 @@ describe('FileMapView', () => {
       const fileMap = new Map();
       fileMap.set('video-1', createMockFile('space.mp4', 'video/mp4'));
 
-      const { container } = render(<FileMapView fileMap={fileMap} />);
+      const { container: _container } = render(<FileMapView fileMap={fileMap} />);
 
       const videoThumb = screen.getByRole('button', {
         name: '播放视频：space.mp4',

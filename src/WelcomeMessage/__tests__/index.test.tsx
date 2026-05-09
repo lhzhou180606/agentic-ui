@@ -333,9 +333,9 @@ describe('WelcomeMessage 组件', () => {
   it('应该正确处理事件处理', () => {
     const handleClick = vi.fn();
 
-    const { container } = renderWelcomeMessage({
+    const { container: _container } = renderWelcomeMessage({
       title: (
-        <button onClick={handleClick} data-testid="clickable-title">
+        <button type="button" onClick={handleClick} data-testid="clickable-title">
           可点击标题
         </button>
       ),

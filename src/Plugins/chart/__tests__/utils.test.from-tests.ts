@@ -47,7 +47,7 @@ describe('Chart Utils', () => {
     });
 
     it('应在 format 抛出时走 catch 并返回原始 value', async () => {
-      const OriginalNumberFormat = Intl.NumberFormat;
+      const _OriginalNumberFormat = Intl.NumberFormat;
       vi.stubGlobal('Intl', {
         ...Intl,
         NumberFormat: class MockNumberFormat {

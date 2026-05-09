@@ -96,7 +96,7 @@ describe('MarkdownEditor Utils', () => {
 
       // 触发 click 监听器，断言 stopPropagation 被调用
       const clickHandler = mockLink.addEventListener.mock.calls.find(
-        (c: [string, Function]) => c[0] === 'click',
+        (c: [string, (...args: unknown[]) => unknown]) => c[0] === 'click',
       )?.[1];
       const mockEvent = { stopPropagation: vi.fn() };
       clickHandler(mockEvent);

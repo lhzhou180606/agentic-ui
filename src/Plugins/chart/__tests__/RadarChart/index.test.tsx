@@ -38,7 +38,7 @@ vi.mock('chart.js', async () => {
         plugins: {
           legend: {
             labels: {
-              generateLabels: vi.fn((chart) => [
+              generateLabels: vi.fn((_chart) => [
                 { text: 'Label 1' },
                 { text: 'Very Long Label That Should Be Truncated' },
               ]),
@@ -51,7 +51,7 @@ vi.mock('chart.js', async () => {
 });
 
 vi.mock('react-chartjs-2', () => ({
-  Radar: React.forwardRef(({ data, options }: any, ref: any) => {
+  Radar: React.forwardRef(({ data: _data, options }: any, ref: any) => {
     React.useEffect(() => {
       if (ref) {
         if (typeof ref === 'function') {
@@ -138,6 +138,7 @@ vi.mock('../../components', () => ({
     <div data-testid="chart-filter">
       {filterOptions?.map((opt: any, i: number) => (
         <button
+          type="button"
           key={i}
           onClick={() => onFilterChange?.(opt.value)}
           data-selected={selectedFilter === opt.value}
@@ -470,7 +471,7 @@ describe('RadarChart', () => {
 
   it('应该处理 tooltip 数据点为空的情况', async () => {
     // Mock tooltip external 来测试空数据点
-    const originalRadar = require('react-chartjs-2').Radar;
+    const _originalRadar = require('react-chartjs-2').Radar;
     vi.mocked(require('react-chartjs-2')).Radar = React.forwardRef(
       ({ options }: any, ref: any) => {
         React.useEffect(() => {

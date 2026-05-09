@@ -110,7 +110,7 @@ describe('toMarkdown plugin functionality', () => {
       toMarkdown: [
         {
           match: (node: any) => node.type === 'nonexistent',
-          convert: (node: any) => ({
+          convert: (_node: any) => ({
             type: 'paragraph',
             children: [],
           }),

@@ -25,7 +25,7 @@ vi.mock('../../../../editor/elements/Table/useScrollShadow', () => ({
 }));
 
 vi.mock('../../../../editor/elements/Table/ReadonlyTableComponent', () => ({
-  ReadonlyTableComponent: ({ children, element, baseCls }: any) => (
+  ReadonlyTableComponent: ({ children, element: _element, baseCls }: any) => (
     <div data-testid="readonly-table" data-basecls={baseCls}>
       {children}
     </div>
@@ -292,7 +292,7 @@ describe('SlateTable', () => {
       const { container } = renderSlateTable();
       const table = container.querySelector('table')!;
       const event = new Event('dragstart', { bubbles: true, cancelable: true });
-      const prevented = !table.dispatchEvent(event);
+      const _prevented = !table.dispatchEvent(event);
       // onDragStart 中调用了 e.preventDefault()
       expect(table).toBeInTheDocument();
     });

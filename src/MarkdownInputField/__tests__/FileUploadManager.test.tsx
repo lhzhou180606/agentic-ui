@@ -36,7 +36,7 @@ import * as utils from '../AttachmentButton/utils';
 describe('useFileUploadManager', () => {
   const mockOnFileMapChange = vi.fn();
   const mockUpload = vi.fn();
-  const mockUploadWithResponse = vi.fn();
+  const _mockUploadWithResponse = vi.fn();
   const mockOnDelete = vi.fn();
 
   const createMockFile = (

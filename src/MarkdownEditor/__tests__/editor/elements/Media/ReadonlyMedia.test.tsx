@@ -365,7 +365,7 @@ describe('ReadonlyMedia', () => {
   describe('mediaElement audio', () => {
     beforeEach(() => {
       vi.mocked(useRefFunctionModule.useRefFunction).mockImplementation(
-        (fn: any) => () => {},
+        (_fn: any) => () => {},
       );
     });
 

@@ -47,7 +47,7 @@ vi.mock('../utils', () => ({
   // 用 dayjs 解析 gmtCreate（缺失返回 0）。源码用它替换了之前的 `as number` 强转。
   getItemTimestamp: (item: { gmtCreate?: number | string | Date }) => {
     const raw = item?.gmtCreate;
-    if (raw == null) return 0;
+    if (raw === null || raw === undefined) return 0;
     if (typeof raw === 'number') return raw;
     const t = dayjs(raw).valueOf();
     return Number.isNaN(t) ? 0 : t;

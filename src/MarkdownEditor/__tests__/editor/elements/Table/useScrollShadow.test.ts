@@ -229,11 +229,14 @@ describe('useScrollShadow Hook', () => {
   it('ref 挂载到 DOM 后滚动触发 throttledCheck 与 checkScroll', () => {
     function Wrapper() {
       const [ref] = useScrollShadow();
-      return React.createElement('div', {
-        ref,
-        'data-testid': 'scroll-target',
-        children: 'content',
-      });
+      return React.createElement(
+        'div',
+        {
+          ref,
+          'data-testid': 'scroll-target',
+        },
+        'content',
+      );
     }
     const { getByTestId } = render(React.createElement(Wrapper));
     const div = getByTestId('scroll-target');

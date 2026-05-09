@@ -77,6 +77,7 @@ vi.mock('../MessagesContent/BubbleExtra', () => ({
   BubbleExtra: ({ onRenderExtraNull }: any) => (
     <div data-testid="bubble-extra">
       <button
+        type="button"
         data-testid="extra-null-btn"
         onClick={() => onRenderExtraNull?.(true)}
       >
@@ -130,7 +131,7 @@ vi.mock('antd', async (importOriginal) => {
       </div>
     ),
     Typography: {
-      Text: ({ children, copyable }: any) => (
+      Text: ({ children, copyable: _copyable }: any) => (
         <span data-testid="typography-text">{children}</span>
       ),
     },
@@ -151,7 +152,12 @@ vi.mock('@ant-design/icons', () => ({
 // Mock Components/ActionIconBox
 vi.mock('../../Components/ActionIconBox', () => ({
   ActionIconBox: ({ children, onClick, title }: any) => (
-    <button data-testid="action-icon-box" onClick={onClick} title={title}>
+    <button
+      type="button"
+      data-testid="action-icon-box"
+      onClick={onClick}
+      title={title}
+    >
       {children}
     </button>
   ),

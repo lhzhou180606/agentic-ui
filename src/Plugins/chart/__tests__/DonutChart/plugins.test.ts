@@ -9,6 +9,82 @@ import {
   createDataLabelsLeaderLinePlugin,
 } from '../../DonutChart/plugins';
 
+function createMockCtx() {
+  const ctx: any = {
+    save: vi.fn(),
+    restore: vi.fn(),
+    beginPath: vi.fn(),
+    arc: vi.fn(),
+    fill: vi.fn(),
+    moveTo: vi.fn(),
+    quadraticCurveTo: vi.fn(),
+    stroke: vi.fn(),
+    fillText: vi.fn(),
+    textAlign: 'center',
+    textBaseline: 'middle',
+    font: '',
+    lineWidth: 1,
+    strokeStyle: '',
+    fillStyleValues: [] as string[],
+  };
+  Object.defineProperty(ctx, 'fillStyle', {
+    get() {
+      return ctx._fillStyle;
+    },
+    set(v: string) {
+      ctx._fillStyle = v;
+      ctx.fillStyleValues.push(v);
+    },
+  });
+  return ctx;
+}
+
+function createLeaderLineChartWithCtx(ctx: any, arcData: any[], values: any[]) {
+  return {
+    ctx,
+    getDatasetMeta: vi.fn(() => ({
+      data: arcData,
+    })),
+    data: {
+      datasets: [{ data: values }],
+    },
+  };
+}
+
+function createLeaderLineChart(arcData: any[], values: any[]) {
+  return createLeaderLineChartWithCtx(createMockCtx(), arcData, values);
+}
+
+function createMockChart(
+  width: number,
+  height: number,
+  hasData: boolean = true,
+) {
+  const mockCtx = createMockCtx();
+
+  const mockData = hasData
+    ? [
+        {
+          x: width / 2,
+          y: height / 2,
+          outerRadius: 80,
+          innerRadius: 40,
+        },
+      ]
+    : [];
+
+  const mockMeta = {
+    data: mockData,
+  };
+
+  return {
+    width,
+    height,
+    ctx: mockCtx,
+    getDatasetMeta: vi.fn(() => (hasData ? mockMeta : null)),
+  };
+}
+
 describe('DonutChart plugins', () => {
   describe('createDataLabelsLeaderLinePlugin', () => {
     it('uses default lineLength and darkMode when not provided', () => {
@@ -347,79 +423,3 @@ describe('DonutChart plugins', () => {
     });
   });
 });
-
-function createMockCtx() {
-  const ctx: any = {
-    save: vi.fn(),
-    restore: vi.fn(),
-    beginPath: vi.fn(),
-    arc: vi.fn(),
-    fill: vi.fn(),
-    moveTo: vi.fn(),
-    quadraticCurveTo: vi.fn(),
-    stroke: vi.fn(),
-    fillText: vi.fn(),
-    textAlign: 'center',
-    textBaseline: 'middle',
-    font: '',
-    lineWidth: 1,
-    strokeStyle: '',
-    fillStyleValues: [] as string[],
-  };
-  Object.defineProperty(ctx, 'fillStyle', {
-    get() {
-      return ctx._fillStyle;
-    },
-    set(v: string) {
-      ctx._fillStyle = v;
-      ctx.fillStyleValues.push(v);
-    },
-  });
-  return ctx;
-}
-
-function createLeaderLineChart(arcData: any[], values: any[]) {
-  return createLeaderLineChartWithCtx(createMockCtx(), arcData, values);
-}
-
-function createLeaderLineChartWithCtx(ctx: any, arcData: any[], values: any[]) {
-  return {
-    ctx,
-    getDatasetMeta: vi.fn(() => ({
-      data: arcData,
-    })),
-    data: {
-      datasets: [{ data: values }],
-    },
-  };
-}
-
-function createMockChart(
-  width: number,
-  height: number,
-  hasData: boolean = true,
-) {
-  const mockCtx = createMockCtx();
-
-  const mockData = hasData
-    ? [
-        {
-          x: width / 2,
-          y: height / 2,
-          outerRadius: 80,
-          innerRadius: 40,
-        },
-      ]
-    : [];
-
-  const mockMeta = {
-    data: mockData,
-  };
-
-  return {
-    width,
-    height,
-    ctx: mockCtx,
-    getDatasetMeta: vi.fn(() => (hasData ? mockMeta : null)),
-  };
-}
