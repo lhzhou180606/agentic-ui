@@ -59,6 +59,7 @@
     "minify:lottie": "node scripts/minify-lottie-json.mjs",
     "build:watch": "father dev",
     "check:demo": "node scripts/checkDemoFiles.js",
+    "check:test-imports": "node scripts/checkTestImports.js",
     "dev": "dumi dev",
     "docs:build": "dumi build",
     "doctor": "father doctor",
