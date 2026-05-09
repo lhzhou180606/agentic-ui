@@ -47,7 +47,7 @@ vi.mock('../../../../MarkdownEditor/editor/store', async () => {
 
 // Mock MarkdownEditor 组件
 vi.mock('../../../../MarkdownEditor', () => ({
-  MarkdownEditor: ({ initValue, ...props }: any) => (
+  MarkdownEditor: ({ initValue }: any) => (
     <div data-testid="markdown-editor">
       <div data-testid="markdown-content">{initValue}</div>
     </div>
@@ -112,13 +112,7 @@ vi.mock('../../components/AceEditor', () => ({
 
 // Mock CodeToolbar 组件
 vi.mock('../../components/CodeToolbar', () => ({
-  CodeToolbar: ({
-    element,
-    readonly,
-    isSelected,
-    onViewModeToggle,
-    ...rest
-  }: any) => (
+  CodeToolbar: ({ element, readonly, isSelected, onViewModeToggle }: any) => (
     <div data-testid="code-toolbar">
       <span>Code Toolbar</span>
       <span data-testid="toolbar-language">
@@ -376,7 +370,7 @@ describe('CodeRenderer Component', () => {
           value: '<div>Test HTML</div>',
         },
       };
-      const { container } = render(<CodeRenderer {...props} />);
+      render(<CodeRenderer {...props} />);
       // 不应该渲染 HtmlPreview
       expect(screen.queryByTestId('html-preview')).not.toBeInTheDocument();
       // 应该渲染代码编辑器容器

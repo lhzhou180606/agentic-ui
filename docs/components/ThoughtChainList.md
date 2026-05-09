@@ -1,4 +1,5 @@
 ---
+title: ThoughtChainList 思维链
 nav:
   order: 1
 atomId: ThoughtChainList

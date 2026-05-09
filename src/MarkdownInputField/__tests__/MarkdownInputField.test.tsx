@@ -10,8 +10,78 @@ vi.mock('../BorderBeamAnimation', () => ({
   BorderBeamAnimation: () => null,
 }));
 
+vi.mock('../../MarkdownEditor', () => ({
+  BaseMarkdownEditor: React.forwardRef((props: any, ref: any) => {
+    // 使用 ref 持有最新内容，避免闭包捕获过期 state（影响 voice 累积场景）
+    const contentRef = React.useRef<string>(
+      props.value ?? props.initValue ?? '',
+    );
+    const [content, setContent] = React.useState(contentRef.current);
+
+    const updateContent = React.useCallback((value: string) => {
+      contentRef.current = value;
+      setContent(value);
+    }, []);
+
+    // 通过 editorRef.current 暴露 store（与真实 BaseMarkdownEditor 一致）
+    const exposeStore = React.useMemo(
+      () => ({
+        store: {
+          getMDContent: () => contentRef.current,
+          setMDContent: (value: string) => updateContent(value),
+          clearContent: () => updateContent(''),
+          editor: { children: [] },
+          inputComposition: false,
+        },
+      }),
+      [updateContent],
+    );
+
+    // editorRef 是 MarkdownInputField 实际使用的入参，需要把 store 挂上
+    React.useEffect(() => {
+      if (props.editorRef) {
+        props.editorRef.current = exposeStore;
+      }
+    }, [props.editorRef, exposeStore]);
+
+    // 同时兼容 forwardRef 调用方
+    React.useImperativeHandle(ref, () => exposeStore);
+
+    // 监听 props.value 的变化
+    React.useEffect(() => {
+      if (props.value !== undefined && props.value !== contentRef.current) {
+        updateContent(props.value);
+      }
+    }, [props.value, updateContent]);
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (props.onKeyDown) {
+        props.onKeyDown(e);
+      }
+    };
+
+    const readonlyCls = props.readonly ? 'markdown-editor-readonly' : '';
+
+    return (
+      <div
+        data-testid="markdown-editor"
+        contentEditable
+        onKeyDown={handleKeyDown}
+        suppressContentEditableWarning
+        style={props.style}
+        className={[props.className, readonlyCls].filter(Boolean).join(' ')}
+      >
+        {content}
+      </div>
+    );
+  }),
+  MarkdownEditorInstance: {},
+}));
+
 vi.mock('../Suggestion', () => ({
-  Suggestion: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  Suggestion: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="suggestion">{children}</div>
+  ),
 }));
 
 vi.mock('../SkillModeBar', () => ({
@@ -34,16 +104,31 @@ vi.mock('../SendActions', () => ({
     onStartRecording,
     onStopRecording,
     onSend,
+    value,
+    attachment,
+    allowEmptySubmit,
   }: {
     voiceRecognizer?: unknown;
     recording?: boolean;
     disabled?: boolean;
     onStartRecording?: () => Promise<void>;
     onStopRecording?: () => Promise<void>;
-    onSend?: () => void;
+    onSend?: (value?: string) => void;
+    value?: string;
+    attachment?: { enable?: boolean };
+    allowEmptySubmit?: boolean;
   }) => {
     return (
       <div data-testid="send-actions-mock">
+        {attachment?.enable ? (
+          <button
+            type="button"
+            data-testid="attachment-button"
+            disabled={disabled}
+          >
+            Attachment
+          </button>
+        ) : null}
         {voiceRecognizer ? (
           <button
             type="button"
@@ -71,7 +156,24 @@ vi.mock('../SendActions', () => ({
         <button
           type="button"
           data-testid="send-button"
-          onClick={() => onSend?.()}
+          onClick={() => {
+            // 与真实 SendActions/sendMessage 行为对齐：
+            // 1) 录音中点击发送，先停止录音再发送
+            // 2) 空内容（含纯空白）默认不触发，allowEmptySubmit 时以空串触发
+            // 3) 非空时传递 trim 后的内容
+            if (recording) {
+              void onStopRecording?.();
+            }
+            const raw = value ?? '';
+            const trimmed = raw.trim();
+            if (!trimmed && !recording) {
+              if (allowEmptySubmit) {
+                onSend?.('');
+              }
+              return;
+            }
+            onSend?.(trimmed || raw);
+          }}
         >
           Send
         </button>
@@ -564,88 +666,9 @@ describe('MarkdownInputField - allowEmptySubmit', () => {
 // ===========================================================================
 // === merged from MarkdownInputField.assertions.test.tsx ===
 // ===========================================================================
-
-vi.mock('../../MarkdownEditor', () => ({
-  BaseMarkdownEditor: React.forwardRef((props: any, ref: any) => {
-    const [content, setContent] = React.useState(
-      props.value || props.initValue || '',
-    );
-
-    // 监听 props.value 的变化
-    React.useEffect(() => {
-      if (props.value !== undefined) {
-        setContent(props.value);
-      }
-    }, [props.value]);
-
-    React.useImperativeHandle(ref, () => ({
-      store: {
-        getMDContent: vi.fn(() => content),
-        setMDContent: vi.fn((value: string) => setContent(value)),
-        clearContent: vi.fn(() => setContent('')),
-        editor: { children: [] },
-        inputComposition: false,
-      },
-    }));
-
-    // 模拟键盘事件处理
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-      if (props.onKeyDown) {
-        props.onKeyDown(e);
-      }
-    };
-
-    return (
-      <div
-        data-testid="markdown-editor"
-        contentEditable
-        onKeyDown={handleKeyDown}
-        suppressContentEditableWarning
-        style={props.style}
-        className={props.className}
-      >
-        {content}
-      </div>
-    );
-  }),
-}));
-
-vi.mock('../SendButton', () => ({
-  resolveSendDisabled: () => false,
-  SendButton: ({ onClick, disabled, loading, ...props }: any) => (
-    <button
-      data-testid="send-button"
-      onClick={onClick}
-      disabled={disabled}
-      data-loading={loading}
-      type="button"
-      {...props}
-    >
-      Send
-    </button>
-  ),
-}));
-
-vi.mock('../AttachmentButton', () => ({
-  AttachmentButton: ({ onFileUpload, disabled, ...props }: any) => (
-    <button
-      data-testid="attachment-button"
-      onClick={() => onFileUpload?.([new File(['test'], 'test.txt')])}
-      disabled={disabled}
-      type="button"
-      {...props}
-    >
-      Attachment
-    </button>
-  ),
-  upLoadFileToServer: vi.fn(),
-}));
-
-vi.mock('../Suggestion', () => ({
-  Suggestion: ({ children }: any) => (
-    <div data-testid="suggestion">{children}</div>
-  ),
-}));
+// 注：本文件顶部已统一 mock 了 SendActions / Suggestion / SkillModeBar 等模块。
+// 由于 vi.mock 会被 hoist，且重复 mock 同一模块时只有最后一次生效，
+// 这里不再重复 vi.mock，避免覆盖顶部的 mock 实现导致前半部分用例失效。
 
 describe('MarkdownInputField 断言测试', () => {
   const user = userEvent.setup();

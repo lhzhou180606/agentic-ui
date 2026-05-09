@@ -31,7 +31,7 @@ vi.mock('antd', () => ({
   message: {
     success: vi.fn(),
   },
-  Segmented: ({ options, value, onChange }: any) => (
+  Segmented: ({ options, _, onChange }: any) => (
     <div data-testid="segmented">
       {options?.map((option: any, index: number) => (
         <button
@@ -96,7 +96,6 @@ describe('CodeToolbar', () => {
     isSelected: false,
     onSelectionChange: vi.fn(),
     theme: 'github',
-    setTheme: vi.fn(),
     isExpanded: true,
   };
 
