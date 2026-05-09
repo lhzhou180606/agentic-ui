@@ -32,6 +32,7 @@ export {
   FileTree,
   PreviewComponent,
   default as Workspace,
+  getFileType,
   getFileTypeIcon,
   getFileTypeName,
   getGroupIcon,

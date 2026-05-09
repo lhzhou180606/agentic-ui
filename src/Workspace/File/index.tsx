@@ -4,7 +4,7 @@ export { PreviewComponent } from './PreviewComponent';
 export type { PreviewComponentProps } from './PreviewComponent';
 
 // 导出类型和工具函数
-export { getFileTypeName } from '../types';
+export { getFileType, getFileTypeName } from '../types';
 export type {
   FileActionRef,
   FileBuiltinActions,
