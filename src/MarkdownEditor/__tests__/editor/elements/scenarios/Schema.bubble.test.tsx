@@ -8,13 +8,13 @@ import { render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { BubbleConfigContext } from '../../../../Bubble/BubbleConfigProvide';
-import { Schema } from '../../../editor/elements/Schema';
-import { EditorStoreContext } from '../../../editor/store';
-import { CodeNode } from '../../../el';
+import { BubbleConfigContext } from '../../../../../Bubble/BubbleConfigProvide';
+import { Schema } from '../../../../editor/elements/Schema';
+import { EditorStoreContext } from '../../../../editor/store';
+import { CodeNode } from '../../../../el';
 
 // Mock SchemaRenderer（路径需与 Schema 组件中的 import 一致）
-vi.mock('../../../../Schema', () => ({
+vi.mock('../../../../../Schema', () => ({
   SchemaRenderer: ({
     schema,
     values,

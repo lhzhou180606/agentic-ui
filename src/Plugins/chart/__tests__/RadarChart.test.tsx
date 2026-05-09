@@ -415,7 +415,7 @@ describe('RadarChart', () => {
   describe('交互功能测试', () => {
     it('应该支持下载功能', async () => {
       const { downloadChart } =
-        await import('../../../src/Plugins/chart/components');
+        await import('../../../../src/Plugins/chart/components');
 
       render(<RadarChart data={sampleData} title="可下载雷达图" />);
 

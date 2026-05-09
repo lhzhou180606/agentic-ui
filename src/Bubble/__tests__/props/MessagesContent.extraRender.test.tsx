@@ -2,9 +2,9 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { BubbleMessageDisplay } from '../MessagesContent';
+import { BubbleMessageDisplay } from '../../MessagesContent';
 
-vi.mock('../MessagesContent/MarkdownPreview', () => ({
+vi.mock('../../MessagesContent/MarkdownPreview', () => ({
   MarkdownPreview: ({ content, extra }: any) => (
     <div data-testid="markdown-preview">
       <div data-testid="content">{content}</div>
@@ -13,11 +13,11 @@ vi.mock('../MessagesContent/MarkdownPreview', () => ({
   ),
 }));
 
-vi.mock('../MessagesContent/DocInfo', () => ({
+vi.mock('../../MessagesContent/DocInfo', () => ({
   DocInfoList: () => <div data-testid="doc-info-list">Doc Info</div>,
 }));
 
-vi.mock('../MessagesContent/EXCEPTION', () => ({
+vi.mock('../../MessagesContent/EXCEPTION', () => ({
   EXCEPTION: ({ extra }: any) => (
     <div data-testid="exception">
       Exception
@@ -27,7 +27,7 @@ vi.mock('../MessagesContent/EXCEPTION', () => ({
 }));
 
 // Mock hooks
-vi.mock('../../Hooks/useRefFunction', () => ({
+vi.mock('../../../Hooks/useRefFunction', () => ({
   useRefFunction: vi.fn((fn) => fn),
 }));
 

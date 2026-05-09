@@ -8,12 +8,12 @@ import { render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { BubbleConfigContext } from '../../../../Bubble/BubbleConfigProvide';
-import { Schema } from '../../../editor/elements/Schema';
-import { EditorStoreContext } from '../../../editor/store';
+import { BubbleConfigContext } from '../../../../../Bubble/BubbleConfigProvide';
+import { Schema } from '../../../../editor/elements/Schema';
+import { EditorStoreContext } from '../../../../editor/store';
 
 // Mock SchemaRenderer
-vi.mock('../../../../Schema', () => ({
+vi.mock('../../../../../Schema', () => ({
   SchemaRenderer: ({
     schema,
     values,

@@ -68,7 +68,7 @@ vi.mock('../utils', () => ({
 }));
 
 // Import BarChart after mocking
-import BarChart, { BarChartDataItem } from '../BarChart';
+import BarChart, { BarChartDataItem } from '../../BarChart';
 
 describe('BarChart maxBarThickness 功能测试', () => {
   const basicData: BarChartDataItem[] = [

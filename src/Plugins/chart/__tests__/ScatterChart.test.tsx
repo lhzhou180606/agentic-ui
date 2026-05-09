@@ -398,7 +398,7 @@ describe('ScatterChart', () => {
   describe('交互功能测试', () => {
     it('应该支持下载功能', async () => {
       const { downloadChart } =
-        await import('../../../src/Plugins/chart/components');
+        await import('../../../../src/Plugins/chart/components');
 
       render(<ScatterChart data={sampleData} title="可下载散点图" />);
 
@@ -870,7 +870,7 @@ describe('ScatterChart', () => {
   describe('覆盖率：handleDownload 与错误边界', () => {
     it('handleDownload 通过 ToolBar 调用 downloadChart', async () => {
       const { downloadChart } =
-        await import('../../../src/Plugins/chart/components');
+        await import('../../../../src/Plugins/chart/components');
       render(<ScatterChart data={sampleData} title="下载" />);
       screen.getByTestId('download-button').click();
       await waitFor(() => {

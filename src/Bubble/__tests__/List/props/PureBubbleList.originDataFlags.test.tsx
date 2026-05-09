@@ -4,9 +4,9 @@ import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { BubbleConfigContext } from '../../BubbleConfigProvide';
-import { PureBubbleList } from '../../List/PureBubbleList';
-import type { MessageBubbleData } from '../../type';
+import { BubbleConfigContext } from '../../../BubbleConfigProvide';
+import { PureBubbleList } from '../../../List/PureBubbleList';
+import type { MessageBubbleData } from '../../../type';
 
 interface CapturedBubbleProps {
   id: string;
@@ -17,7 +17,7 @@ const mockState = vi.hoisted(() => ({
   captured: [] as CapturedBubbleProps[],
 }));
 
-vi.mock('../../PureBubble', () => {
+vi.mock('../../../PureBubble', () => {
   const MockBubble: React.FC<{
     id: string;
     originData: MessageBubbleData;

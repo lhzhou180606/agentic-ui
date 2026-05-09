@@ -2,8 +2,8 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { BubbleConfigContext } from '../BubbleConfigProvide';
-import { BubbleExtra } from '../MessagesContent/BubbleExtra';
+import { BubbleConfigContext } from '../../BubbleConfigProvide';
+import { BubbleExtra } from '../../MessagesContent/BubbleExtra';
 
 const BubbleConfigProvide: React.FC<{
   children: React.ReactNode;
@@ -76,7 +76,7 @@ vi.mock('@ant-design/agentic-ui', async () => {
 });
 
 // Mock ActionIconBox and CopyButton
-vi.mock('../../index', async () => {
+vi.mock('../../../index', async () => {
   const actual = await vi.importActual('../../index');
   return {
     ...actual,

@@ -467,7 +467,7 @@ describe('TableCellIndex 组件测试', () => {
     }
 
     const { NativeTableEditor } =
-      await import('../../../../../src/MarkdownEditor/utils/native-table');
+      await import('../../../../../../src/MarkdownEditor/utils/native-table');
     expect(NativeTableEditor.removeTable).toHaveBeenCalledWith(editor, [0]);
   });
 
@@ -485,7 +485,7 @@ describe('TableCellIndex 组件测试', () => {
     editor.children = [{ type: 'table', children: [testRow] }];
 
     const { NativeTableEditor } =
-      await import('../../../../../src/MarkdownEditor/utils/native-table');
+      await import('../../../../../../src/MarkdownEditor/utils/native-table');
 
     render(
       <ConfigProvider>

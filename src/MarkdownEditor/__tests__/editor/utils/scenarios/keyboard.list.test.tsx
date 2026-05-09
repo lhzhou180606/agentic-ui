@@ -9,7 +9,7 @@ import {
 } from 'slate';
 import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { EditorStore } from '../../../editor/store';
+import { EditorStore } from '../../../../editor/store';
 import { KeyboardTask } from '../../../editor/utils/keyboard';
 
 // Mock dependencies
@@ -34,7 +34,7 @@ Object.defineProperty(navigator, 'clipboard', {
 });
 
 // Mock EditorUtils
-vi.mock('../../../editor/utils/editorUtils', () => ({
+vi.mock('../../../../editor/utils/editorUtils', () => ({
   EditorUtils: {
     toggleFormat: vi.fn(),
     clearMarks: vi.fn(),
@@ -47,7 +47,7 @@ vi.mock('../../../editor/utils/editorUtils', () => ({
   },
 }));
 
-vi.mock('../../../editor/store', () => ({
+vi.mock('../../../../editor/store', () => ({
   EditorStore: vi.fn(),
 }));
 

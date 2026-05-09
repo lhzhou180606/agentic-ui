@@ -147,7 +147,7 @@ vi.mock('slate', () => ({
   },
 }));
 
-vi.mock('../../../I18n', () => ({
+vi.mock('../../../../I18n', () => ({
   I18nContext: React.createContext({
     locale: {
       table: '表格',

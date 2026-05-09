@@ -446,7 +446,7 @@ describe('toolsConfig', () => {
     it('align-left onClick 在非代码块时调用 setAlignment', async () => {
       const { Editor } = await import('slate');
       const EditorUtils =
-        (await import('../../../../../../src/MarkdownEditor/editor/utils/editorUtils')) as any;
+        (await import('../../../../../../../src/MarkdownEditor/editor/utils/editorUtils')) as any;
       vi.mocked(Editor.nodes).mockReturnValue([
         [{ type: 'paragraph' }, [0]],
       ] as any);
@@ -479,7 +479,7 @@ describe('toolsConfig', () => {
 
     it('align-left isActive 调用 isAlignmentActive', async () => {
       const EditorUtils =
-        (await import('../../../../../../src/MarkdownEditor/editor/utils/editorUtils')) as any;
+        (await import('../../../../../../../src/MarkdownEditor/editor/utils/editorUtils')) as any;
       vi.mocked((await import('slate')).Editor.nodes).mockReturnValue([
         [{ type: 'paragraph' }, [0]],
       ] as any);
@@ -504,7 +504,7 @@ describe('toolsConfig', () => {
 
     it('align-center onClick 与 isActive 被调用', async () => {
       const EditorUtils =
-        (await import('../../../../../../src/MarkdownEditor/editor/utils/editorUtils')) as any;
+        (await import('../../../../../../../src/MarkdownEditor/editor/utils/editorUtils')) as any;
       vi.mocked((await import('slate')).Editor.nodes).mockReturnValue([
         [{ type: 'paragraph' }, [0]],
       ] as any);
@@ -542,7 +542,7 @@ describe('toolsConfig', () => {
 
     it('align-right onClick 与 isActive 被调用', async () => {
       const EditorUtils =
-        (await import('../../../../../../src/MarkdownEditor/editor/utils/editorUtils')) as any;
+        (await import('../../../../../../../src/MarkdownEditor/editor/utils/editorUtils')) as any;
       vi.mocked((await import('slate')).Editor.nodes).mockReturnValue([
         [{ type: 'paragraph' }, [0]],
       ] as any);
@@ -580,7 +580,7 @@ describe('toolsConfig', () => {
 
     it('align-left onClick 在 isCodeNode 为 true 时不调用 setAlignment', async () => {
       const EditorUtils =
-        (await import('../../../../../../src/MarkdownEditor/editor/utils/editorUtils')) as any;
+        (await import('../../../../../../../src/MarkdownEditor/editor/utils/editorUtils')) as any;
       vi.mocked((await import('slate')).Editor.nodes).mockReturnValue([
         [{ type: 'code' }, [0]],
       ] as any);

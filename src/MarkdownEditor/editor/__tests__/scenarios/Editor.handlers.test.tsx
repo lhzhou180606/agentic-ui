@@ -1,9 +1,9 @@
 import { render } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { PluginContext } from '../../plugin';
-import type { MEditorProps } from '../Editor';
-import * as editorUtilsModule from '../utils/editorUtils';
+import { PluginContext } from '../../../plugin';
+import type { MEditorProps } from '../../Editor';
+import * as editorUtilsModule from '../../utils/editorUtils';
 
 let editableProps: Record<string, any> = {};
 const setDomRect = vi.fn();
@@ -32,26 +32,26 @@ vi.mock('../../Hooks/useRefFunction', () => ({
   useRefFunction: (fn: (...args: any[]) => any) => fn,
 }));
 
-vi.mock('../plugins/useKeyboard', () => ({
+vi.mock('../../plugins/useKeyboard', () => ({
   useKeyboard: () => vi.fn(),
 }));
 
-vi.mock('../plugins/useOnchange', () => ({
+vi.mock('../../plugins/useOnchange', () => ({
   useOnchange: () => vi.fn(),
 }));
 
-vi.mock('../plugins/useHighlight', () => ({
+vi.mock('../../plugins/useHighlight', () => ({
   useHighlight: () => () => [],
 }));
 
-vi.mock('../style', () => ({
+vi.mock('../../style', () => ({
   useStyle: () => ({
     wrapSSR: (node: React.ReactNode) => node,
     hashId: '',
   }),
 }));
 
-vi.mock('../store', () => ({
+vi.mock('../../store', () => ({
   useEditorStore: () => ({
     store: { inputComposition: false },
     markdownEditorRef: mockEditorRef,
@@ -61,7 +61,7 @@ vi.mock('../store', () => ({
   }),
 }));
 
-import { SlateMarkdownEditor } from '../Editor';
+import { SlateMarkdownEditor } from '../../Editor';
 
 describe('SlateMarkdownEditor handler coverage', () => {
   const renderEditor = (props: Partial<MEditorProps> = {}) => {

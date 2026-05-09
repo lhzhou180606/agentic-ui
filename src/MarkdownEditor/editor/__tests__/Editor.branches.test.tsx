@@ -88,7 +88,7 @@ vi.mock('slate-react', () => ({
   },
 }));
 
-vi.mock('../../Hooks/useRefFunction', () => ({
+vi.mock('../../../Hooks/useRefFunction', () => ({
   useRefFunction: (fn: (...args: any[]) => any) => fn,
 }));
 

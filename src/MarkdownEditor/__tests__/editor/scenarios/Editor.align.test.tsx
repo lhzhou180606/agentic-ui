@@ -5,8 +5,8 @@ import { BaseEditor, createEditor, Editor, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { BaseMarkdownEditor } from '../../BaseMarkdownEditor';
-import { EditorUtils } from '../../editor/utils/editorUtils';
+import { BaseMarkdownEditor } from '../../../BaseMarkdownEditor';
+import { EditorUtils } from '../../../editor/utils/editorUtils';
 
 describe('Editor Alignment Tests', () => {
   afterEach(() => {

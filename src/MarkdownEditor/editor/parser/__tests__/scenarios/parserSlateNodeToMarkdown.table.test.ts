@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
+import { parserSlateNodeToMarkdown } from '../../parserSlateNodeToMarkdown';
 
 describe('parserSlateNodeToMarkdown', () => {
   describe('handleTable', () => {

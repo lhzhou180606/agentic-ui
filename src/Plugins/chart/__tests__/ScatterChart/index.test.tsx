@@ -8,7 +8,7 @@ let ScatterChart: React.FC<any>;
 beforeEach(async () => {
   try {
     const mod =
-      await import('../../../../src/Plugins/chart/ScatterChart/index');
+      await import('../../../../../src/Plugins/chart/ScatterChart/index');
     ScatterChart = mod.default;
   } catch (e) {
     const mod = await import('../../ScatterChart');

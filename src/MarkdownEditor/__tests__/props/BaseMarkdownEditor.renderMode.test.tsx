@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { BaseMarkdownEditor } from '../BaseMarkdownEditor';
+import { BaseMarkdownEditor } from '../../BaseMarkdownEditor';
 
 describe('BaseMarkdownEditor renderMode=markdown', () => {
   it('应使用 MarkdownRenderer 渲染 agentic-ui-task 围栏', async () => {

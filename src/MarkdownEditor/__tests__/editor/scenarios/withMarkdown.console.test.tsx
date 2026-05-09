@@ -4,7 +4,7 @@ import { BaseEditor, createEditor, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { withMarkdown } from '../../editor/plugins/withMarkdown';
+import { withMarkdown } from '../../../editor/plugins/withMarkdown';
 
 // Mock ReactEditor
 vi.mock('slate-react', () => ({

@@ -1,8 +1,8 @@
 import { Element } from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useHighlight } from '../useHighlight';
+import { useHighlight } from '../../useHighlight';
 
-vi.mock('../../utils/editorUtils', () => ({
+vi.mock('../../../utils/editorUtils', () => ({
   EditorUtils: {
     isDirtLeaf: vi.fn(() => false),
   },

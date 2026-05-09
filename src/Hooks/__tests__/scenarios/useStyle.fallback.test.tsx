@@ -10,7 +10,7 @@ vi.mock('@ant-design/theme-token', () => ({
   createStyleRegister: () => () => null,
 }));
 
-import { useEditorStyleRegister } from '../useStyle';
+import { useEditorStyleRegister } from '../../useStyle';
 
 describe('useEditorStyleRegister 兜底分支', () => {
   it('应在 genStyles 返回空值时返回 wrapSSR 与 hashId 兜底', () => {

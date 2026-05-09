@@ -10,9 +10,9 @@ import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { parserSlateNodeToMarkdown } from '../../../utils';
-import { EditorUtils } from '../../../utils/editorUtils';
-import { withMarkdown } from '../../withMarkdown';
-import { BackspaceKey } from '../backspace';
+import { EditorUtils } from '../../../../utils/editorUtils';
+import { withMarkdown } from '../../../withMarkdown';
+import { BackspaceKey } from '../../backspace';
 
 describe('BackspaceKey - Markdown 输出测试', () => {
   let editor: BaseEditor & ReactEditor & HistoryEditor;

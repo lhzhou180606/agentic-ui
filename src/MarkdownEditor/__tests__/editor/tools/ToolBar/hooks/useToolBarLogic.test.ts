@@ -55,7 +55,7 @@ vi.mock('../../../../../editor/utils/dom', () => ({
   getSelRect: (...args: any[]) => mockGetSelRect(...args),
 }));
 
-vi.mock('../../../../../Plugins/formatter', () => ({
+vi.mock('../../../../../../Plugins/formatter', () => ({
   MarkdownFormatter: {
     format: vi.fn((x: string) => `formatted:${x}`),
   },

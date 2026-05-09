@@ -13,7 +13,7 @@ import { Td } from '../../../../editor/elements/Table/Td';
 // Mock dependencies
 vi.mock('../../../../editor/store');
 vi.mock('../../../../hooks/editor');
-vi.mock('../../../../hooks/useClickAway', () => ({
+vi.mock('../../../../../hooks/useClickAway', () => ({
   useClickAway: vi.fn(),
 }));
 

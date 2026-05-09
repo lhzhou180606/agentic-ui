@@ -83,7 +83,7 @@ vi.mock('slate', () => {
 });
 
 // Mock NativeTableEditor
-vi.mock('../../utils/native-table', () => ({
+vi.mock('../../../utils/native-table', () => ({
   NativeTableEditor: {
     insertTable: vi.fn(),
   },

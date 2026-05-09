@@ -234,7 +234,7 @@ describe('DonutChart', () => {
   describe('SSR / 非浏览器环境', () => {
     it('isWindowDefined 为 false 时不注册 Chart', async () => {
       const { isWindowDefined } =
-        await import('../../../../src/Plugins/chart/env');
+        await import('../../../../../src/Plugins/chart/env');
       vi.mocked(isWindowDefined).mockReturnValueOnce(false);
 
       const { container } = render(
@@ -1025,7 +1025,7 @@ describe('DonutChart', () => {
     it('应该下载单个图表', async () => {
       // 直接导入 mock 的模块
       const componentsModule =
-        await import('../../../../src/Plugins/chart/components');
+        await import('../../../../../src/Plugins/chart/components');
       const downloadSpy = vi.spyOn(componentsModule, 'downloadChart');
 
       render(
@@ -1066,7 +1066,7 @@ describe('DonutChart', () => {
 
     it('应该处理下载异常并回退到单图下载', async () => {
       const chartComponents =
-        await import('../../../../src/Plugins/chart/components');
+        await import('../../../../../src/Plugins/chart/components');
       const downloadSpy = vi.spyOn(chartComponents, 'downloadChart');
 
       const originalCreateElement = Document.prototype.createElement.bind(

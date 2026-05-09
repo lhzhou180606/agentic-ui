@@ -2,11 +2,11 @@ import { BaseEditor, createEditor, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { EditorStore } from '../../../store';
+import { EditorStore } from '../../../../store';
 import { parserSlateNodeToMarkdown } from '../../../utils';
-import { withMarkdown } from '../../withMarkdown';
-import { BackspaceKey } from '../backspace';
-import { EnterKey } from '../enter';
+import { withMarkdown } from '../../../withMarkdown';
+import { BackspaceKey } from '../../backspace';
+import { EnterKey } from '../../enter';
 
 describe('EnterKey - Markdown 输出测试', () => {
   let editor: BaseEditor & ReactEditor & HistoryEditor;

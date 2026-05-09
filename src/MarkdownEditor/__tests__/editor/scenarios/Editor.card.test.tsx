@@ -4,8 +4,8 @@ import { BaseEditor, createEditor, Node, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { withMarkdown } from '../../editor/plugins/withMarkdown';
-import { EditorUtils } from '../../editor/utils/editorUtils';
+import { withMarkdown } from '../../../editor/plugins/withMarkdown';
+import { EditorUtils } from '../../../editor/utils/editorUtils';
 
 describe('Editor Card Tests', () => {
   afterEach(() => {

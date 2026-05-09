@@ -69,7 +69,7 @@ describe('loadKatex', () => {
       vi.resetModules();
 
       const { loadKatex } =
-        await import('../../../src/Plugins/katex/loadKatex');
+        await import('../../../../src/Plugins/katex/loadKatex');
 
       await expect(loadKatex()).rejects.toThrow('Katex 仅在浏览器环境中可用');
     } finally {
@@ -112,7 +112,7 @@ describe('preloadKatex', () => {
       vi.resetModules();
 
       const { preloadKatex } =
-        await import('../../../src/Plugins/katex/loadKatex');
+        await import('../../../../src/Plugins/katex/loadKatex');
 
       expect(() => preloadKatex()).not.toThrow();
     } finally {

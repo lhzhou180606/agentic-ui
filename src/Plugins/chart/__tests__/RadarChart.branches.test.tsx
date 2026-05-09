@@ -382,7 +382,7 @@ describe('RadarChart 分支逻辑', () => {
 
     it('下载时 downloadChart 抛错触发 console.warn', async () => {
       const { downloadChart } =
-        await import('../../../src/Plugins/chart/components');
+        await import('../../../../src/Plugins/chart/components');
       (downloadChart as any).mockImplementation(() => {
         throw new Error('download fail');
       });
