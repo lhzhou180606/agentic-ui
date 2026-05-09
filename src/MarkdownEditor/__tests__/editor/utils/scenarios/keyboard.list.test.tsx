@@ -10,7 +10,7 @@ import {
 import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EditorStore } from '../../../../editor/store';
-import { KeyboardTask } from '../../../editor/utils/keyboard';
+import { KeyboardTask } from '../../../../editor/utils/keyboard';
 
 // Mock dependencies
 vi.mock('antd', () => ({

@@ -9,7 +9,7 @@ import {
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { parserSlateNodeToMarkdown } from '../../../utils';
+import { parserSlateNodeToMarkdown } from '../../../../utils';
 import { EditorUtils } from '../../../../utils/editorUtils';
 import { withMarkdown } from '../../../withMarkdown';
 import { BackspaceKey } from '../../backspace';

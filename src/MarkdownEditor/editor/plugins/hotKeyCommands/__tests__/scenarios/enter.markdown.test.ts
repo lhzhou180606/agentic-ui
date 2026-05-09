@@ -3,7 +3,7 @@ import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EditorStore } from '../../../../store';
-import { parserSlateNodeToMarkdown } from '../../../utils';
+import { parserSlateNodeToMarkdown } from '../../../../utils';
 import { withMarkdown } from '../../../withMarkdown';
 import { BackspaceKey } from '../../backspace';
 import { EnterKey } from '../../enter';
