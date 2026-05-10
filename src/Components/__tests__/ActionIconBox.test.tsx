@@ -1,10 +1,14 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { adaptiveTooltipEnvironment } from '../../Utils/adaptiveTooltip';
 import { ActionIconBox } from '../ActionIconBox';
 
 describe('ActionIconBox 组件', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
   const TestIcon = () => <span data-testid="test-icon">Icon</span>;
 
   it('应该渲染基本的图标盒子', () => {
@@ -16,6 +20,55 @@ describe('ActionIconBox 组件', () => {
 
     expect(screen.getByTestId('action-icon-box')).toBeInTheDocument();
     expect(screen.getByTestId('test-icon')).toBeInTheDocument();
+  });
+
+  it('触摸策略为真时 Tooltip 包裹仍保留原生 title 兜底', async () => {
+    const spy = vi
+      .spyOn(adaptiveTooltipEnvironment, 'isInformationalClickContext')
+      .mockReturnValue(true);
+
+    try {
+      render(
+        <ActionIconBox title="保存">
+          <TestIcon />
+        </ActionIconBox>,
+      );
+
+      await act(async () => {
+        await Promise.resolve();
+      });
+
+      expect(screen.getByTestId('action-icon-box')).toHaveAttribute(
+        'title',
+        '保存',
+      );
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('触摸策略为假且存在 Tooltip 时不设置原生 title', async () => {
+    const spy = vi
+      .spyOn(adaptiveTooltipEnvironment, 'isInformationalClickContext')
+      .mockReturnValue(false);
+
+    try {
+      render(
+        <ActionIconBox title="保存">
+          <TestIcon />
+        </ActionIconBox>,
+      );
+
+      await act(async () => {
+        await Promise.resolve();
+      });
+
+      expect(screen.getByTestId('action-icon-box')).not.toHaveAttribute(
+        'title',
+      );
+    } finally {
+      spy.mockRestore();
+    }
   });
 
   it('应该显示标题文本', () => {

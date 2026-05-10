@@ -688,8 +688,10 @@ export {
 } from './Components/VisualList';
 
 // ─── Hooks ───────────────────────────────────────────────────────────────────
+export { useAdaptiveTooltipProps } from './Hooks/useAdaptiveTooltipProps';
 export { useAutoScroll } from './Hooks/useAutoScroll';
 export { useLanguage } from './Hooks/useLanguage';
+export { useNativeTitleTooltipFallback } from './Hooks/useNativeTitleTooltipFallback';
 export { useRefFunction } from './Hooks/useRefFunction';
 export {
   resetComponent,
@@ -699,6 +701,13 @@ export {
   type GenerateStyle,
 } from './Hooks/useStyle';
 export { useThrottleFn } from './Hooks/useThrottleFn';
+
+export {
+  adaptiveTooltipEnvironment,
+  getAdaptiveTooltipProps,
+  shouldUseInformationalTooltipClickTrigger,
+  type AdaptiveTooltipKind,
+} from './Utils/adaptiveTooltip';
 
 // ─── 国际化 ──────────────────────────────────────────────────────────────────
 export {
