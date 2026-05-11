@@ -133,6 +133,9 @@ export const AttachmentButton: React.FC<
       e.stopPropagation();
       e.preventDefault();
     }
+    if (!disabled) {
+      uploadImage();
+    }
   };
 
   const wrapper = render ? (
