@@ -1,10 +1,9 @@
-import { ConfigProvider } from 'antd';
+﻿import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { memo, useContext, useState } from 'react';
 import { TextLoading } from '../Components/lotties/TextLoading';
 import { useLocale } from '../I18n';
 import { BaseMarkdownEditor } from '../MarkdownEditor';
-import { BorderBeamAnimation } from './BorderBeamAnimation';
 import {
   DEFAULT_BORDER_RADIUS_PX,
   ENLARGED_DEFAULT_HEIGHT_PX,
@@ -121,9 +120,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     attachment,
   });
 
-  // 边框光束动画状态
   const [isFocused, setIsFocused] = useState(false);
-  const [animationComplete, setAnimationComplete] = useState(false);
 
   // 各类按钮存在性 & 计数：纯布尔运算，原 useMarkdownInputFieldActions hook
   // 已被内联到此处，避免为 5 行计算单开 hook + 在主组件做胶水。
@@ -371,11 +368,6 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
         onClick={handleContainerClick}
         onKeyDown={handleKeyDown}
       >
-        <BorderBeamAnimation
-          isVisible={isFocused && !animationComplete}
-          borderRadius={borderRadius || DEFAULT_BORDER_RADIUS_PX}
-          onAnimationComplete={() => setAnimationComplete(true)}
-        />
         <div
           style={{
             display: 'flex',
@@ -481,13 +473,11 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   onFocus?.(value, schema, e);
                   activeInput(true);
                   setIsFocused(true);
-                  setAnimationComplete(false);
                 }}
                 onBlur={(value, schema, e) => {
                   onBlur?.(value, schema, e);
                   activeInput(false);
                   setIsFocused(false);
-                  setAnimationComplete(false);
                 }}
                 onPaste={(e) => {
                   handlePaste(e);

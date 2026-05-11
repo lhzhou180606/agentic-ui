@@ -1,4 +1,4 @@
-import { Keyframes } from '@ant-design/cssinjs';
+﻿import { Keyframes } from '@ant-design/cssinjs';
 import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
 import {
   ChatTokenType,
@@ -102,10 +102,6 @@ const genStyle: GenerateStyle<
       transition: 'box-shadow 0.3s',
       '> * ': {
         boxSizing: 'border-box',
-      },
-      '&:active,&.active': {
-        outline: '1px solid transparent',
-        outlineColor: 'var(--mif-active-outline-color, transparent)',
       },
       boxShadow:
         '0px 0px 1px 0px rgba(10, 48, 104, 0.15), 0px 1.5px 4px -1px rgba(10, 48, 104, 0.04)',
