@@ -1,4 +1,4 @@
-import { ChevronUp } from '@sofa-design/icons';
+﻿import { ChevronUp } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import { useMergedState } from 'rc-util';
@@ -11,6 +11,7 @@ import React, {
   useState,
 } from 'react';
 import { ActionIconBox } from '../Components/ActionIconBox';
+import { TextSwap } from '../Components/TextSwap';
 import { useRefFunction } from '../Hooks/useRefFunction';
 import { I18nContext } from '../I18n';
 import { StatusIcon } from './components/StatusIcon';
@@ -89,46 +90,54 @@ export const TaskList = memo(
       };
     }, [simpleExpanded]);
 
-    const { summaryStatus, summaryText, hasError, lastItem } = useMemo(() => {
-      const completedCount = items.filter((i) => i.status === 'success').length;
-      const loadingItem = items.find((i) => i.status === 'loading');
-      const errorExists = items.some((i) => i.status === 'error');
-      const allDone = completedCount === items.length && items.length > 0;
+    const { summaryStatus, summaryText, summarySwapKey, hasError, lastItem } =
+      useMemo(() => {
+        const completedCount = items.filter(
+          (i) => i.status === 'success',
+        ).length;
+        const loadingItem = items.find((i) => i.status === 'loading');
+        const errorExists = items.some((i) => i.status === 'error');
+        const allDone = completedCount === items.length && items.length > 0;
 
-      let status: TaskStatus = 'pending';
-      let text: React.ReactNode = locale?.['taskList.taskList'] || '任务列表';
+        let status: TaskStatus = 'pending';
+        let text: React.ReactNode = locale?.['taskList.taskList'] || '任务列表';
+        let swapKey = `idle:${items.map((i) => `${i.key}:${i.status}`).join('|')}`;
 
-      if (allDone) {
-        status = 'success';
-        const customCompleteText =
-          typeof taskCompleteText === 'function'
-            ? taskCompleteText({ items })
-            : taskCompleteText;
-        text =
-          customCompleteText ?? locale?.['taskList.taskComplete'] ?? '任务完成';
-      } else if (loadingItem?.title) {
-        status = 'loading';
-        const tpl =
-          locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
-        const title = loadingItem.title;
-        const taskName =
-          typeof title === 'string' || typeof title === 'number'
-            ? String(title)
-            : '';
-        text = tpl.replace('${taskName}', taskName);
-      } else if (errorExists) {
-        status = 'error';
-        const tpl = locale?.['taskList.taskInProgress'] || '正在进行任务';
-        text = tpl.replace('${taskName}', '');
-      }
+        if (allDone) {
+          status = 'success';
+          const customCompleteText =
+            typeof taskCompleteText === 'function'
+              ? taskCompleteText({ items })
+              : taskCompleteText;
+          text =
+            customCompleteText ?? locale?.['taskList.taskComplete'] ?? '任务完成';
+          swapKey = `done:${items.map((i) => i.key).join(',')}`;
+        } else if (loadingItem?.title) {
+          status = 'loading';
+          const tpl =
+            locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
+          const title = loadingItem.title;
+          const taskName =
+            typeof title === 'string' || typeof title === 'number'
+              ? String(title)
+              : '';
+          text = tpl.replace('${taskName}', taskName);
+          swapKey = `loading:${loadingItem.key}:${taskName}`;
+        } else if (errorExists) {
+          status = 'error';
+          const tpl = locale?.['taskList.taskInProgress'] || '正在进行任务';
+          text = tpl.replace('${taskName}', '');
+          swapKey = 'error';
+        }
 
-      return {
-        summaryStatus: status,
-        summaryText: text,
-        hasError: errorExists,
-        lastItem: items[items.length - 1] as TaskItem | undefined,
-      };
-    }, [items, locale, taskCompleteText]);
+        return {
+          summaryStatus: status,
+          summaryText: text,
+          summarySwapKey: swapKey,
+          hasError: errorExists,
+          lastItem: items[items.length - 1] as TaskItem | undefined,
+        };
+      }, [items, locale, taskCompleteText]);
 
     // 注意：此处必须用 useCallback 而非 useRefFunction。
     // renderItems 在父组件渲染期被同步调用（`{renderItems(items)}`），
@@ -194,7 +203,7 @@ export const TaskList = memo(
             />
           </div>
           <div className={classNames(`${simpleCls}-text`, hashId)}>
-            {summaryText}
+            <TextSwap swapKey={summarySwapKey}>{summaryText}</TextSwap>
           </div>
           <div className={classNames(`${simpleCls}-arrow`, hashId)}>
             <ActionIconBox

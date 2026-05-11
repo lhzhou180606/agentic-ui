@@ -1,4 +1,4 @@
-import {
+﻿import {
   ChatTokenType,
   GenerateStyle,
   useEditorStyleRegister,
@@ -164,7 +164,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
-          animation: 'taskTextFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         },
 
         [`${componentCls}-simple-arrow`]: {
@@ -195,11 +194,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       '&-simple-list': {
         padding: '4px 12px 8px',
-      },
-
-      '@keyframes taskTextFadeIn': {
-        '0%': { opacity: 0, filter: 'blur(4px)', transform: 'translateY(2px)' },
-        '100%': { opacity: 1, filter: 'blur(0)', transform: 'translateY(0)' },
       },
     },
   };

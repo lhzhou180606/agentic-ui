@@ -1,7 +1,9 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { DEFAULT_TEXT_SWAP_DURATION_MS } from '../Components/TextSwap/constants';
+import { textSwapEnterAnimationForwards } from '../Components/TextSwap/textSwapMotion';
 
 export interface AnimationConfig {
-  /** 淡入动画持续时间（ms），默认 250 */
+  /** 淡入动画持续时间（ms），默认与 TextSwap 一致 */
   fadeDuration?: number;
   /** 缓动函数，默认 ease-out */
   easing?: string;
@@ -31,10 +33,22 @@ const extractText = (children: React.ReactNode): string => {
 const isStreamingCompatible = (prev: string, next: string) =>
   prev.startsWith(next) || next.startsWith(prev);
 
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia) {
+    return false;
+  }
+  try {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch {
+    return false;
+  }
+}
+
 /** 流式文字淡入，前缀追加只触发一次入场，非前缀替换时重播 */
 const AnimationText = React.memo<AnimationTextProps>(
   ({ children, animationConfig }) => {
-    const { fadeDuration = 250, easing = 'ease-out' } = animationConfig || {};
+    const { fadeDuration = DEFAULT_TEXT_SWAP_DURATION_MS, easing = 'ease-out' } =
+      animationConfig || {};
     const [animComplete, setAnimComplete] = useState(false);
     const [animSession, setAnimSession] = useState(0);
     const prevTextRef = useRef('');
@@ -68,8 +82,8 @@ const AnimationText = React.memo<AnimationTextProps>(
     const animationStyle = useMemo(
       () => ({
         display: 'inline-block',
-        animation: `markdownRendererSlideFadeIn ${fadeDuration}ms ${easing} forwards`,
-        willChange: 'opacity, transform',
+        animation: textSwapEnterAnimationForwards(fadeDuration, easing),
+        willChange: 'opacity, transform, filter',
         color: 'inherit',
       }),
       [fadeDuration, easing],
@@ -81,6 +95,10 @@ const AnimationText = React.memo<AnimationTextProps>(
       }),
       [],
     );
+
+    if (prefersReducedMotion()) {
+      return <span style={doneChunkStyle}>{children}</span>;
+    }
 
     return animComplete ? (
       <span style={doneChunkStyle}>{children}</span>

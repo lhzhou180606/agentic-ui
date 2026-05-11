@@ -1,4 +1,9 @@
-import type { CSSInterpolation } from '@ant-design/cssinjs';
+﻿import type { CSSInterpolation } from '@ant-design/cssinjs';
+import { DEFAULT_TEXT_SWAP_DURATION_MS } from '../Components/TextSwap/constants';
+import {
+  textSwapEnterAnimationBoth,
+  textSwapEnterKeyframes,
+} from '../Components/TextSwap/textSwapMotion';
 import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
 import {
   ChatTokenType,
@@ -130,7 +135,10 @@ const genTableStyle = (
         'tr td:first-child:not(.config-td)': { fontWeight: 600 },
 
         'tbody tr:not(.config-tr)': {
-          animation: 'agenticTableRowFadeIn 0.3s ease both',
+          animation: textSwapEnterAnimationBoth(
+            DEFAULT_TEXT_SWAP_DURATION_MS,
+            'ease-out',
+          ),
         },
         'tbody tr:not(.config-tr):hover': {
           background:
@@ -291,9 +299,12 @@ const genTableStyle = (
       },
     },
 
-    '@keyframes agenticTableRowFadeIn': {
-      from: { opacity: 0, transform: 'translateY(4px)' },
-      to: { opacity: 1, transform: 'translateY(0)' },
+    ...textSwapEnterKeyframes,
+
+    '@media (prefers-reduced-motion: reduce)': {
+      [`${tableCls} table tbody tr:not(.config-tr)`]: {
+        animation: 'none',
+      },
     },
   };
 };

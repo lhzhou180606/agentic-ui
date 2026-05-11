@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MarkdownRenderer 复用 MarkdownEditor 的样式体系。
  * 两者使用相同的 CSS 前缀（agentic-md-editor），确保渲染结果视觉一致。
  *
@@ -7,6 +7,7 @@
  */
 export { useStyle } from '../MarkdownEditor/style';
 
+import { textSwapEnterKeyframes } from '../Components/TextSwap/textSwapMotion';
 import { useEditorStyleRegister } from '../Hooks/useStyle';
 
 export const useRendererVarStyle = (prefixCls: string) => {
@@ -21,12 +22,7 @@ export const useRendererVarStyle = (prefixCls: string) => {
         '--padding-5x': '20px',
       },
 
-      // 流式文字淡入动画（opacity + translateY，GPU 硬件加速，清爽流派）
-      // 仅使用 opacity 和 transform，避免 blur 带来的重绘开销
-      '@keyframes markdownRendererSlideFadeIn': {
-        from: { opacity: 0, transform: 'translateY(2px)', filter: 'blur(1px)' },
-        to: { opacity: 1, transform: 'translateY(0)', filter: 'blur(0px)' },
-      },
+      ...textSwapEnterKeyframes,
 
       '@keyframes markdownStreamingCursorBlink': {
         '0%, 100%': { opacity: 0.9, boxShadow: '0 0 4px currentColor' },
