@@ -1,5 +1,8 @@
 ﻿import type { CSSInterpolation } from '@ant-design/cssinjs';
-import { DEFAULT_TEXT_SWAP_DURATION_MS } from '../Components/TextSwap/constants';
+import {
+  DEFAULT_TEXT_SWAP_DURATION_MS,
+  TEXT_SWAP_EASING,
+} from '../Components/TextSwap/constants';
 import {
   textSwapEnterAnimationBoth,
   textSwapEnterKeyframes,
@@ -137,7 +140,7 @@ const genTableStyle = (
         'tbody tr:not(.config-tr)': {
           animation: textSwapEnterAnimationBoth(
             DEFAULT_TEXT_SWAP_DURATION_MS,
-            'ease-out',
+            TEXT_SWAP_EASING,
           ),
         },
         'tbody tr:not(.config-tr):hover': {

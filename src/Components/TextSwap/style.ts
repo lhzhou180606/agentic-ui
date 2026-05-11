@@ -4,15 +4,22 @@
   useEditorStyleRegister,
 } from '../../Hooks/useStyle';
 
+import {
+  DEFAULT_TEXT_SWAP_DURATION_MS,
+  TEXT_SWAP_BLUR_PX,
+  TEXT_SWAP_EASING,
+  TEXT_SWAP_TRANSLATE_Y_PX,
+} from './constants';
+
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   const { componentCls } = token;
 
   return {
     [componentCls]: {
-      '--text-swap-dur': '200ms',
-      '--text-swap-translate-y': '8px',
-      '--text-swap-blur': '2px',
-      '--text-swap-ease': 'ease-out',
+      '--text-swap-dur': `${DEFAULT_TEXT_SWAP_DURATION_MS}ms`,
+      '--text-swap-translate-y': `${TEXT_SWAP_TRANSLATE_Y_PX}px`,
+      '--text-swap-blur': `${TEXT_SWAP_BLUR_PX}px`,
+      '--text-swap-ease': TEXT_SWAP_EASING,
 
       display: 'inline-block',
       minWidth: 0,

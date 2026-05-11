@@ -1,5 +1,8 @@
 ﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { DEFAULT_TEXT_SWAP_DURATION_MS } from '../Components/TextSwap/constants';
+import {
+  DEFAULT_TEXT_SWAP_DURATION_MS,
+  TEXT_SWAP_EASING,
+} from '../Components/TextSwap/constants';
 import { textSwapEnterAnimationForwards } from '../Components/TextSwap/textSwapMotion';
 
 export interface AnimationConfig {
@@ -47,8 +50,10 @@ function prefersReducedMotion(): boolean {
 /** 流式文字淡入，前缀追加只触发一次入场，非前缀替换时重播 */
 const AnimationText = React.memo<AnimationTextProps>(
   ({ children, animationConfig }) => {
-    const { fadeDuration = DEFAULT_TEXT_SWAP_DURATION_MS, easing = 'ease-out' } =
-      animationConfig || {};
+    const {
+      fadeDuration = DEFAULT_TEXT_SWAP_DURATION_MS,
+      easing = TEXT_SWAP_EASING,
+    } = animationConfig || {};
     const [animComplete, setAnimComplete] = useState(false);
     const [animSession, setAnimSession] = useState(0);
     const prevTextRef = useRef('');
