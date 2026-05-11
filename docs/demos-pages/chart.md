@@ -1,4 +1,4 @@
----
+﻿---
 nav:
   title: Demo
   order: 5
@@ -148,6 +148,32 @@ group:
 仅缺 `亮点` / `简介` 时仍正常出卡片；解析阶段无主标题列则整表降级为普通 Markdown 表格。
 
 <code src="../demos/charts/doc-cards/doc-cards-fallback.tsx" background="var(--main-bg-color)" title="容错与降级" iframe=560></code>
+
+## 四象限图 (quadrant)
+
+将表格**前 4 行**按顺序映射为 **2×2** 网格：第 1 列为象限标签，第 2 列为条目（支持逗号、分号、顿号、竖线等分隔，与卡片列表 `tags` 拆分规则一致）。不足 4 行时自动补空占位；超过 4 行只取前 4 行。
+
+与 `docCards` 相同，推荐 **HTML 注释内写 `chartType` + GFM 表格**；若上游已是结构化数据，可直接 `import { QuadrantChart }`。
+
+### Markdown 注释驱动（首选用法）
+
+<code src="../demos/markdown-quadrant.tsx" background="var(--main-bg-color)" title="Markdown 注释驱动" iframe=780></code>
+
+### QuadrantChart 组件直接使用
+
+<code src="../demos/charts/quadrant/quadrant-basic.tsx" background="var(--main-bg-color)" title="组件基础用法" iframe=520></code>
+
+### toolbar 槽位
+
+<code src="../demos/charts/quadrant/quadrant-toolbar.tsx" background="var(--main-bg-color)" title="标题 + toolbar" iframe=520></code>
+
+### 流式追加（模拟 LLM 边产边渲染）
+
+<code src="../demos/charts/quadrant/quadrant-streaming.tsx" background="var(--main-bg-color)" title="流式追加" iframe=560></code>
+
+### 不足四行与空态
+
+<code src="../demos/charts/quadrant/quadrant-fallback.tsx" background="var(--main-bg-color)" title="补位与空数据" iframe=720></code>
 
 ## Mermaid 图表
 
