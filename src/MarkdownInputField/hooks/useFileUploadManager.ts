@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+﻿import { useContext, useEffect, useRef } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 import type { AttachmentButtonProps } from '../AttachmentButton';
@@ -81,6 +81,19 @@ export const useFileUploadManager = ({
   onFileMapChange,
 }: FileUploadManagerProps): FileUploadManagerReturn => {
   const { locale } = useContext(I18nContext);
+
+  /** 复用单个隐藏 file input，避免反复创建/卸载导致部分环境下选择器异常 */
+  const hiddenFileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    return () => {
+      const el = hiddenFileInputRef.current;
+      if (el?.parentNode) {
+        el.parentNode.removeChild(el);
+      }
+      hiddenFileInputRef.current = null;
+    };
+  }, []);
 
   const fileList = Array.from(fileMap?.values() || []);
   const uploadingCount = fileList.filter(
@@ -176,12 +189,19 @@ export const useFileUploadManager = ({
     }
 
     const accept = getAcceptValue(forGallery || false);
-    const input = document.createElement('input');
-    input.id = 'uploadImage' + '_' + Math.random();
-    input.type = 'file';
+
+    let input = hiddenFileInputRef.current;
+    if (!input) {
+      input = document.createElement('input');
+      input.type = 'file';
+      input.style.display = 'none';
+      hiddenFileInputRef.current = input;
+      document.body.appendChild(input);
+    }
+
     input.accept = accept;
     input.multiple = attachment?.allowMultiple ?? true;
-    input.style.display = 'none';
+    input.value = '';
 
     input.onchange = async (e: Event) => {
       if (input.dataset.readonly) {
@@ -215,9 +235,7 @@ export const useFileUploadManager = ({
     if (input.dataset.readonly) {
       return;
     }
-    document.body.appendChild(input);
     input.click();
-    input.remove();
   });
 
   /**
