@@ -302,7 +302,10 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
   return wrapSSR(
     <div
       data-testid={testId || 'ToolUseBarThink'}
-      className={cls.root}
+      className={classNames(cls.root, {
+        [`${prefixCls}-root-think-collapsed`]:
+          Boolean(thinkContent) && !expandedState,
+      })}
       style={styles?.root}
     >
       {/* Bar */}

@@ -781,5 +781,4 @@ describe('MarkdownRenderer', () => {
       container.querySelector('[data-testid="file-view-file-list"]'),
     ).toBeTruthy();
   });
-
 });

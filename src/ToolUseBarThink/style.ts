@@ -221,18 +221,31 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '&-think-collapse': {
         display: 'grid',
-        gridTemplateRows: '0fr',
-        transition: `grid-template-rows var(--resize-dur) var(--resize-ease)`,
+        gridTemplateRows: 'minmax(0, 0fr)',
+        minHeight: 0,
+        maxHeight: 0,
         overflow: 'hidden',
         width: '100%',
-        willChange: 'grid-template-rows',
+        pointerEvents: 'none',
+        transition: [
+          `grid-template-rows var(--resize-dur) var(--resize-ease)`,
+          `max-height var(--resize-dur) var(--resize-ease)`,
+        ].join(','),
+        willChange: 'grid-template-rows, max-height',
       },
       '&-think-collapse-open': {
-        gridTemplateRows: '1fr',
+        gridTemplateRows: 'minmax(0, 1fr)',
+        maxHeight: 800,
+        pointerEvents: 'auto',
       },
       '&-think-collapse-inner': {
         minHeight: 0,
+        maxHeight: '100%',
         overflow: 'hidden',
+      },
+
+      '&-root-think-collapsed': {
+        gap: 0,
       },
 
       '&-container': {
