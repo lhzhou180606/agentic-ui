@@ -36,6 +36,7 @@ import type {
   WorkspacePanelType,
   WorkspaceProps,
 } from './types';
+import { WorkspaceTabCountDigits } from './WorkspaceTabCountDigits';
 
 export type { FileActionRef } from './types';
 
@@ -214,8 +215,16 @@ const Workspace: FC<WorkspaceProps> & {
               {tabConfig.title}
             </span>
             {tabConfig.count !== undefined && (
-              <span className={classNames(`${prefixCls}-tab-count`, hashId)}>
-                {tabConfig.count}
+              <span
+                className={classNames(`${prefixCls}-tab-count`, hashId)}
+                data-testid={`workspace-tab-count--${tabConfig.key}`}
+              >
+                <WorkspaceTabCountDigits
+                  tabKey={tabConfig.key}
+                  value={tabConfig.count}
+                  prefixCls={prefixCls}
+                  hashId={hashId}
+                />
               </span>
             )}
           </div>

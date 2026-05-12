@@ -368,8 +368,18 @@ describe('Workspace Component', () => {
       </TestWrapper>,
     );
 
-    expect(screen.getByText('5')).toBeInTheDocument();
-    expect(screen.getByText('10')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('workspace-tab-count-digits--realtime'),
+    ).toHaveTextContent('5');
+    expect(
+      screen.getByTestId('workspace-tab-count-digits--browser'),
+    ).toHaveTextContent('10');
+    expect(
+      screen.getByTestId('workspace-tab-count-digit--browser--0'),
+    ).toHaveTextContent('1');
+    expect(
+      screen.getByTestId('workspace-tab-count-digit--browser--1'),
+    ).toHaveTextContent('0');
   });
 
   it('应该支持自定义标签页配置', () => {
@@ -960,7 +970,11 @@ describe('Workspace Component', () => {
       const onClose = vi.fn();
       const handleAction = vi.fn();
       const customContent = (
-        <button type="button" data-testid="custom-action" onClick={handleAction}>
+        <button
+          type="button"
+          data-testid="custom-action"
+          onClick={handleAction}
+        >
           自定义操作
         </button>
       );
