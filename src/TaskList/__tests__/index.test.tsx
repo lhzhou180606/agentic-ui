@@ -992,10 +992,14 @@ describe('TaskList', () => {
       expect(bar).toHaveAttribute('aria-label', '展开');
       expect(screen.getByText('正在进行任务')).toBeInTheDocument();
       expect(
-        bar.querySelector('[data-testid="task-list-status-loading"]'),
+        bar.querySelector(
+          '[data-testid="task-list-simple-summary-status-loading"]',
+        ),
       ).toBeInTheDocument();
       expect(
-        bar.querySelector('[data-testid="task-list-status-error"]'),
+        bar.querySelector(
+          '[data-testid="task-list-simple-summary-status-error"]',
+        ),
       ).not.toBeInTheDocument();
     });
 
