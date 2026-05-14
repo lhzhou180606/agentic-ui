@@ -28,7 +28,7 @@ import { MarkdownEditor } from '@ant-design/agentic-ui';
 export default () => {
   return (
     <MarkdownEditor
-      initValue="# Hello World\n\n这是一段示例文本。"
+      initValue={'# Hello World\n\n这是一段示例文本。'}
       height="400px"
       onChange={(value) => console.log('内容变化:', value)}
     />
@@ -45,7 +45,7 @@ export default () => {
   return (
     <MarkdownEditor
       readonly
-      initValue="# 只读模式\n\n用户无法编辑，但可以查看和复制。"}
+      initValue={'# 只读模式\n\n用户无法编辑，但可以查看和复制。'}
       height="300px"
     />
   );
@@ -62,7 +62,7 @@ export default () => {
     <MarkdownEditor
       readonly
       renderMode="markdown"
-      initValue="# 轻量渲染\n\n不加载 Slate，首包最小。"}
+      initValue={'# 轻量渲染\n\n不加载 Slate，首包最小。'}
       height="300px"
     />
   );
@@ -81,7 +81,7 @@ export default () => {
       initValue="# 自定义工具栏"
       toolBar={{
         enable: true,
-        hideTools: ['image', 'formula'],
+        hideTools: ['table', 'color'],
         extra: [
           <Button key="save" type="primary" size="small">
             保存
@@ -128,7 +128,7 @@ export default () => {
     <MarkdownEditor
       readonly
       reportMode
-      initValue="# 评论功能\n\n选中文本即可评论。"}
+      initValue={'# 评论功能\n\n选中文本即可评论。'}
       comment={{
         enable: true,
         onSubmit: (id, comment) => {
@@ -199,7 +199,7 @@ export default () => {
 | compact                     | 是否启用紧凑模式                                                                                                                                         | `boolean`               | `false`   | -    |
 | streaming                   | 流式输出模式，同时传入时优先于 `typewriter`                                                                                                              | `boolean`               | -         | -    |
 | isFinished                  | 流式是否完成（仅 `renderMode: 'markdown'`），未传入时回退到 `!streaming`                                                                                 | `boolean`               | -         | -    |
-| typewriter                  | `streaming` 的别名，向下兼容                                                                                                                             | `boolean`               | -         | -    |
+| ~~typewriter~~              | **已废弃**：`streaming` 的别名，向下兼容，新代码请使用 `streaming`                                                                                       | `boolean`               | -         | -    |
 | streamingParagraphAnimation | 末段淡入动画（仅 `renderMode: 'markdown'`），默认开启，传 `false` 关闭                                                                                   | `boolean`               | -         | -    |
 | queueOptions                | 字符队列配置（仅 `renderMode: 'markdown'`），默认关闭逐字 RAF                                                                                            | `CharacterQueueOptions` | -         | -    |
 | deps                        | MElement 刷新依赖                                                                                                                                        | `string[]`              | -         | -    |
@@ -221,14 +221,24 @@ export default () => {
 
 | 属性      | 说明                   | 类型                | 默认值  | 版本 |
 | --------- | ---------------------- | ------------------- | ------- | ---- |
-| enable    | 是否启用工具栏         | `boolean`           | `true`  | -    |
+| enable    | 是否启用工具栏         | `boolean`           | `false` | -    |
 | min       | 是否使用最小化工具栏   | `boolean`           | `false` | -    |
 | hideTools | 需要隐藏的工具栏选项   | `ToolsKeyType[]`    | -       | -    |
 | extra     | 额外的自定义工具栏项目 | `React.ReactNode[]` | -       | -    |
 
 **ToolsKeyType 可选值：**
 
-`'bold'` | `'italic'` | `'underline'` | `'strikethrough'` | `'code'` | `'heading'` | `'link'` | `'color'` | `'clearFormat'` | `'undo'` | `'redo'` | `string`
+格式相关：`'bold'` | `'italic'` | `'strikethrough'` | `'inline-code'` | `'color'` | `'clear'`
+
+标题：`'head'` | `'H1'` | `'H2'` | `'H3'`
+
+列表：`'b-list'`（无序） | `'n-list'`（有序） | `'t-list'`（任务）
+
+块元素：`'quote'` | `'code'` | `'table'` | `'column'` | `'divider'` | `'link'`
+
+对齐：`'align-left'` | `'align-center'` | `'align-right'`
+
+历史：`'undo'` | `'redo'`
 
 #### 浮动工具栏 (floatBar)
 
@@ -276,7 +286,7 @@ export default () => {
 | deleteConfirmText   | 删除评论确认文本                                           | `string`                                                                                                                                                                                 | -      | -    |
 | loadMentions        | 加载 @提及用户列表                                         | `(text: string) => Promise<{ name: string }[]>`                                                                                                                                          | -      | -    |
 | mentionsPlaceholder | @提及输入框占位符                                          | `string`                                                                                                                                                                                 | -      | -    |
-| placeholder         | 评论输入框占位符，未提供时回退到 `titlePlaceholderContent` | `string`                                                                                                                                                                                 | -      | -    |
+| placeholder         | 评论输入框占位符，未提供时回退到顶层的 [`titlePlaceholderContent`](#引用与其他) | `string`                                                                                                                                                                                 | -      | -    |
 | editorRender        | 自定义评论编辑器渲染                                       | `(dom: React.ReactNode) => React.ReactNode`                                                                                                                                              | -      | -    |
 | listItemRender      | 自定义评论列表项渲染                                       | `(defaultDom: { checkbox: ReactNode \| null; mentionsUser: ReactNode \| null; children: any }, comment: { element: Elements; children: ReactNode; attributes: any }) => React.ReactNode` | -      | -    |
 
@@ -315,7 +325,7 @@ export default () => {
 | minColumn    | 最小列数                     | `number`                                                                                 | -      | -    |
 | minRows      | 最小行数                     | `number`                                                                                 | -      | -    |
 | pure         | 是否启用纯净模式（无工具栏） | `boolean`                                                                                | -      | -    |
-| previewTitle | 预览模式标题                 | `ReactNode`                                                                              | -      | -    |
+| previewTitle | 预览模式标题                 | `string`                                                                                 | -      | -    |
 | actions      | 表格操作配置                 | `{ fullScreen?: 'modal' \| 'drawer'; download?: 'csv'; copy?: 'md' \| 'html' \| 'csv' }` | -      | -    |
 | cssVariables | CSS 变量自定义表格样式       | `Record<\`--${string}\`, string>`                                                        | -      | -    |
 
@@ -347,11 +357,11 @@ export default () => {
 
 **JinjaTemplateItem**
 
-| 属性        | 说明     | 类型     |
-| ----------- | -------- | -------- |
-| title       | 模板标题 | `string` |
-| description | 模板描述 | `string` |
-| template    | 模板内容 | `string` |
+| 属性        | 说明              | 类型     |
+| ----------- | ----------------- | -------- |
+| title       | 模板标题          | `string` |
+| description | 模板描述（可选）  | `string` |
+| template    | 模板内容          | `string` |
 
 #### 粘贴配置 (pasteConfig)
 
@@ -411,10 +421,10 @@ export default () => {
 | editorRef               | 编辑器实例引用                                  | `React.Ref<MarkdownEditorInstance \| undefined>`                                                                                      | -      | -    |
 | rootContainer           | 根容器引用                                      | `React.MutableRefObject<HTMLDivElement \| undefined>`                                                                                 | -      | -    |
 | plugins                 | 编辑器插件配置                                  | `any[]`                                                                                                                               | -      | -    |
-| markdownToHtmlOptions   | 自定义 remark 插件，格式同 Babel 插件数组       | `MarkdownToHtmlOptions`                                                                                                               | -      | -    |
+| markdownToHtmlOptions   | 自定义 unified 插件数组，每项为 `Plugin` 或 `[Plugin, ...options]`，例如 `[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]` | `MarkdownToHtmlOptions`                                                                                                               | -      | -    |
 | fncProps                | 脚注配置                                        | `{ render: (...) => React.ReactNode; onOriginUrlClick?: (url?: string) => void; onFootnoteDefinitionChange?: (data: [...]) => void }` | -      | -    |
 | anchorProps             | 锚点链接配置                                    | `AnchorProps`                                                                                                                         | -      | -    |
-| titlePlaceholderContent | 标题占位符内容                                  | `string`                                                                                                                              | -      | -    |
+| titlePlaceholderContent | 标题占位符内容；同时作为 `comment.placeholder` 未指定时的回退值 | `string`                                                                                                                              | -      | -    |
 | attachment              | 附件配置                                        | `Record<string, unknown>`                                                                                                             | -      | -    |
 | toolbarConfig           | 工具栏配置（另一种方式）                        | `{ show?: boolean; items?: string[] }`                                                                                                | -      | -    |
 | fileMapConfig           | FileMapView 配置（仅 `renderMode: 'markdown'`） | `FileMapConfig`                                                                                                                       | -      | -    |
@@ -425,9 +435,10 @@ export default () => {
 
 通过 `editorRef` 获取编辑器实例，支持以下属性和方法：
 
-| 属性/方法            | 说明                   | 类型                                                               |
-| -------------------- | ---------------------- | ------------------------------------------------------------------ |
-| store                | 编辑器内部状态管理     | `EditorStore`                                                      |
-| markdownContainerRef | Markdown 容器 DOM 引用 | `React.MutableRefObject<HTMLDivElement \| null>`                   |
-| markdownEditorRef    | Slate 编辑器实例引用   | `React.MutableRefObject<BaseEditor & ReactEditor & HistoryEditor>` |
-| exportHtml           | 导出为 HTML 文件       | `(filename?: string) => void`                                      |
+| 属性/方法            | 说明                                | 类型                                                               |
+| -------------------- | ----------------------------------- | ------------------------------------------------------------------ |
+| store                | 编辑器内部状态管理（含 `getMDContent` / `setMDContent` 等常用方法） | `EditorStore`                                                      |
+| markdownContainerRef | Markdown 容器 DOM 引用              | `React.MutableRefObject<HTMLDivElement \| null>`                   |
+| markdownEditorRef    | Slate 编辑器实例引用                | `React.MutableRefObject<BaseEditor & ReactEditor & HistoryEditor>` |
+| exportHtml           | 导出为 HTML 文件                    | `(filename?: string) => void`                                      |
+| range                | 内部使用的选区缓存                  | `any`                                                              |

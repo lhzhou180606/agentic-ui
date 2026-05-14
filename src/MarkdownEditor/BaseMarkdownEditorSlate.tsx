@@ -347,7 +347,7 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
                 })}
               >
                 <ToolBar
-                  hideTools={toolBar.hideTools as any}
+                  hideTools={toolBar.hideTools}
                   extra={toolBar.extra}
                   min={toolBar.min}
                 />

@@ -11,6 +11,7 @@ import type {
 import { TagPopupProps } from './editor/elements/TagPopup';
 import { EditorStore } from './editor/store';
 import { InsertAutocompleteProps } from './editor/tools/InsertAutocomplete';
+import type { ToolsKeyType } from './editor/tools/ToolBar/config/toolsConfig';
 import type { MarkdownToHtmlOptions } from './editor/utils/markdownToHtml';
 import { CustomLeaf, Elements } from './el';
 
@@ -279,20 +280,8 @@ export type MarkdownEditorProps = {
   toolBar?: {
     enable?: boolean;
     min?: boolean;
-    hideTools?: (
-      | 'bold'
-      | 'italic'
-      | 'underline'
-      | 'strikethrough'
-      | 'code'
-      | 'heading'
-      | 'link'
-      | 'color'
-      | 'clearFormat'
-      | 'undo'
-      | 'redo'
-      | string
-    )[];
+    /** 需要隐藏的工具栏选项，键名见 toolsConfig.tsx 中的 ToolsKeyType */
+    hideTools?: ToolsKeyType[];
     extra?: React.ReactNode[];
   };
   id?: string;
