@@ -1,5 +1,5 @@
 ---
-title: MarkdownRenderer
+title: MarkdownRenderer - 流式 Markdown 渲染器
 atomId: MarkdownRenderer
 nav:
   order: 2
