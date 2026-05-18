@@ -64,6 +64,9 @@ const INPUT_FIELD_PADDING = {
 // MarkdownInputField 中 code block 的默认高度，避免初始占位过高
 const DEFAULT_INPUT_CODE_BLOCK_HEIGHT = 120;
 
+/** 输入框内编辑器正文默认字号（覆盖 MarkdownEditor content 的 15px / paragraph-lg） */
+const INPUT_FIELD_EDITOR_CONTENT_FONT_SIZE = 14;
+
 // 定义旋转动画
 const stopIconRotate = new Keyframes('stopIconRotate', {
   '0%': {
@@ -159,6 +162,11 @@ const genStyle: GenerateStyle<
         'div[data-be="paragraph"]': {
           margin: '0 !important',
           padding: '0 !important',
+        },
+        [`${token.antCls}-agentic-md-editor-content`]: {
+          fontSize: INPUT_FIELD_EDITOR_CONTENT_FONT_SIZE,
+          font: `var(--font-text-paragraph-base, ${INPUT_FIELD_EDITOR_CONTENT_FONT_SIZE}px / ${token.lineHeight} ${token.fontFamily})`,
+          letterSpacing: 'var(--letter-spacing-paragraph-base, normal)',
         },
       },
       // 仅覆盖 MarkdownInputField 内的代码块默认高度
