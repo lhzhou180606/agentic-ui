@@ -4,7 +4,6 @@
   Locate,
   SquareArrowOutUpRight as ShareIcon,
 } from '@sofa-design/icons';
-import { Typography } from 'antd';
 import classNames from 'clsx';
 import React, { memo, type FC } from 'react';
 
@@ -90,10 +89,11 @@ const FileTreeLeafTitleComponent: FC<FileTreeLeafTitleProps> = ({
   };
 
   const actionBtnClass = classNames(`${prefixCls}-leaf-action-btn`, hashId);
+  const titleTextClass = classNames(`${prefixCls}-leaf-title-text`, hashId);
 
   if (isDisabled) {
     return (
-      <span className={classNames(`${prefixCls}-leaf-title-text`, hashId)}>
+      <span className={titleTextClass} title={fileWithId.name}>
         {fileWithId.name}
       </span>
     );
@@ -101,8 +101,8 @@ const FileTreeLeafTitleComponent: FC<FileTreeLeafTitleProps> = ({
 
   return (
     <div className={classNames(`${prefixCls}-leaf-title`, hashId)}>
-      <div className={classNames(`${prefixCls}-leaf-title-text`, hashId)}>
-        <Typography.Text>{fileWithId.name}</Typography.Text>
+      <div className={titleTextClass} title={fileWithId.name}>
+        {fileWithId.name}
       </div>
       <div
         className={classNames(`${prefixCls}-leaf-actions`, hashId)}
