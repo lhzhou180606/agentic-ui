@@ -541,6 +541,20 @@ export const sortChartDataRowsByXField = <T extends Record<string, unknown>>(
  *
  * @since 1.0.0
  */
+export const isXValueEqual = (
+  a: number | string,
+  b: number | string,
+): boolean => {
+  const normalizedA = normalizeXValue(a);
+  const normalizedB = normalizeXValue(b);
+
+  if (typeof normalizedA === 'number' && typeof normalizedB === 'number') {
+    return normalizedA === normalizedB;
+  }
+
+  return String(normalizedA) === String(normalizedB);
+};
+
 /**
  * 解析图表排序列名：显式 `sortBy` 优先，否则表格含 `index` 列时自动使用
  */
@@ -619,22 +633,6 @@ export const getSortByForX = (
     }
   }
   return best;
-};
-
-export const isXValueEqual = (
-  a: number | string,
-  b: number | string,
-): boolean => {
-  const normalizedA = normalizeXValue(a);
-  const normalizedB = normalizeXValue(b);
-
-  // 如果都是数字，按数值比较
-  if (typeof normalizedA === 'number' && typeof normalizedB === 'number') {
-    return normalizedA === normalizedB;
-  }
-
-  // 否则按字符串比较
-  return String(normalizedA) === String(normalizedB);
 };
 
 /**
