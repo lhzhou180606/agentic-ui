@@ -171,6 +171,7 @@ const ChartRuntimeRendererImpl: React.FC<{
   convertDonutData,
   convertFlatData,
   config,
+  renderKey,
   title,
   dataTime,
   toolBar,
@@ -199,7 +200,7 @@ const ChartRuntimeRendererImpl: React.FC<{
     const pieSize = config?.height || 400;
     return (
       <DonutChart
-        key={`${config?.index}-pie`}
+        key={`${config?.index}-pie-${renderKey}`}
         data={convertDonutData}
         configs={[{ chartStyle: 'pie', showLegend: true }]}
         width={pieSize}
@@ -216,7 +217,7 @@ const ChartRuntimeRendererImpl: React.FC<{
   if (chartType === 'donut') {
     return (
       <DonutChart
-        key={`${config?.index}-donut`}
+        key={`${config?.index}-donut-${renderKey}`}
         data={convertDonutData}
         configs={[{ chartStyle: 'donut', showLegend: true }]}
         height={config?.height || 400}
@@ -232,7 +233,7 @@ const ChartRuntimeRendererImpl: React.FC<{
   if (chartType === 'bar') {
     return (
       <BarChart
-        key={`${config?.index}-bar`}
+        key={`${config?.index}-bar-${renderKey}`}
         data={convertFlatData}
         height={config?.height || 400}
         title={title || ''}
@@ -250,7 +251,7 @@ const ChartRuntimeRendererImpl: React.FC<{
   if (chartType === 'line') {
     return (
       <LineChart
-        key={`${config?.index}-line`}
+        key={`${config?.index}-line-${renderKey}`}
         data={convertFlatData}
         height={config?.height || 400}
         title={title || ''}
@@ -266,7 +267,7 @@ const ChartRuntimeRendererImpl: React.FC<{
   if (chartType === 'column') {
     return (
       <BarChart
-        key={`${config?.index}-column`}
+        key={`${config?.index}-column-${renderKey}`}
         data={convertFlatData}
         height={config?.height || 400}
         title={title || ''}
@@ -284,7 +285,7 @@ const ChartRuntimeRendererImpl: React.FC<{
   if (chartType === 'area') {
     return (
       <AreaChart
-        key={`${config?.index}-area`}
+        key={`${config?.index}-area-${renderKey}`}
         data={convertFlatData}
         height={config?.height || 400}
         title={title || ''}
@@ -319,7 +320,7 @@ const ChartRuntimeRendererImpl: React.FC<{
 
     return (
       <RadarChart
-        key={`${config?.index}-radar`}
+        key={`${config?.index}-radar-${renderKey}`}
         data={radarData}
         height={config?.height || 400}
         title={title || ''}
@@ -349,7 +350,7 @@ const ChartRuntimeRendererImpl: React.FC<{
 
     return (
       <ScatterChart
-        key={`${config?.index}-scatter`}
+        key={`${config?.index}-scatter-${renderKey}`}
         data={scatterData}
         height={config?.height || 400}
         title={title || ''}
@@ -380,7 +381,7 @@ const ChartRuntimeRendererImpl: React.FC<{
 
     return (
       <FunnelChart
-        key={`${config?.index}-funnel`}
+        key={`${config?.index}-funnel-${renderKey}`}
         data={funnelData}
         height={config?.height || 400}
         title={title || ''}
@@ -444,7 +445,7 @@ const ChartRuntimeRendererImpl: React.FC<{
 
     return (
       <BoxPlotChart
-        key={`${config?.index}-boxplot`}
+        key={`${config?.index}-boxplot-${renderKey}`}
         data={boxplotData}
         height={config?.height || 400}
         title={title || ''}
@@ -500,7 +501,7 @@ const ChartRuntimeRendererImpl: React.FC<{
 
     return (
       <HistogramChart
-        key={`${config?.index}-histogram`}
+        key={`${config?.index}-histogram-${renderKey}`}
         data={histogramData}
         height={config?.height || 400}
         title={title || ''}
@@ -1109,10 +1110,10 @@ export const ChartRender: React.FC<{
               }}
               initialValues={config}
               onFinish={(values) => {
-                setConfig({
-                  ...props.config,
+                setConfig((prev) => ({
+                  ...prev,
                   ...values,
-                });
+                }));
                 setRenderKey((k) => k + 1);
               }}
             >

@@ -843,7 +843,7 @@ export const isConfigEqual = (config1: any, config2: any): boolean => {
   if (keys1.length !== keys2.length) return false;
 
   // 只比较关键字段
-  const keyFields = ['x', 'y', 'height', 'index', 'rest'];
+  const keyFields = ['x', 'y', 'height', 'index', 'sortBy', 'rest'];
   for (const key of keyFields) {
     if (config1[key] !== config2[key]) {
       // 对于 rest 对象，进行浅比较
