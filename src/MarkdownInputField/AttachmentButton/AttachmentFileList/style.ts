@@ -109,8 +109,9 @@ const genStyle: GenStyleFn<'AttachmentFileList'> = (token) => {
             border: 'none',
             overflow: 'hidden',
             img: {
-              maxWidth: '100%',
-              maxHeight: '100%',
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
               borderRadius: 'inherit',
               transition: 'transform 0.3s',
             },
