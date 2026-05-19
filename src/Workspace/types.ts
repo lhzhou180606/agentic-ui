@@ -678,6 +678,12 @@ export interface FileTreeProps extends BaseChildProps {
    * @internal
    */
   fileItemHashId?: string;
+  /**
+   * 按工作区相对路径索引的平铺 {@link FileNode}
+   * @description `Workspace.File` 在同时传入 `nodes` 与 `fileTreeSwitch` 时会根据 `nodes` 自动构建并注入，使树视图 `onDownload` / `onPreview` 等与列表收到同一 `FileNode`（如 `workspace:` 与 `file:` 前缀）
+   * @internal
+   */
+  fileNodeByRelativePath?: Map<string, FileNode>;
 }
 
 /** 文件面板在「列表」与「文件树」之间的视图模式 */

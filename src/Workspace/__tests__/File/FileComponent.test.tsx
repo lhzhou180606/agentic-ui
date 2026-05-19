@@ -204,6 +204,49 @@ describe('FileComponent', () => {
       onLoadChildren: vi.fn().mockResolvedValue([]),
     };
 
+    it('树视图 onDownload 应与平铺 nodes 对齐（workspace: / file:）', async () => {
+      const onDownload = vi.fn();
+      const nodes: FileNode[] = [
+        {
+          id: 'workspace:AGENTS.md',
+          name: 'AGENTS.md',
+          canPreview: true,
+          canDownload: true,
+        },
+      ];
+      render(
+        <TestWrapper>
+          <FileComponent
+            nodes={nodes}
+            onDownload={onDownload}
+            fileTreeSwitch={{
+              treeProps: {
+                treeData: [
+                  {
+                    key: 'file:AGENTS.md',
+                    name: 'AGENTS.md',
+                    isLeaf: true,
+                  },
+                ],
+                onLoadChildren: vi.fn().mockResolvedValue([]),
+              },
+              view: 'tree',
+            }}
+          />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: '下载' }));
+      expect(onDownload).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'workspace:AGENTS.md',
+          name: 'AGENTS.md',
+          canPreview: true,
+          canDownload: true,
+        }),
+      );
+    });
+
     it('展示段选择器并切换到内嵌文件树', async () => {
       const nodes: FileNode[] = [
         { id: 'f1', name: 'list.txt', url: 'https://example.com/a.txt' },
@@ -2849,9 +2892,25 @@ describe('FileComponent', () => {
         </TestWrapper>,
       );
 
-      // 检查 Spin 组件的 loading 状态
-      expect(container.querySelector('.ant-spin')).toBeInTheDocument();
-      expect(container.querySelector('.ant-spin-spinning')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-testid="file-panel-loading"]'),
+      ).toBeInTheDocument();
+      expect(container.querySelectorAll('.ant-spin-spinning')).toHaveLength(1);
+      expect(screen.queryByText('test.txt')).not.toBeInTheDocument();
+    });
+
+    it('isLoading=true 且 nodes 为空时不应同时展示空态', () => {
+      const { container } = render(
+        <TestWrapper>
+          <FileComponent nodes={[]} isLoading />
+        </TestWrapper>,
+      );
+
+      expect(
+        container.querySelector('[data-testid="file-panel-loading"]'),
+      ).toBeInTheDocument();
+      expect(container.querySelectorAll('.ant-spin-spinning')).toHaveLength(1);
+      expect(container.querySelector('.ant-empty')).not.toBeInTheDocument();
     });
 
     it('isLoading 应优先于 loading 属性', () => {

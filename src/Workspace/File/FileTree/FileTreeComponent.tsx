@@ -17,6 +17,7 @@ import { I18nContext, compileTemplate } from '../../../I18n';
 import type { FileNode, FileTreeNode, FileTreeProps } from '../../types';
 import { getFileType } from '../../types';
 import { FileItem } from '../components/FileItem';
+import type { ResolveTreeLeafFileOptions } from '../resolveTreeLeafFile';
 import { resolveTreeLeafFile } from '../resolveTreeLeafFile';
 import { useFileStyle } from '../style';
 import { getFileTypeIcon } from '../utils';
@@ -46,6 +47,7 @@ const mapTreeToDataNodes = (
     onPreview?: FileTreeProps['onPreview'];
     onShare?: FileTreeProps['onShare'];
     onLocate?: (file: FileNode) => void;
+    resolveTreeLeafFileOptions?: ResolveTreeLeafFileOptions;
   },
 ): DataNode[] =>
   nodes.map((node) => {
@@ -53,7 +55,7 @@ const mapTreeToDataNodes = (
     const resolvedIsLeaf = node.isLeaf ?? !hasChildren;
 
     if (resolvedIsLeaf) {
-      const leafFile = resolveTreeLeafFile(node);
+      const leafFile = resolveTreeLeafFile(node, ctx.resolveTreeLeafFileOptions);
       const title =
         leafFile !== null ? (
           <FileItem
@@ -195,6 +197,7 @@ const FileTreeComponent: FC<FileTreeProps> = ({
   filterKeyword,
   fileItemPrefixCls: fileItemPrefixClsProp,
   fileItemHashId: fileItemHashIdProp,
+  fileNodeByRelativePath,
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);
@@ -247,6 +250,11 @@ const FileTreeComponent: FC<FileTreeProps> = ({
     [expandedKeys, keysInDisplayTree],
   );
 
+  const resolveTreeLeafFileOptions = useMemo<ResolveTreeLeafFileOptions>(
+    () => ({ fileNodeByRelativePath }),
+    [fileNodeByRelativePath],
+  );
+
   const dataNodes = useMemo(
     () =>
       mapTreeToDataNodes(displayTree, {
@@ -259,6 +267,7 @@ const FileTreeComponent: FC<FileTreeProps> = ({
         onPreview,
         onShare,
         onLocate,
+        resolveTreeLeafFileOptions,
       }) as NonNullable<TreeProps['treeData']>,
     [
       displayTree,
@@ -271,6 +280,7 @@ const FileTreeComponent: FC<FileTreeProps> = ({
       onPreview,
       onShare,
       onLocate,
+      resolveTreeLeafFileOptions,
     ],
   );
 
@@ -313,7 +323,7 @@ const FileTreeComponent: FC<FileTreeProps> = ({
       const n = nodeMap.get(k);
       if (!n) return;
       onSelect?.(n);
-      const file = resolveTreeLeafFile(n);
+      const file = resolveTreeLeafFile(n, resolveTreeLeafFileOptions);
       if (!file || n.disabled === true) return;
       if (onFileClick) {
         onFileClick(file);

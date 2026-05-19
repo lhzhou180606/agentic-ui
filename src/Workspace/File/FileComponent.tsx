@@ -13,6 +13,7 @@ import React, {
   type ReactNode,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -33,6 +34,7 @@ import {
 } from './components/FileGroup';
 import { FileItem } from './components/FileItem';
 import { SearchInput } from './components/SearchInput';
+import { buildFileNodeRelativePathIndex } from './buildFileNodeRelativePathIndex';
 import { FileTree } from './FileTree';
 import { isImageFile } from './FileTypeProcessor';
 import {
@@ -169,6 +171,10 @@ export const FileComponent: FC<{
   );
 
   const safeNodes = nodes || [];
+  const fileNodeByRelativePath = useMemo(
+    () => buildFileNodeRelativePathIndex(safeNodes),
+    [safeNodes],
+  );
   // 优先使用 isLoading，向后兼容 loading
   const loading = isLoading ?? loadingProp;
 
@@ -632,50 +638,60 @@ export const FileComponent: FC<{
     );
   }
 
-  // 列表页路由：自定义 loading 渲染 vs 默认 Spin
+  const renderListBody = () => {
+    if (panelView === 'tree' && fileTreeSwitch) {
+      return (
+        <div
+          className={classNames(`${prefixCls}-tree-panel`, hashId)}
+          data-testid="file-tree-embed"
+        >
+          <FileTree
+            {...fileTreeSwitch.treeProps}
+            resetKey={resetKey}
+            filterKeyword={
+              hasKeyword ? String(keyword ?? '').trim() : undefined
+            }
+            fileItemPrefixCls={prefixCls}
+            fileItemHashId={hashId}
+            onDownload={onDownload}
+            onPreview={handlePreview}
+            onShare={onShare}
+            onLocate={onLocate}
+            onFileClick={onFileClick}
+            fileNodeByRelativePath={fileNodeByRelativePath}
+          />
+        </div>
+      );
+    }
+
+    return renderFileContent();
+  };
+
+  const renderListLoading = () => {
+    if (loadingRender) {
+      return loadingRender();
+    }
+
+    return (
+      <div
+        className={classNames(`${prefixCls}-panel-loading`, hashId)}
+        data-testid="file-panel-loading"
+      >
+        <Spin />
+      </div>
+    );
+  };
+
+  // 列表页：loading 时仅展示加载态，避免嵌套 Spin 与列表/空态叠加出现双 loading
   return wrapSSR(
     <>
-      {loading && loadingRender ? (
-        <div
-          className={classNames(`${prefixCls}-container`, hashId)}
-          data-testid="file-component"
-        >
-          {renderToolbarRow()}
-          {loadingRender()}
-        </div>
-      ) : (
-        <Spin spinning={!!loading}>
-          <div
-            className={classNames(`${prefixCls}-container`, hashId)}
-            data-testid="file-component"
-          >
-            {renderToolbarRow()}
-            {panelView === 'tree' && fileTreeSwitch ? (
-              <div
-                className={classNames(`${prefixCls}-tree-panel`, hashId)}
-                data-testid="file-tree-embed"
-              >
-                <FileTree
-                  {...fileTreeSwitch.treeProps}
-                  resetKey={resetKey}
-                  filterKeyword={
-                    hasKeyword ? String(keyword ?? '').trim() : undefined
-                  }
-                  fileItemPrefixCls={prefixCls}
-                  fileItemHashId={hashId}
-                  onDownload={onDownload}
-                  onPreview={handlePreview}
-                  onShare={onShare}
-                  onLocate={onLocate}
-                  onFileClick={onFileClick}
-                />
-              </div>
-            ) : (
-              renderFileContent()
-            )}
-          </div>
-        </Spin>
-      )}
+      <div
+        className={classNames(`${prefixCls}-container`, hashId)}
+        data-testid="file-component"
+      >
+        {renderToolbarRow()}
+        {loading ? renderListLoading() : renderListBody()}
+      </div>
       {ImagePreviewComponent}
     </>,
   );

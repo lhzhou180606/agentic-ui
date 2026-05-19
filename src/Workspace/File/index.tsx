@@ -18,4 +18,13 @@ export type {
   FileType,
   GroupNode,
 } from '../types';
+export { buildFileNodeRelativePathIndex } from './buildFileNodeRelativePathIndex';
+export { resolveTreeLeafFile } from './resolveTreeLeafFile';
+export type { ResolveTreeLeafFileOptions } from './resolveTreeLeafFile';
+export {
+  FILE_TREE_DIR_KEY_PREFIX,
+  FILE_TREE_LEAF_KEY_PREFIX,
+  WORKSPACE_FILE_NODE_ID_PREFIX,
+  fileIdOrTreeKeyToRelativePath,
+} from './workspaceFileId';
 export { getFileTypeIcon, getGroupIcon } from './utils';

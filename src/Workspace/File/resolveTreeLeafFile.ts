@@ -1,11 +1,48 @@
 import type { FileNode, FileTreeNode } from '../types';
 import { ensureNodeWithId } from './handlers';
+import { fileIdOrTreeKeyToRelativePath } from './workspaceFileId';
+
+export interface ResolveTreeLeafFileOptions {
+  /**
+   * 按相对路径索引的平铺文件节点
+   * @description `Workspace.File` 在同时提供 `nodes` 与 `fileTreeSwitch` 时会自动注入，使树视图回调与列表一致
+   */
+  fileNodeByRelativePath?: Map<string, FileNode>;
+}
+
+const lookupFlatFileNode = (
+  node: FileTreeNode,
+  rawId: string,
+  index: Map<string, FileNode>,
+): FileNode | undefined => {
+  const candidates = [
+    fileIdOrTreeKeyToRelativePath(rawId),
+    fileIdOrTreeKeyToRelativePath(node.key),
+    node.file?.id ? fileIdOrTreeKeyToRelativePath(node.file.id) : null,
+    node.id ? fileIdOrTreeKeyToRelativePath(String(node.id)) : null,
+  ];
+
+  for (const relativePath of candidates) {
+    if (!relativePath) {
+      continue;
+    }
+    const matched = index.get(relativePath);
+    if (matched) {
+      return matched;
+    }
+  }
+
+  return undefined;
+};
 
 /**
  * 将文件树叶子节点解析为与平铺列表一致的 {@link FileNode}
- * @description 合并 `file` 与节点顶层的 url/content 等字段（兼容未包在 file 内的入参）
+ * @description 合并 `file` 与节点顶层的 url/content 等字段；若提供 {@link ResolveTreeLeafFileOptions.fileNodeByRelativePath}，则按相对路径对齐列表节点（统一 `workspace:` / `file:` 等 id 前缀）
  */
-export const resolveTreeLeafFile = (node: FileTreeNode): FileNode | null => {
+export const resolveTreeLeafFile = (
+  node: FileTreeNode,
+  options?: ResolveTreeLeafFileOptions,
+): FileNode | null => {
   const hasChildren = Boolean(node.children && node.children.length > 0);
   const resolvedIsLeaf = node.isLeaf ?? !hasChildren;
   if (!resolvedIsLeaf) {
@@ -24,10 +61,29 @@ export const resolveTreeLeafFile = (node: FileTreeNode): FileNode | null => {
     ...nodeFileFields
   } = node as FileTreeNode & Partial<FileNode>;
 
-  return ensureNodeWithId({
+  const rawId = file?.id ?? (id !== undefined ? String(id) : undefined) ?? key;
+
+  const base = ensureNodeWithId({
     ...nodeFileFields,
     ...(file ?? {}),
     name: file?.name ?? name,
-    id: file?.id ?? id ?? key,
+    id: rawId,
+  });
+
+  const index = options?.fileNodeByRelativePath;
+  if (!index?.size) {
+    return base;
+  }
+
+  const matched = lookupFlatFileNode(node, rawId, index);
+  if (!matched) {
+    return base;
+  }
+
+  return ensureNodeWithId({
+    ...matched,
+    ...base,
+    id: matched.id,
+    name: base.name,
   });
 };

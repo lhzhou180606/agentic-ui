@@ -60,4 +60,47 @@ describe('resolveTreeLeafFile', () => {
     };
     expect(resolveTreeLeafFile(node)).toBeNull();
   });
+
+  it('应按相对路径对齐平铺 nodes（workspace: 与 file:）', () => {
+    const flatNode = {
+      id: 'workspace:AGENTS.md',
+      name: 'AGENTS.md',
+      canPreview: true,
+      canDownload: true,
+    };
+
+    const index = new Map([['AGENTS.md', flatNode]]);
+
+    const treeLeaf: FileTreeNode = {
+      key: 'file:AGENTS.md',
+      name: 'AGENTS.md',
+      isLeaf: true,
+    };
+
+    expect(
+      resolveTreeLeafFile(treeLeaf, { fileNodeByRelativePath: index }),
+    ).toEqual(
+      expect.objectContaining({
+        id: 'workspace:AGENTS.md',
+        name: 'AGENTS.md',
+        canPreview: true,
+        canDownload: true,
+      }),
+    );
+  });
+
+  it('无索引时仍使用树 key 作为 id', () => {
+    const treeLeaf: FileTreeNode = {
+      key: 'file:skills/data-query/SKILL.md',
+      name: 'SKILL.md',
+      isLeaf: true,
+    };
+
+    expect(resolveTreeLeafFile(treeLeaf)).toEqual(
+      expect.objectContaining({
+        id: 'file:skills/data-query/SKILL.md',
+        name: 'SKILL.md',
+      }),
+    );
+  });
 });

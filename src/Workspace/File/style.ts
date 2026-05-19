@@ -22,6 +22,14 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
       display: 'flex',
       flexDirection: 'column',
 
+      [`${token.componentCls}-panel-loading`]: {
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 0,
+      },
+
       // 分组展示模式
       [`&--group`]: {
         [`${token.componentCls}-group`]: {
