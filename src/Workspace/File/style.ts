@@ -127,81 +127,12 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
       },
     },
 
-    // 文件项样式
+    // 文件项共用子元素（平铺 / 树通过 --list、--tree 区分布局）
     [`${token.componentCls}-item`]: {
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: '4px',
-      marginBottom: '4px',
-      padding: '4px',
-      borderRadius: 'var(--radius-control-base)',
-      cursor: 'pointer',
-      transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
       boxSizing: 'border-box',
-
-      // 定位高亮动画
-      '&:target': {
-        animationName: 'flash-shadow',
-        animationDuration: '3s',
-        animationTimingFunction: 'ease-in-out',
-        animationIterationCount: 1,
-      },
-
-      '&:last-child': {
-        marginBottom: 0,
-      },
-
-      '&:hover': {
-        background: 'var(--color-gray-control-fill-hover)',
-
-        // 鼠标悬浮时显示操作区
-        [`${token.componentCls}-item-actions`]: {
-          opacity: 1,
-          visibility: 'visible',
-          pointerEvents: 'auto',
-        },
-      },
-
-      // 键盘聚焦时也显示操作区，提升可访问性
-      '&:focus-within': {
-        [`${token.componentCls}-item-actions`]: {
-          opacity: 1,
-          visibility: 'visible',
-          pointerEvents: 'auto',
-        },
-      },
-
-      // 文件树叶子行：与平铺列表共用 FileItem，仅保留文件名与操作区
-      '&--tree': {
-        width: '100%',
-        marginBottom: 0,
-        padding: 0,
-        cursor: 'default',
-        background: 'transparent',
-
-        '&:hover': {
-          background: 'transparent',
-        },
-
-        [`${token.componentCls}-item-icon`]: {
-          display: 'none',
-        },
-
-        [`${token.componentCls}-item-details`]: {
-          display: 'none',
-        },
-
-        [`${token.componentCls}-item-info`]: {
-          flex: 1,
-          minWidth: 0,
-        },
-
-        [`${token.componentCls}-item-actions`]: {
-          opacity: 1,
-          visibility: 'visible',
-          pointerEvents: 'auto',
-        },
-      },
+      borderRadius: 'var(--radius-control-base)',
+      transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
+      maxWidth: '100%',
 
       // 文件图标
       [`&-icon`]: {
@@ -290,6 +221,82 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
           {
             color: 'var(--color-gray-text-light)',
           },
+      },
+    },
+
+    // 平铺列表行
+    [`${token.componentCls}-item--list`]: {
+      display: 'flex',
+      width: '100%',
+      alignItems: 'center',
+      gap: '4px',
+      marginBottom: '4px',
+      padding: '4px',
+      cursor: 'pointer',
+
+      '&:target': {
+        animationName: 'flash-shadow',
+        animationDuration: '3s',
+        animationTimingFunction: 'ease-in-out',
+        animationIterationCount: 1,
+      },
+
+      '&:last-child': {
+        marginBottom: 0,
+      },
+
+      '&:hover': {
+        background: 'var(--color-gray-control-fill-hover)',
+
+        [`${token.componentCls}-item-actions`]: {
+          opacity: 1,
+          visibility: 'visible',
+          pointerEvents: 'auto',
+        },
+      },
+
+      '&:focus-within': {
+        [`${token.componentCls}-item-actions`]: {
+          opacity: 1,
+          visibility: 'visible',
+          pointerEvents: 'auto',
+        },
+      },
+    },
+
+    // 文件树叶子行
+    [`${token.componentCls}-item--tree`]: {
+      display: 'inline-flex',
+      width: 'auto',
+      maxWidth: 'none',
+      alignItems: 'center',
+      gap: '4px',
+      marginBottom: 0,
+      padding: 0,
+      cursor: 'default',
+      background: 'transparent',
+
+      '&:hover': {
+        background: 'transparent',
+      },
+
+      [`${token.componentCls}-item-icon`]: {
+        display: 'none',
+      },
+
+      [`${token.componentCls}-item-details`]: {
+        display: 'none',
+      },
+
+      [`${token.componentCls}-item-info`]: {
+        flex: 1,
+        minWidth: 0,
+      },
+
+      [`${token.componentCls}-item-actions`]: {
+        opacity: 1,
+        visibility: 'visible',
+        pointerEvents: 'auto',
       },
     },
 

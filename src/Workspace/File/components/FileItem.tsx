@@ -344,6 +344,7 @@ const FileItemComponent: FC<FileItemProps> = ({
       onClick={handleClick}
       className={classNames(
         `${prefixCls}-item`,
+        `${prefixCls}-item--list`,
         { [`${prefixCls}-item-disabled`]: isDisabled },
         hashId,
       )}

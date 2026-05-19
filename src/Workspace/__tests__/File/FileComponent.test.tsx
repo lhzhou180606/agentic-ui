@@ -89,6 +89,9 @@ describe('FileComponent', () => {
 
       expect(screen.getByText('test.txt')).toBeInTheDocument();
       expect(screen.getByText('image.png')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-workspace-file-item--list'),
+      ).toBeInTheDocument();
     });
 
     it('应该渲染文件分组', () => {
