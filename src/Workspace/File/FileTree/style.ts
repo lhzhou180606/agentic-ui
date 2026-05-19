@@ -1,4 +1,4 @@
-﻿import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 
 const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
   const { componentCls, antCls } = token;
@@ -42,8 +42,9 @@ const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
           overflow: 'hidden',
         },
         [`${antCls}-tree-title`]: {
+          display: 'inline-flex',
+          alignItems: 'center',
           flex: 1,
-          width: '100%',
           minWidth: 0,
           height: 32,
           lineHeight: '32px',

@@ -655,6 +655,8 @@ export const ChartRender: React.FC<{
     x: any;
     y: any;
     rest: any;
+    /** 排序列名；未配置时若表格含 index 列会自动使用 */
+    sortBy?: string;
     index?: any;
     chartData?: any;
     columns?: any;

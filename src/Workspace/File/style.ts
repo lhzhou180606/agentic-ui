@@ -121,7 +121,7 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
 
     // 文件项样式
     [`${token.componentCls}-item`]: {
-      display: 'flex',
+      display: 'inline-flex',
       alignItems: 'center',
       gap: '4px',
       marginBottom: '4px',
