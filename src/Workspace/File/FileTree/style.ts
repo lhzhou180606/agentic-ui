@@ -1,5 +1,8 @@
 import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 
+/** Workspace 文件树每级缩进（px）；antd Tree 通过 indent-unit 宽度控制 */
+const FILE_TREE_INDENT_SIZE = 12;
+
 const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
   const { componentCls, antCls } = token;
 
@@ -35,6 +38,9 @@ const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
           alignSelf: 'center',
           height: 32,
           lineHeight: '32px',
+        },
+        [`${antCls}-tree-indent-unit`]: {
+          width: FILE_TREE_INDENT_SIZE,
         },
         [`&${antCls}-tree-block-node ${antCls}-tree-list-holder-inner ${antCls}-tree-node-content-wrapper`]:
           {
