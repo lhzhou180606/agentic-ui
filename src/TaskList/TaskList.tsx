@@ -40,6 +40,7 @@ export const TaskList = memo(
     open,
     onOpenChange,
     taskCompleteText,
+    showProgress = false,
   }: TaskListProps) => {
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const prefixCls = getPrefixCls('task-list');
@@ -91,7 +92,7 @@ export const TaskList = memo(
       };
     }, [simpleExpanded]);
 
-    const { summaryStatus, summaryText, summarySwapKey, isCancelled, lastItem } =
+    const { summaryStatus, summaryText, summarySwapKey, isCancelled, lastItem, completedCount, totalCount } =
       useMemo(() => {
         const completedCount = items.filter(
           (i) => i.status === 'success',
@@ -147,6 +148,8 @@ export const TaskList = memo(
           summarySwapKey: swapKey,
           isCancelled: hasError,
           lastItem: items[items.length - 1] as TaskItem | undefined,
+          completedCount,
+          totalCount: items.length,
         };
       }, [items, locale, taskCompleteText, externalLoading]);
 
@@ -192,6 +195,9 @@ export const TaskList = memo(
         ? [lastItem]
         : [];
 
+    const progressPercent =
+      totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
     return wrapSSR(
       <div
         className={classNames(`${simpleCls}-wrapper`, hashId, className)}
@@ -217,6 +223,14 @@ export const TaskList = memo(
           <div className={classNames(`${simpleCls}-text`, hashId)}>
             <TextSwap swapKey={summarySwapKey}>{summaryText}</TextSwap>
           </div>
+          {showProgress && totalCount > 0 && (
+            <div
+              className={classNames(`${simpleCls}-count`, hashId)}
+              data-testid="task-list-simple-progress-count"
+            >
+              {completedCount}/{totalCount}
+            </div>
+          )}
           <div className={classNames(`${simpleCls}-arrow`, hashId)}>
             <ActionIconBox
               title={simpleArrowTitle}
@@ -231,6 +245,21 @@ export const TaskList = memo(
             </ActionIconBox>
           </div>
         </div>
+        {showProgress && totalCount > 0 && (
+          <div
+            className={classNames(`${simpleCls}-progress`, hashId)}
+            data-testid="task-list-simple-progress"
+          >
+            <div
+              className={classNames(`${simpleCls}-progress-bar`, hashId, {
+                [`${simpleCls}-progress-bar-success`]: summaryStatus === 'success',
+                [`${simpleCls}-progress-bar-error`]: summaryStatus === 'error',
+              })}
+              style={{ width: `${progressPercent}%` }}
+              data-testid="task-list-simple-progress-bar"
+            />
+          </div>
+        )}
         <div
           className={classNames(`${simpleCls}-content`, hashId, {
             [`${simpleCls}-content-expanded`]: simpleExpanded,

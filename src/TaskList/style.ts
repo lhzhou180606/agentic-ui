@@ -173,6 +173,34 @@ const genStyle: GenStyleFn<'TaskList'> = (token) => {
           alignItems: 'center',
           justifyContent: 'center',
         },
+
+        [`${componentCls}-simple-count`]: {
+          flexShrink: 0,
+          font: 'var(--font-text-paragraph-sm, 12px)',
+          color: 'var(--color-gray-text-secondary, rgba(0,3,9,0.45))',
+          letterSpacing: 'var(--letter-spacing-paragraph-sm, normal)',
+          lineHeight: 1,
+        },
+      },
+
+      // Simple variant - progress bar
+      '&-simple-progress': {
+        height: 2,
+        background: 'var(--color-gray-control-fill-active, rgba(0,0,0,0.06))',
+
+        [`${componentCls}-simple-progress-bar`]: {
+          height: '100%',
+          background: 'var(--color-primary-control-fill-primary)',
+          transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+
+          '&-success': {
+            background: 'var(--color-green-control-fill-primary)',
+          },
+
+          '&-error': {
+            background: 'var(--color-red-control-fill-primary)',
+          },
+        },
       },
 
       // Simple variant - content area

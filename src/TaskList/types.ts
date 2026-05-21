@@ -42,6 +42,11 @@ export interface TaskListProps {
   taskCompleteText?:
     | React.ReactNode
     | ((params: { items: TaskItem[] }) => React.ReactNode);
+  /**
+   * simple 模式下是否展示进度信息：摘要条内显示「已完成/总数」计数，条底部展示细线进度条。
+   * 仅在 `variant="simple"` 时生效。
+   */
+  showProgress?: boolean;
 }
 
 /**
