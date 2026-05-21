@@ -18,6 +18,7 @@ group:
   - ⚡️ `useStyle` now returns an identity `wrapSSR`. Style injection happens through cssinjs's `useGlobalCache` → `updateCSS` side effect during the hook call and never depended on `wrapSSR`. In our CSR-only config `wrapSSR(node)` was always `<><Empty/>{node}</>`, so we drop that Fragment + `<Empty/>` allocation. Existing `return wrapSSR(<jsx/>)` callers continue to work (identity passthrough); new code can simply `return <jsx/>`.
 
 - Workspace
+  - 💄 `FileTree`: folder and leaf names use CSS single-line ellipsis; full name via native `title` on hover.
   - 🆕 Added `defaultActiveTabKey` to set the initial active tab in uncontrolled mode.
   - 🆕 Added `notifyOnInvalidActiveTabKey` (default `true`): when controlled `activeTabKey` is not in the tab list, whether to call `onTabChange` with a valid key; `false` falls back in the UI only.
   - 🆕 Added `preserveFilePreviewOnTabChange` (default `false`): when `true`, leaving and returning to a file panel keeps `Workspace.File` / `Workspace.FileTree` preview state.

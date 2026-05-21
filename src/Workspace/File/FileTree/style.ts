@@ -42,7 +42,7 @@ const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
         [`${antCls}-tree-indent-unit`]: {
           width: FILE_TREE_INDENT_SIZE,
         },
-        [`&${antCls}-tree-block-node ${antCls}-tree-list-holder-inner ${antCls}-tree-node-content-wrapper`]:
+        [`${antCls}-tree-list-holder-inner ${antCls}-tree-node-content-wrapper`]:
           {
             display: 'flex',
             flex: 1,
@@ -50,17 +50,21 @@ const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
             overflow: 'hidden',
           },
         [`${antCls}-tree-title`]: {
-          display: 'inline-flex',
+          display: 'flex',
           alignItems: 'center',
           flex: 1,
           minWidth: 0,
+          maxWidth: '100%',
           height: 32,
           lineHeight: '32px',
           overflow: 'hidden',
-          [`&:not(:has(.${componentCls}-leaf-title))`]: {
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          },
+        },
+        [`${componentCls}-node-title`]: {
+          flex: 1,
+          minWidth: 0,
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+          textOverflow: 'ellipsis',
         },
       },
     },

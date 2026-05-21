@@ -213,9 +213,12 @@ const FileItemComponent: FC<FileItemProps> = ({
             {fileWithId.renderName ? (
               fileWithId.renderName(renderContext)
             ) : (
-              <Typography.Text ellipsis={{ tooltip: fileWithId.name }}>
+              <span
+                className={classNames(`${prefixCls}-item-name-text`, hashId)}
+                title={fileWithId.name}
+              >
                 {fileWithId.name}
-              </Typography.Text>
+              </span>
             )}
           </div>
         </div>

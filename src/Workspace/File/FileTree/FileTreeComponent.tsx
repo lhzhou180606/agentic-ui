@@ -1,4 +1,4 @@
-﻿import { FileFolders } from '@sofa-design/icons';
+import { FileFolders } from '@sofa-design/icons';
 import { ConfigProvider, Empty, Tree, Typography } from 'antd';
 import type { DataNode, EventDataNode, TreeProps } from 'antd/es/tree';
 import type { AntdTreeNodeAttribute } from 'antd/es/tree/Tree';
@@ -22,6 +22,19 @@ import { resolveTreeLeafFile } from '../resolveTreeLeafFile';
 import { useFileStyle } from '../style';
 import { getFileTypeIcon } from '../utils';
 import { useFileTreeStyle } from './style';
+
+const renderTreeNodeTitle = (
+  name: string,
+  prefixCls: string,
+  hashId: string,
+) => (
+  <span
+    className={classNames(`${prefixCls}-node-title`, hashId)}
+    title={name}
+  >
+    {name}
+  </span>
+);
 
 const walkAndIndex = (
   nodes: FileTreeNode[],
@@ -74,7 +87,7 @@ const mapTreeToDataNodes = (
             onLocate={ctx.onLocate}
           />
         ) : (
-          node.name
+          renderTreeNodeTitle(node.name, ctx.prefixCls, ctx.hashId)
         );
 
       return {
@@ -87,7 +100,7 @@ const mapTreeToDataNodes = (
 
     return {
       key: node.key,
-      title: node.name,
+      title: renderTreeNodeTitle(node.name, ctx.prefixCls, ctx.hashId),
       isLeaf: false,
       disabled: node.disabled,
       children: hasChildren

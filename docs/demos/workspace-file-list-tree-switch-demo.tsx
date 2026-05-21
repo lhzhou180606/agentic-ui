@@ -1,4 +1,4 @@
-﻿import { Workspace } from '@ant-design/agentic-ui';
+import { Workspace } from '@ant-design/agentic-ui';
 import type {
   FileNode,
   FilePanelViewMode,
@@ -28,6 +28,13 @@ const LONG_NAME_ASSET =
 const LONG_NAME_DOCS =
   'architecture-and-design-decisions-for-agentic-ui-file-panel-tree-mode-guide.md';
 
+/** 恰好 200 字符，用于验证平铺 / 文件树下单行省略 */
+const LONG_NAME_200_CHARS =
+  'dtclaw--dtclaw-workspace-pool-prod-54h7r-' + 'a'.repeat(156) + '.md';
+
+const LONG_FOLDER_200_CHARS =
+  'dtclaw--dtclaw-workspace-pool-folder-prod-54h7r-' + 'b'.repeat(152);
+
 const ALL_FILES: FileNode[] = [
   {
     id: 'flat-readme',
@@ -36,6 +43,15 @@ const ALL_FILES: FileNode[] = [
     size: '12KB',
     lastModified: '09:30',
     url: 'https://example.com/README.md',
+    canPreview: true,
+  },
+  {
+    id: 'flat-name-200',
+    name: LONG_NAME_200_CHARS,
+    type: 'markdown',
+    size: '1KB',
+    lastModified: '刚刚',
+    url: 'https://example.com/long-name-200.md',
     canPreview: true,
   },
   {
@@ -168,6 +184,17 @@ const ALL_FILES: FileNode[] = [
 
 const MOCK_CHILDREN: Record<string, FileTreeNode[]> = {
   'demo-root': [
+    {
+      key: `demo-root/${LONG_FOLDER_200_CHARS}`,
+      name: LONG_FOLDER_200_CHARS,
+      isLeaf: false,
+    },
+    {
+      key: `demo-root/${LONG_NAME_200_CHARS}`,
+      name: LONG_NAME_200_CHARS,
+      isLeaf: true,
+      file: ALL_FILES[1],
+    },
     { key: 'demo-root/src', name: 'src', isLeaf: false },
     { key: 'demo-root/docs', name: 'docs', isLeaf: false },
     { key: 'demo-root/assets', name: 'assets', isLeaf: false },
@@ -182,19 +209,27 @@ const MOCK_CHILDREN: Record<string, FileTreeNode[]> = {
       key: `demo-root/${LONG_NAME_README}`,
       name: LONG_NAME_README,
       isLeaf: true,
-      file: ALL_FILES[1],
+      file: ALL_FILES[2],
     },
     {
       key: 'demo-root/package.json',
       name: 'package.json',
       isLeaf: true,
-      file: ALL_FILES[2],
+      file: ALL_FILES[3],
     },
     {
       key: 'demo-root/changelog.zh-CN.md',
       name: 'changelog.zh-CN.md',
       isLeaf: true,
-      file: ALL_FILES[14],
+      file: ALL_FILES[15],
+    },
+  ],
+  [`demo-root/${LONG_FOLDER_200_CHARS}`]: [
+    {
+      key: `demo-root/${LONG_FOLDER_200_CHARS}/inside.md`,
+      name: 'inside.md',
+      isLeaf: true,
+      file: ALL_FILES[0],
     },
   ],
   'demo-root/src': [
@@ -205,13 +240,13 @@ const MOCK_CHILDREN: Record<string, FileTreeNode[]> = {
       key: 'demo-root/src/api.ts',
       name: 'api.ts',
       isLeaf: true,
-      file: ALL_FILES[3],
+      file: ALL_FILES[4],
     },
     {
       key: 'demo-root/src/app.tsx',
       name: 'app.tsx',
       isLeaf: true,
-      file: ALL_FILES[4],
+      file: ALL_FILES[5],
     },
   ],
   'demo-root/src/components': [
@@ -219,13 +254,13 @@ const MOCK_CHILDREN: Record<string, FileTreeNode[]> = {
       key: 'demo-root/src/components/FileItem.tsx',
       name: 'FileItem.tsx',
       isLeaf: true,
-      file: ALL_FILES[5],
+      file: ALL_FILES[6],
     },
     {
       key: `demo-root/src/components/${LONG_NAME_COMPONENT}`,
       name: LONG_NAME_COMPONENT,
       isLeaf: true,
-      file: ALL_FILES[10],
+      file: ALL_FILES[11],
     },
   ],
   'demo-root/src/hooks': [
@@ -233,7 +268,7 @@ const MOCK_CHILDREN: Record<string, FileTreeNode[]> = {
       key: 'demo-root/src/hooks/useFileTreeLazyLoad.ts',
       name: 'useFileTreeLazyLoad.ts',
       isLeaf: true,
-      file: ALL_FILES[6],
+      file: ALL_FILES[7],
     },
   ],
   'demo-root/src/styles': [
@@ -241,7 +276,7 @@ const MOCK_CHILDREN: Record<string, FileTreeNode[]> = {
       key: 'demo-root/src/styles/variables.css',
       name: 'variables.css',
       isLeaf: true,
-      file: ALL_FILES[7],
+      file: ALL_FILES[8],
     },
   ],
   'demo-root/docs': [
@@ -249,13 +284,13 @@ const MOCK_CHILDREN: Record<string, FileTreeNode[]> = {
       key: 'demo-root/docs/getting-started.md',
       name: 'getting-started.md',
       isLeaf: true,
-      file: ALL_FILES[8],
+      file: ALL_FILES[9],
     },
     {
       key: `demo-root/docs/${LONG_NAME_DOCS}`,
       name: LONG_NAME_DOCS,
       isLeaf: true,
-      file: ALL_FILES[9],
+      file: ALL_FILES[10],
     },
   ],
   'demo-root/assets': [
@@ -263,13 +298,13 @@ const MOCK_CHILDREN: Record<string, FileTreeNode[]> = {
       key: 'demo-root/assets/logo.png',
       name: 'logo.png',
       isLeaf: true,
-      file: ALL_FILES[11],
+      file: ALL_FILES[12],
     },
     {
       key: `demo-root/assets/${LONG_NAME_ASSET}`,
       name: LONG_NAME_ASSET,
       isLeaf: true,
-      file: ALL_FILES[12],
+      file: ALL_FILES[13],
     },
   ],
   'demo-root/.github': [
@@ -280,7 +315,7 @@ const MOCK_CHILDREN: Record<string, FileTreeNode[]> = {
       key: 'demo-root/.github/workflows/ci.yml',
       name: 'ci.yml',
       isLeaf: true,
-      file: ALL_FILES[13],
+      file: ALL_FILES[14],
     },
   ],
 };
@@ -313,8 +348,8 @@ const WorkspaceFileListTreeSwitchDemo: React.FC = () => {
             开启工具栏上的分段切换；下方按钮演示<strong>受控</strong>的{' '}
             <Typography.Text code>view</Typography.Text> /{' '}
             <Typography.Text code>onViewChange</Typography.Text>，与面板内
-            Segmented 同步。列表含多级目录与<strong>超长文件名</strong>
-            ，便于验证省略与操作区叠层
+            Segmented 同步。列表含多级目录、<strong>200 字符文件名</strong>
+            与超长文件夹名，便于验证单行省略与操作区叠层
           </Typography.Paragraph>
 
           <Alert
@@ -323,8 +358,8 @@ const WorkspaceFileListTreeSwitchDemo: React.FC = () => {
             message={panelView === 'list' ? '平铺模式' : '文件树模式'}
             description={
               panelView === 'list'
-                ? '列表按文件名过滤当前全部 15 个文件条目（含 4 个超长文件名）'
-                : '树内搜索仅匹配已展开目录下已加载的文件名；展开 workspace → src / docs / assets 可浏览更多叶子；叶子可挂 `file` 与列表一致支持预览/下载'
+                ? '列表按文件名过滤当前全部 16 个文件条目（含 200 字符文件名与 4 个其它超长名）'
+                : '树内搜索仅匹配已展开目录下已加载的文件名；展开 workspace 可见 200 字符文件夹/文件；再展开 src / docs / assets 浏览更多叶子'
             }
           />
 

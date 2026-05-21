@@ -1,4 +1,4 @@
-﻿import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
   return {
@@ -304,6 +304,19 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
       [`${token.componentCls}-item-info`]: {
         flex: 1,
         minWidth: 0,
+      },
+
+      [`${token.componentCls}-item-name`]: {
+        minWidth: 0,
+        overflow: 'hidden',
+        wordBreak: 'normal',
+      },
+
+      [`${token.componentCls}-item-name-text`]: {
+        display: 'block',
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
       },
 
       [`${token.componentCls}-item-actions`]: {

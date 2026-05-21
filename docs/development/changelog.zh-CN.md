@@ -18,6 +18,7 @@ group:
   - ⚡️ `useStyle` 返回的 `wrapSSR` 改为 identity 函数：样式注入由 cssinjs `useGlobalCache` → `updateCSS` 副作用完成，与 `wrapSSR` 无关；浏览器 CSR 下 `wrapSSR(node)` 此前一直等于 `<><Empty/>{node}</>`，组件库也未使用 `<StyleProvider ssrInline>`，因此该层 Fragment + `<Empty/>` 元素纯属无用开销。改造后每个组件每次渲染少一层 React 元素分配；组件文件继续 `return wrapSSR(<jsx/>)` 仍兼容（identity 透传），新组件可以直接 `return <jsx/>`。
 
 - Workspace
+  - 💄 `FileTree`：文件夹与叶子节点名称通过 CSS 单行省略，悬停 `title` 展示完整名称。
   - 🆕 新增 `defaultActiveTabKey`：非受控模式下指定初始激活的标签 key。
   - 🆕 新增 `notifyOnInvalidActiveTabKey`（默认 `true`）：受控且 `activeTabKey` 不在当前标签列表时，是否通过 `onTabChange` 回传有效 key；设为 `false` 时仅界面回退、不触发回调。
   - 🆕 新增 `preserveFilePreviewOnTabChange`（默认 `false`）：为 `true` 时离开文件类标签再返回可保留 `Workspace.File` / `Workspace.FileTree` 的预览态。
