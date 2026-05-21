@@ -1,4 +1,4 @@
-﻿import { ChevronUp } from '@sofa-design/icons';
+import { ChevronUp } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import { useMergedState } from 'rc-util';
@@ -32,6 +32,7 @@ const getDefaultExpandedKeys = (
 export const TaskList = memo(
   ({
     items,
+    loading: externalLoading = false,
     className,
     expandedKeys,
     onExpandedKeysChange,
@@ -90,14 +91,16 @@ export const TaskList = memo(
       };
     }, [simpleExpanded]);
 
-    const { summaryStatus, summaryText, summarySwapKey, hasError, lastItem } =
+    const { summaryStatus, summaryText, summarySwapKey, lastItem } =
       useMemo(() => {
         const completedCount = items.filter(
           (i) => i.status === 'success',
         ).length;
         const loadingItem = items.find((i) => i.status === 'loading');
-        const errorExists = items.some((i) => i.status === 'error');
-        const allDone = completedCount === items.length && items.length > 0;
+        const allDone =
+          !externalLoading &&
+          completedCount === items.length &&
+          items.length > 0;
 
         let status: TaskStatus = 'pending';
         let text: React.ReactNode = locale?.['taskList.taskList'] || '任务列表';
@@ -125,18 +128,19 @@ export const TaskList = memo(
               : '';
           text = tpl.replace('${taskName}', taskName);
           swapKey = `loading:${loadingItem.key}:${taskName}`;
-        } else if (errorExists) {
-          status = 'error';
-          const tpl = locale?.['taskList.taskInProgress'] || '正在进行任务';
+        } else if (externalLoading || items.length > 0) {
+          // 外部 loading 或内部未全部成功 → 视为进行中
+          status = 'loading';
+          const tpl =
+            locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
           text = tpl.replace('${taskName}', '');
-          swapKey = 'error';
+          swapKey = `in-progress:${externalLoading}:${items.map((i) => `${i.key}:${i.status}`).join('|')}`;
         }
 
         return {
           summaryStatus: status,
           summaryText: text,
           summarySwapKey: swapKey,
-          hasError: errorExists,
           lastItem: items[items.length - 1] as TaskItem | undefined,
         };
       }, [items, locale, taskCompleteText]);
@@ -175,13 +179,7 @@ export const TaskList = memo(
       ? locale?.['taskList.collapse'] || '收起'
       : locale?.['taskList.expand'] || '展开';
 
-    const visibleItems = simpleExpanded
-      ? hasError
-        ? items.slice(-1)
-        : items
-      : lastItem
-        ? [lastItem]
-        : [];
+    const visibleItems = simpleExpanded ? items : lastItem ? [lastItem] : [];
 
     return wrapSSR(
       <div

@@ -14,6 +14,8 @@ export type TaskListVariant = 'default' | 'simple';
 export interface TaskListProps {
   /** 任务列表数据 */
   items: TaskItem[];
+  /** 外部加载状态，为 true 时摘要栏始终显示 loading，只有 loading 为 false 且所有 item 均为 success 时才显示"任务完成" */
+  loading?: boolean;
   /** 自定义类名 */
   className?: string;
   /** 受控模式：指定当前展开的任务项 key 数组 */

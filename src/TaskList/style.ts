@@ -1,4 +1,4 @@
-﻿import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
 const genStyle: GenStyleFn<'TaskList'> = (token) => {
   const { componentCls } = token;
@@ -189,7 +189,23 @@ const genStyle: GenStyleFn<'TaskList'> = (token) => {
       },
 
       '&-simple-list': {
-        padding: '4px 12px 8px',
+        padding: '4px 4px 8px',
+
+        // 在 simple 模式下，子项 icon 和文字与摘要栏对齐
+        [`${componentCls}-thoughtChainItem`]: {
+          [`${componentCls}-left`]: {
+            padding: '4px 0 0',
+          },
+          [`${componentCls}-right`]: {
+            padding: '4px 0',
+          },
+          [`${componentCls}-top ${componentCls}-title`]: {
+            marginLeft: 8,
+          },
+        },
+        [`${componentCls}-body ${componentCls}-content`]: {
+          marginLeft: 8,
+        },
       },
     },
   };
