@@ -1,4 +1,4 @@
-﻿import { fireEvent, render, screen } from '@testing-library/react';
+﻿import { fireEvent, render, screen, within } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -111,8 +111,9 @@ describe('TaskList Component', () => {
     );
 
     expect(screen.getByTestId('task-list-status-success')).toBeInTheDocument();
-    expect(screen.getByTestId('task-list-status-loading')).toBeInTheDocument();
+    expect(screen.getAllByTestId('task-list-status-loading')).toHaveLength(1);
     expect(screen.getAllByTestId('task-list-status-pending')).toHaveLength(2);
+    expect(screen.getAllByTestId('task-list-loading')).toHaveLength(3);
   });
 
   it('应该显示错误状态的任务', () => {
@@ -170,8 +171,10 @@ describe('TaskList Component', () => {
       </TestWrapper>,
     );
 
-    const loadingComponent = screen.getByTestId('task-list-loading');
-    expect(loadingComponent).toBeInTheDocument();
+    const loadingStatus = screen.getByTestId('task-list-status-loading');
+    const loadingComponent = within(loadingStatus).getByTestId(
+      'task-list-loading',
+    );
     expect(loadingComponent).toHaveAttribute('data-size', '16');
   });
 

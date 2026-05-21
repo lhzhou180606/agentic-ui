@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
+﻿/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable react/no-children-prop */
 import classNames from 'clsx';
 import React, { useContext, useEffect, useMemo, useRef } from 'react';
@@ -20,6 +20,7 @@ import {
 } from 'slate-react';
 import { useDebounceFn } from '../../Hooks/useDebounceFn';
 import { useRefFunction } from '../../Hooks/useRefFunction';
+import { isWeChat } from '../../Utils/env';
 import { parserMdToSchema } from '../BaseMarkdownEditor';
 import { Elements } from '../el';
 import { PluginContext } from '../plugin';
@@ -383,14 +384,31 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     const container = markdownContainerRef?.current;
     if (!container) return;
 
-    const handleMouseUp = (e: MouseEvent) => {
-      e.preventDefault();
+    // 勿对 mouseup/touchend 调用 preventDefault：移动端触摸会合成 mouse 事件，
+    // 阻止默认行为会导致 contenteditable 无法稳定聚焦或 IME 无法写入（与 #401 同类）。
+    const handlePointerUp = (e: MouseEvent | TouchEvent) => {
       handleSelectionChange.run();
+      if (readonly || !isWeChat()) return;
+      const target = e.target as HTMLElement | null;
+      if (!target?.closest('[contenteditable="true"]')) return;
+      const editor = markdownEditorRef.current;
+      if (!editor) return;
+      requestAnimationFrame(() => {
+        try {
+          if (!ReactEditor.isFocused(editor)) {
+            EditorUtils.focus(editor);
+          }
+        } catch {
+          // 编辑器未挂载或只读态下忽略
+        }
+      });
     };
-    container.addEventListener('mouseup', handleMouseUp);
+    container.addEventListener('mouseup', handlePointerUp);
+    container.addEventListener('touchend', handlePointerUp, { passive: true });
 
     return () => {
-      container.removeEventListener('mouseup', handleMouseUp);
+      container.removeEventListener('mouseup', handlePointerUp);
+      container.removeEventListener('touchend', handlePointerUp);
       handleSelectionChange.cancel();
     };
   }, [readonly, markdownContainerRef?.current]);
@@ -835,65 +853,63 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
    */
   const onPaste = useRefFunction(handlePasteEvent);
 
+  const syncTagPopupCompositionAttr = useRefFunction((active: boolean) => {
+    const focusPath = markdownEditorRef.current.selection?.focus.path || [];
+    if (focusPath.length === 0) return;
+    try {
+      const node = Node.get(markdownEditorRef.current, focusPath);
+      const dom = ReactEditor.toDOMNode(markdownEditorRef.current, node);
+      const tagInput = dom?.querySelector('[data-tag-popup-input]');
+      if (!tagInput) return;
+      if (active) {
+        tagInput.setAttribute('data-composition', '');
+      } else {
+        tagInput.removeAttribute('data-composition');
+      }
+    } catch {
+      // node may not be mounted yet; ignore
+    }
+  });
+
+  /** 进入 IME 组合态（勿 preventDefault，见 #401） */
+  const activateInputComposition = useRefFunction(() => {
+    cancelClearInputCompositionRef.current?.();
+    cancelClearInputCompositionRef.current = null;
+
+    markdownContainerRef.current?.setAttribute('data-composition', '');
+    store.inputComposition = true;
+    props.onCompositionActiveChange?.(true);
+    syncTagPopupCompositionAttr(true);
+  });
+
   /**
    * 处理输入法开始事件
    */
   const onCompositionStart = () => {
-    cancelClearInputCompositionRef.current?.();
-    cancelClearInputCompositionRef.current = null;
-
-    if (markdownContainerRef.current) {
-      markdownContainerRef.current.setAttribute('data-composition', '');
-    }
-    store.inputComposition = true;
-    props.onCompositionActiveChange?.(true);
-
-    const focusPath = markdownEditorRef.current.selection?.focus.path || [];
-    if (focusPath.length > 0) {
-      const node = Node.get(
-        markdownEditorRef.current,
-        markdownEditorRef.current.selection?.focus.path || [],
-      );
-      if (node) {
-        try {
-          const dom = ReactEditor.toDOMNode(markdownEditorRef.current, node);
-          if (dom) {
-            const tagInput = dom.querySelector('[data-tag-popup-input]');
-            if (tagInput) {
-              tagInput.setAttribute('data-composition', '');
-            }
-          }
-        } catch {
-          // node may not be mounted yet; ignore
-        }
-      }
-    }
-
-    // 注意：不在此处调用 e.preventDefault()。
-    // 移动端（Android GBoard / iOS 软键盘）所有输入都经过组合事件，
-    // 调用 preventDefault 会阻断浏览器将字符写入 contenteditable，
-    // 导致 Slate 模型永远为空，占位符无法消失。
+    activateInputComposition();
   };
 
   /**
    * 部分 Android WebView（如微信）可能跳过 compositionstart 直接触发
-   * compositionupdate，此处兜底确保 data-composition 始终被设置。
+   * compositionupdate；微信下每次 update 都刷新组合态，避免 inputComposition 卡住。
    */
   const onCompositionUpdate = () => {
+    if (isWeChat()) {
+      activateInputComposition();
+      return;
+    }
     if (
       markdownContainerRef.current &&
       !markdownContainerRef.current.hasAttribute('data-composition')
     ) {
-      markdownContainerRef.current.setAttribute('data-composition', '');
-      store.inputComposition = true;
-      props.onCompositionActiveChange?.(true);
+      activateInputComposition();
     }
   };
 
   /**
    * 处理输入法结束事件
    */
-  const onCompositionEnd = () => {
+  const onCompositionEnd = useRefFunction(() => {
     markImeEnterCommitGuard();
 
     cancelClearInputCompositionRef.current?.();
@@ -905,36 +921,44 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       },
     );
 
-    const focusPath = markdownEditorRef.current.selection?.focus.path || [];
-    if (focusPath.length > 0) {
-      const node = Node.get(
-        markdownEditorRef.current,
-        markdownEditorRef.current.selection?.focus.path || [],
-      );
-      if (node) {
-        try {
-          const dom = ReactEditor.toDOMNode(markdownEditorRef.current, node);
-          if (dom) {
-            const tagInput = dom.querySelector('[data-tag-popup-input]');
-            if (tagInput) {
-              tagInput.removeAttribute('data-composition');
-            }
-          }
-        } catch {
-          // node may have been unmounted during composition; ignore
-        }
-      }
-    }
+    syncTagPopupCompositionAttr(false);
 
     // 延迟到下一帧移除 data-composition，确保 Slate 完成模型更新、
     // React 完成重渲染（isEmpty 变为 false、empty class 移除）后
     // 再解除占位符隐藏，避免竞态导致占位符短暂闪现。
     requestAnimationFrame(() => {
-      if (markdownContainerRef.current) {
-        markdownContainerRef.current.removeAttribute('data-composition');
-      }
+      markdownContainerRef.current?.removeAttribute('data-composition');
     });
-  };
+  });
+
+  // 微信 X5 / WKWebView：偶发不上报 compositionend，用原生 input 收尾组合态
+  useEffect(() => {
+    if (!isWeChat() || readonly) return;
+    const container = markdownContainerRef.current;
+    if (!container) return;
+
+    const handleNativeInput = (event: Event) => {
+      const inputEvent = event as InputEvent;
+      if (inputEvent.isComposing) {
+        activateInputComposition();
+        return;
+      }
+      if (store.inputComposition) {
+        onCompositionEnd();
+      }
+    };
+
+    container.addEventListener('input', handleNativeInput, true);
+    return () => {
+      container.removeEventListener('input', handleNativeInput, true);
+    };
+  }, [
+    readonly,
+    markdownContainerRef,
+    store,
+    activateInputComposition,
+    onCompositionEnd,
+  ]);
 
   const elementRenderElement = useRefFunction(
     (eleProps: RenderElementProps) => {

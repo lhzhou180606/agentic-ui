@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Editor.tsx 分支覆盖补充测试
  *
  * 策略：Mock Slate/Editable 以捕获 handler 函数并直接调用，
@@ -1869,13 +1869,14 @@ describe('Editor branches - mouseup effect', () => {
     editableProps = {};
   });
 
-  it('mouseup on container calls handleSelectionChange.run', async () => {
+  it('mouseup/touchend on container register selection sync listeners', async () => {
     const { container } = setupStore({ readonly: false });
     const addSpy = vi.spyOn(container, 'addEventListener');
 
     renderEditor({});
 
     expect(addSpy).toHaveBeenCalledWith('mouseup', expect.any(Function));
+    expect(addSpy).toHaveBeenCalledWith('touchend', expect.any(Function));
     addSpy.mockRestore();
   });
 

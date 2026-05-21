@@ -16,7 +16,7 @@ import { useRefFunction } from '../Hooks/useRefFunction';
 import { I18nContext } from '../I18n';
 import { StatusIcon } from './components/StatusIcon';
 import { TaskListItem } from './components/TaskListItem';
-import { getArrowRotation } from './constants';
+import { getArrowRotation, isTaskInProgress } from './constants';
 import { useStyle } from './style';
 import type { TaskItem, TaskListProps, TaskStatus } from './types';
 
@@ -96,12 +96,12 @@ export const TaskList = memo(
         const completedCount = items.filter(
           (i) => i.status === 'success',
         ).length;
-        const loadingItem = items.find((i) => i.status === 'loading');
+        const inProgressItem = items.find((i) => isTaskInProgress(i.status));
         const hasError = items.some((i) => i.status === 'error');
-        const allDone =
-          !externalLoading &&
-          completedCount === items.length &&
-          items.length > 0;
+        const allSuccess =
+          completedCount === items.length && items.length > 0;
+        // 全部 item 已为 success 时展示完成态；不因 loading prop 滞留为「进行中」
+        const allDone = allSuccess;
 
         let status: TaskStatus = 'pending';
         let text: React.ReactNode = locale?.['taskList.taskList'] || '任务列表';
@@ -118,17 +118,17 @@ export const TaskList = memo(
             locale?.['taskList.taskComplete'] ??
             '任务完成';
           swapKey = `done:${items.map((i) => i.key).join(',')}`;
-        } else if (loadingItem) {
+        } else if (inProgressItem) {
           status = 'loading';
           const tpl =
             locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
-          const title = loadingItem.title;
+          const title = inProgressItem.title;
           const taskName =
             typeof title === 'string' || typeof title === 'number'
               ? String(title)
               : '';
           text = tpl.replace('${taskName}', taskName);
-          swapKey = `loading:${loadingItem.key}:${taskName}`;
+          swapKey = `loading:${inProgressItem.key}:${taskName}`;
         } else if (hasError) {
           status = 'error';
           text = locale?.['taskList.taskAborted'] || '任务已取消';

@@ -1,5 +1,6 @@
-import React from 'react';
+﻿import React from 'react';
 
+/** `pending` 与 `loading` 在 UI 上合并为同一进行中样式（主色 + Loading 图标） */
 export type TaskStatus = 'success' | 'pending' | 'loading' | 'error';
 
 export interface TaskItem {
@@ -14,7 +15,11 @@ export type TaskListVariant = 'default' | 'simple';
 export interface TaskListProps {
   /** 任务列表数据 */
   items: TaskItem[];
-  /** 外部加载状态，为 true 时摘要栏始终显示 loading，只有 loading 为 false 且所有 item 均为 success 时才显示"任务完成" */
+  /**
+   * 外部加载状态。当存在 `status: 'loading' | 'pending'` 的 item 且无 error 时，
+   * 与 `loading={true}` 一并参与摘要「进行中」判定；若全部 item 已为 `success`，摘要显示完成态（忽略本 prop）。
+   * 流式结束后请置为 `false`，避免摘要滞留。
+   */
   loading?: boolean;
   /** 自定义类名 */
   className?: string;

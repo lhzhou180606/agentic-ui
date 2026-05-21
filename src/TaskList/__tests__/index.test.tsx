@@ -1,5 +1,5 @@
 ﻿import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TaskList } from '..';
@@ -60,9 +60,8 @@ describe('TaskList', () => {
       );
       expect(taskItems).toHaveLength(3);
 
-      // 由于组件类型限制，loading状态不在mockItems中，所以没有loading组件
       const loadingComponents = screen.queryAllByTestId('task-list-loading');
-      expect(loadingComponents).toHaveLength(0);
+      expect(loadingComponents).toHaveLength(2);
     });
 
     it('应该正确渲染 loading 状态并传入 size', () => {
@@ -77,8 +76,8 @@ describe('TaskList', () => {
       ];
       render(<TaskList items={itemsWithLoading} />);
 
-      const loadingEl = screen.getByTestId('task-list-loading');
-      expect(loadingEl).toBeInTheDocument();
+      const loadingStatus = screen.getByTestId('task-list-status-loading');
+      const loadingEl = within(loadingStatus).getByTestId('task-list-loading');
       expect(loadingEl).toHaveAttribute('data-size', '16');
     });
 
@@ -223,11 +222,14 @@ describe('TaskList', () => {
 
       render(<TaskList items={itemsWithEmptyContent} />);
 
-      expect(screen.getByText('Empty Content Task')).toBeInTheDocument();
+      expect(screen.getAllByText('Empty Content Task').length).toBeGreaterThan(
+        0,
+      );
       const arrowContainers = document.querySelectorAll(
         '[data-testid="task-list-arrowContainer"]',
       );
-      expect(arrowContainers).toHaveLength(0);
+      expect(arrowContainers).toHaveLength(1);
+      expect(screen.getAllByText('Empty Content Task')).toHaveLength(2);
     });
 
     it('应该处理null内容', () => {
@@ -241,7 +243,48 @@ describe('TaskList', () => {
       ];
 
       render(<TaskList items={itemsWithNullContent} />);
-      expect(screen.getByText('Null Content Task')).toBeInTheDocument();
+      expect(screen.getAllByText('Null Content Task')).toHaveLength(2);
+    });
+
+    it('应渲染序列化 pre 形态的 content 正文', () => {
+      const serializedContent = {
+        type: 'pre',
+        props: {
+          children: 'Validation failed for tool "web_search"',
+        },
+      };
+      const items = [
+        {
+          key: '1',
+          title: 'web_search · query',
+          content: serializedContent as any,
+          status: 'success' as const,
+        },
+      ];
+
+      render(<TaskList items={items} />);
+
+      expect(
+        screen.getByText('Validation failed for tool "web_search"'),
+      ).toBeInTheDocument();
+    });
+
+    it('content 为空时应以 title 作为正文并显示展开箭头', () => {
+      const items = [
+        {
+          key: '1',
+          title: 'web_search · latest news',
+          content: {} as any,
+          status: 'success' as const,
+        },
+      ];
+
+      render(<TaskList items={items} />);
+
+      expect(
+        document.querySelectorAll('[data-testid="task-list-arrowContainer"]'),
+      ).toHaveLength(1);
+      expect(screen.getAllByText('web_search · latest news')).toHaveLength(2);
     });
 
     it('应该处理空数组', () => {
@@ -305,7 +348,7 @@ describe('TaskList', () => {
       expect(successIcons.length).toBeGreaterThan(0);
     });
 
-    it('应该正确渲染pending状态图标', () => {
+    it('pending 状态应与 loading 使用同一进行中图标', () => {
       const pendingItems = [
         {
           key: '1',
@@ -317,10 +360,11 @@ describe('TaskList', () => {
 
       render(<TaskList items={pendingItems} />);
 
-      const pendingIcons = document.querySelectorAll(
-        '[data-testid="task-list-status-pending"]',
-      );
-      expect(pendingIcons.length).toBeGreaterThan(0);
+      const pendingRoot = screen.getByTestId('task-list-status-pending');
+      expect(pendingRoot).toHaveClass('ant-task-list-status-loading');
+      expect(
+        pendingRoot.querySelector('[data-testid="task-list-loading"]'),
+      ).toBeInTheDocument();
     });
 
     it('应该正确渲染loading状态图标', () => {
@@ -826,6 +870,50 @@ describe('TaskList', () => {
       render(<TaskList items={allDoneItems} variant="simple" />);
 
       expect(screen.getByText('任务完成')).toBeInTheDocument();
+    });
+
+    it('全部 success 时即使 loading=true 也应显示任务完成', () => {
+      const allDoneItems = [
+        {
+          key: '1',
+          title: 'Task 1',
+          content: 'Content 1',
+          status: 'success' as const,
+        },
+        {
+          key: '2',
+          title: 'Task 2',
+          content: 'Content 2',
+          status: 'success' as const,
+        },
+      ];
+
+      render(
+        <TaskList items={allDoneItems} variant="simple" loading={true} />,
+      );
+
+      expect(screen.getByText('任务完成')).toBeInTheDocument();
+      expect(screen.queryByText('正在进行任务')).not.toBeInTheDocument();
+    });
+
+    it('open=true 时应展示全部任务项', () => {
+      const sixItems = Array.from({ length: 6 }, (_, i) => ({
+        key: String(i + 1),
+        title: `Step ${i + 1}`,
+        content: `Body ${i + 1}`,
+        status: 'success' as const,
+      }));
+
+      render(
+        <TaskList items={sixItems} variant="simple" open={true} />,
+      );
+
+      const taskItems = document.querySelectorAll(
+        '[data-testid="task-list-thoughtChainItem"]',
+      );
+      expect(taskItems).toHaveLength(6);
+      expect(screen.getByText('Step 1')).toBeInTheDocument();
+      expect(screen.getByText('Step 6')).toBeInTheDocument();
     });
 
     describe('taskCompleteText 自定义文案', () => {

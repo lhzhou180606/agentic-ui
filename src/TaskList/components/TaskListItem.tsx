@@ -1,10 +1,14 @@
-import { ChevronUp } from '@sofa-design/icons';
+﻿import { ChevronUp } from '@sofa-design/icons';
 import classNames from 'clsx';
 import React, { memo, useContext } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
-import { getArrowRotation, hasTaskContent } from '../constants';
+import { getArrowRotation } from '../constants';
+import {
+  hasNormalizedTaskContent,
+  normalizeTaskContent,
+} from '../normalizeTaskContent';
 import type { TaskItem } from '../types';
 import { StatusIcon } from './StatusIcon';
 
@@ -21,7 +25,8 @@ export const TaskListItem: React.FC<TaskListItemProps> = memo(
   ({ item, isLast, prefixCls, hashId, expandedKeys, onToggle }) => {
     const { locale } = useContext(I18nContext);
     const isCollapsed = !expandedKeys.includes(item.key);
-    const hasContent = hasTaskContent(item.content);
+    const normalizedContent = normalizeTaskContent(item.content, item.title);
+    const hasContent = hasNormalizedTaskContent(item.content, item.title);
 
     const handleToggle = useRefFunction(() => {
       onToggle(item.key);
@@ -84,7 +89,7 @@ export const TaskListItem: React.FC<TaskListItemProps> = memo(
           {!isCollapsed && (
             <div className={classNames(`${prefixCls}-body`, hashId)}>
               <div className={classNames(`${prefixCls}-content`, hashId)}>
-                {item.content}
+                {normalizedContent}
               </div>
             </div>
           )}

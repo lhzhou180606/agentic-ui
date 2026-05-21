@@ -1,4 +1,4 @@
-import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
+﻿import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
 const genStyle: GenStyleFn<'TaskList'> = (token) => {
   const { componentCls } = token;
@@ -51,11 +51,16 @@ const genStyle: GenStyleFn<'TaskList'> = (token) => {
         },
       },
 
-      '&-status-idle': {
-        height: 16,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+      '&-status-success': {
+        color: 'var(--color-green-control-fill-primary)',
+      },
+
+      '&-status-loading': {
+        color: 'var(--color-primary-control-fill-primary)',
+      },
+
+      '&-status-error': {
+        color: 'var(--color-red-control-fill-primary)',
       },
 
       '&-top': {

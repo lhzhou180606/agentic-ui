@@ -1,4 +1,4 @@
-import classNames from 'clsx';
+﻿import classNames from 'clsx';
 import React, { useContext, useEffect, useState } from 'react';
 import { Node } from 'slate';
 import { I18nContext } from '../../../../I18n';
@@ -30,7 +30,12 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
     if (!container) return;
 
     const onStart = () => setIsComposing(true);
-    const onEnd = () => setIsComposing(false);
+    // 与 Editor 一致：compositionend 后推迟清除，避免微信 WebView 上 Slate 尚未写入就恢复 empty
+    const onEnd = () => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setIsComposing(false));
+      });
+    };
     container.addEventListener('compositionstart', onStart);
     container.addEventListener('compositionend', onEnd);
     return () => {
