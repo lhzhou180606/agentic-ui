@@ -143,7 +143,7 @@ export const TaskList = memo(
           summarySwapKey: swapKey,
           lastItem: items[items.length - 1] as TaskItem | undefined,
         };
-      }, [items, locale, taskCompleteText]);
+      }, [items, locale, taskCompleteText, externalLoading]);
 
     // 注意：此处必须用 useCallback 而非 useRefFunction。
     // renderItems 在父组件渲染期被同步调用（`{renderItems(items)}`），
