@@ -417,7 +417,7 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
           data-testid="tool-user-item-tool-container"
           aria-hidden={!expanded}
         >
-          {innerContent}
+          <div>{innerContent}</div>
         </div>
       ) : null}
 

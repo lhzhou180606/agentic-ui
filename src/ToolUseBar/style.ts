@@ -6,6 +6,11 @@ import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
 const genStyle: GenStyleFn<'ToolUseBar'> = (token) => {
   return {
+    '@property --tool-rotate': {
+      syntax: "'<angle>'",
+      inherits: false,
+      initialValue: '0deg',
+    } as any,
     '@keyframes toolUseBarSpin': {
       from: { '--tool-rotate': '0deg' },
       to: { '--tool-rotate': '360deg' },
@@ -285,27 +290,25 @@ const genStyle: GenStyleFn<'ToolUseBar'> = (token) => {
         zIndex: 1,
       },
       '&-tool-container': {
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        maxHeight: 0,
-        overflow: 'hidden',
+        display: 'grid',
+        gridTemplateRows: '0fr',
         opacity: 0,
         pointerEvents: 'none',
         transition: [
-          `max-height var(--resize-dur) var(--resize-ease)`,
-          `width var(--resize-dur) var(--resize-ease)`,
+          `grid-template-rows var(--resize-dur) var(--resize-ease)`,
           `opacity var(--resize-dur) var(--resize-ease)`,
         ].join(','),
-        willChange: 'max-height, width',
         position: 'relative',
         paddingInline: 4,
         paddingBottom: 0,
+        '& > *': {
+          overflow: 'hidden',
+          minHeight: 0,
+        },
         '&-expanded': {
-          maxHeight: 700,
+          gridTemplateRows: '1fr',
           opacity: 1,
           pointerEvents: 'auto',
-          overflowY: 'auto',
           paddingBottom: 4,
         },
         '&-light': {
@@ -399,7 +402,6 @@ const genStyle: GenStyleFn<'ToolUseBar'> = (token) => {
       '@media (prefers-reduced-motion: reduce)': {
         '&-tool-container': {
           transition: 'none !important',
-          willChange: 'auto',
         },
         '&-tool-image-wrapper-loading': {
           animation: 'none',

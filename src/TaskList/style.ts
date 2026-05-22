@@ -122,6 +122,8 @@ const genStyle: GenStyleFn<'TaskList'> = (token) => {
 
       // Simple variant - wrapper
       '&-simple-wrapper': {
+        width: 'fit-content',
+        maxWidth: '100%',
         borderRadius: 'var(--radius-control-base, 8px)',
         overflow: 'hidden',
       },
