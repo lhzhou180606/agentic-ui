@@ -322,7 +322,7 @@ Logs: openclaw logs --follow
       let result: { container: HTMLElement } | null = null;
       expect(() => {
         result = render(
-          <MarkdownRenderer content="# Title" streaming isFinished={false} />,
+          <MarkdownRenderer content="# Title" streaming />,
         );
       }).not.toThrow();
 

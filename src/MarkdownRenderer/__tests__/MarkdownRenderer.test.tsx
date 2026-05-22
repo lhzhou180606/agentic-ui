@@ -132,7 +132,6 @@ describe('MarkdownRenderer', () => {
       <MarkdownRenderer
         content={tablePrefix}
         streaming={true}
-        queueOptions={{ animate: false }}
       />,
     );
 
@@ -142,7 +141,6 @@ describe('MarkdownRenderer', () => {
       <MarkdownRenderer
         content={'| Header |\n| --- |\n| Cell |'}
         streaming={true}
-        queueOptions={{ animate: false }}
       />,
     );
 
@@ -183,51 +181,9 @@ describe('MarkdownRenderer', () => {
     expect(container.textContent).toContain('updated');
   });
 
-  it('流式模式下应通过字符队列逐步输出', () => {
+  it('流式模式下应即时输出完整内容', () => {
     const { container } = render(
-      <MarkdownRenderer
-        content="Hello World"
-        streaming={true}
-        queueOptions={{ charsPerFrame: 5, animate: true }}
-      />,
-    );
-
-    // CharacterQueue 使用 RAF 驱动逐字输出。
-    // happy-dom 下 advanceTimersByTime(16) 不一定触发 RAF，
-    // 使用 advanceTimersToNextTimer 多次推进确保 RAF 回调被执行。
-    act(() => {
-      vi.advanceTimersToNextTimer();
-      vi.advanceTimersToNextTimer();
-    });
-
-    expect(container.textContent).toContain('Hello');
-
-    // 再推进多帧输出剩余字符
-    act(() => {
-      vi.advanceTimersToNextTimer();
-      vi.advanceTimersToNextTimer();
-      vi.advanceTimersToNextTimer();
-    });
-
-    expect(container.textContent).toContain('Hello Worl');
-  });
-
-  it('流式模式下 isFinished 应 flush 全部内容', () => {
-    const { container, rerender } = render(
-      <MarkdownRenderer
-        content="Hello World"
-        streaming={true}
-        queueOptions={{ charsPerFrame: 1, animate: true }}
-      />,
-    );
-
-    rerender(
-      <MarkdownRenderer
-        content="Hello World"
-        streaming={true}
-        isFinished={true}
-        queueOptions={{ charsPerFrame: 1, animate: true }}
-      />,
+      <MarkdownRenderer content="Hello World" streaming={true} />,
     );
 
     expect(container.textContent).toContain('Hello World');
@@ -336,7 +292,6 @@ describe('MarkdownRenderer', () => {
           'Microsoft Corporation 是一家领先的技术公司，专注于云计算、生产力软件、业务应用程序和消费技术。公司的核心业务模式围绕三大分部展开：Productivity and Business Processes（生产力和业务流程）、Intelligent Cloud（智能云）、以及 More Personal Computing（更多个人计算）。[^1]'
         }
         streaming={true}
-        queueOptions={{ animate: false }}
       />,
     );
 
@@ -352,7 +307,6 @@ describe('MarkdownRenderer', () => {
       <MarkdownRenderer
         content={baseContent}
         streaming={true}
-        queueOptions={{ animate: false }}
       />,
     );
 
@@ -362,7 +316,6 @@ describe('MarkdownRenderer', () => {
       <MarkdownRenderer
         content={`${baseContent}[^1]`}
         streaming={true}
-        queueOptions={{ animate: false }}
       />,
     );
 
@@ -444,7 +397,6 @@ describe('MarkdownRenderer', () => {
       <MarkdownRenderer
         content="![alt text](https://example.com/image.png)"
         streaming={true}
-        queueOptions={{ animate: false }}
       />,
     );
 

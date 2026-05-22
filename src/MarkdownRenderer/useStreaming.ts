@@ -211,6 +211,11 @@ const recognizeHandlers = Object.values(tokenRecognizerMap).map((rec) => ({
   recognize: (cache: StreamCache) => recognize(cache, rec!.tokenType),
 }));
 
+// O(1) 查找优化：建立 tokenType → recognizer 的映射
+const recognizerByType = new Map(
+  recognizeHandlers.map((h) => [h.tokenType, h.recognize]),
+);
+
 const getInitialCache = (): StreamCache => ({
   pending: '',
   token: StreamCacheTokenType.Text,
@@ -286,10 +291,8 @@ export const useStreaming = (input: string, enabled: boolean): string => {
       if (cache.token === StreamCacheTokenType.Text) {
         for (const handler of recognizeHandlers) handler.recognize(cache);
       } else {
-        const handler = recognizeHandlers.find(
-          (h) => h.tokenType === cache.token,
-        );
-        handler?.recognize(cache);
+        const recognize = recognizerByType.get(cache.token);
+        recognize?.(cache);
         if (
           (cache.token as StreamCacheTokenType) === StreamCacheTokenType.Text
         ) {

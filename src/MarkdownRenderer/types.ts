@@ -28,22 +28,6 @@ export interface MarkdownRendererEleProps {
   [key: string]: any;
 }
 
-export interface CharacterQueueOptions {
-  /** 默认 3 */
-  charsPerFrame?: number;
-  /** 流式时默认合并为 false，需打字机时设 true */
-  animate?: boolean;
-  /** 仅对末尾 N 字做动画，前面内容立即展示 */
-  animateTailChars?: number;
-  /** 速度因子，默认 1.0 */
-  speed?: number;
-  flushOnComplete?: boolean;
-  /** 默认 100ms */
-  backgroundInterval?: number;
-  /** 默认 10 */
-  backgroundBatchMultiplier?: number;
-}
-
 export type { RendererPlugin } from '../MarkdownEditor/plugin';
 
 export interface RendererBlockProps {
@@ -57,8 +41,6 @@ export type RenderMode = 'slate' | 'markdown';
 export interface MarkdownRendererProps {
   content: string;
   streaming?: boolean;
-  isFinished?: boolean;
-  queueOptions?: CharacterQueueOptions;
   plugins?: MarkdownEditorPlugin[];
   remarkPlugins?: MarkdownRemarkPlugin[];
   htmlConfig?: MarkdownToHtmlConfig;
@@ -73,8 +55,6 @@ export interface MarkdownRendererProps {
     /** 返回 false 阻止跳转 */
     onClick?: (url?: string) => boolean | void;
   };
-  /** 末段淡入动画，默认开启；传 false 关闭 */
-  streamingParagraphAnimation?: boolean;
   apaasify?: {
     enable?: boolean;
     render?: (value: any) => React.ReactNode;

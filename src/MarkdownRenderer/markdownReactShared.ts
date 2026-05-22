@@ -24,7 +24,6 @@ import {
   INITIAL_FENCE_STATE,
   updateFenceStateForLine,
 } from './streaming/fenceTracker';
-import { StreamAnimWrap } from './streaming/StreamAnimWrap';
 import type { MarkdownRendererEleProps, RendererBlockProps } from './types';
 import {
   extractChildrenText,
@@ -64,7 +63,6 @@ const buildEditorAlignedComponents = (
     onClick?: (url?: string) => boolean | void;
   },
   fncProps?: MarkdownEditorProps['fncProps'],
-  streamingParagraphAnimation?: boolean,
   eleRender?: (
     props: MarkdownRendererEleProps,
     defaultDom: React.ReactNode,
@@ -73,17 +71,6 @@ const buildEditorAlignedComponents = (
   const listCls = `${prefixCls}-list`;
   const tableCls = `${prefixCls}-content-table`;
   const contentCls = prefixCls; // e.g. ant-agentic-md-editor-content
-
-  /**
-   * 段落级流式淡入：通过模块级 StreamAnimWrap 组件实现，避免 buildEditorAlignedComponents
-   * 重建时 React 把 wrap 当作新组件类型导致整段子树卸载重挂。
-   */
-  const wrapAnimation = (children: any) =>
-    jsx(StreamAnimWrap, {
-      streaming,
-      streamingParagraphAnimation,
-      children,
-    });
 
   /**
    * 应用 eleRender 拦截：若用户返回非 undefined 值则使用，否则使用 defaultDom。
@@ -111,7 +98,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-be': 'paragraph',
         'data-testid': 'markdown-paragraph',
-        children: wrapAnimation(children),
+        children,
       });
       return applyEleRender('p', { node, children, ...rest }, defaultDom);
     },
@@ -327,7 +314,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-testid': 'markdown-th',
         style: { whiteSpace: 'normal', maxWidth: '20%' },
-        children: wrapAnimation(children),
+        children,
       });
     },
     td: (props: any) => {
@@ -336,7 +323,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-testid': 'markdown-td',
         style: { whiteSpace: 'normal', maxWidth: '20%' },
-        children: wrapAnimation(children),
+        children,
       });
     },
 
@@ -522,7 +509,7 @@ const buildEditorAlignedComponents = (
           children: src,
         });
       }
-      const imgWidth = width ? Number(width) || width : 400;
+      // width 若未提供，不设置默认值，完全由 CSS 控制宽度
       const defaultDom = jsx('div' as any, {
         'data-be': 'image',
         'data-testid': 'markdown-image',
@@ -548,7 +535,7 @@ const buildEditorAlignedComponents = (
           children: jsx(Image as any, {
             src,
             alt: alt || 'image',
-            width: imgWidth,
+            width: width ? Number(width) || width : undefined,
             height,
             preview: { getContainer: () => document.body },
             referrerPolicy: 'no-referrer',
@@ -843,7 +830,8 @@ const splitMarkdownBlocks = (content: string): string[] => {
 
     inList = LIST_ITEM_PATTERN.test(line) || (inList && /^\s+\S/.test(line));
     inBlockquote = BLOCKQUOTE_PATTERN.test(line);
-    inTable = TABLE_LINE_PATTERN.test(line) || (inTable && /^\s+\S/.test(line));
+    // 表格无缩进续行：仅按行首 | 判断，避免缩进行误触发 inTable
+    inTable = TABLE_LINE_PATTERN.test(line);
 
     current.push(line);
   }
@@ -867,8 +855,6 @@ export interface UseMarkdownToReactOptions {
   };
   fncProps?: MarkdownEditorProps['fncProps'];
   streaming?: boolean;
-  /** 默认开启；传 false 关闭末段段落动画 */
-  streamingParagraphAnimation?: boolean;
   /** 原始流字符串，与 useStreaming 输出分离避免缓存误判 */
   contentRevisionSource?: string;
   /** 返回 undefined 回退默认渲染 */

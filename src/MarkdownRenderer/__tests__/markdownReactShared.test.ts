@@ -7,7 +7,6 @@ import {
   renderMarkdownBlock,
   splitMarkdownBlocks,
 } from '../markdownReactShared';
-import { StreamingAnimationContext } from '../StreamingAnimationContext';
 
 describe('splitMarkdownBlocks', () => {
   it('splits on single blank line', () => {
@@ -180,7 +179,6 @@ describe('buildEditorAlignedComponents', () => {
       streaming?: boolean;
       linkConfig?: any;
       fncProps?: any;
-      streamingParagraphAnimation?: boolean;
       eleRender?: any;
       userComponents?: Record<string, any>;
     } = {},
@@ -191,7 +189,6 @@ describe('buildEditorAlignedComponents', () => {
       opts.streaming,
       opts.linkConfig,
       opts.fncProps,
-      opts.streamingParagraphAnimation,
       opts.eleRender,
     );
 
@@ -202,48 +199,12 @@ describe('buildEditorAlignedComponents', () => {
       expect(result).toBeDefined();
     });
 
-    it('wraps streaming paragraph with AnimationText when prop omitted', () => {
+    it('does not wrap streaming paragraph with fade-in animation', () => {
       const comps = buildComponents({ streaming: true });
-      render(
-        React.createElement(
-          StreamingAnimationContext.Provider,
-          { value: { animateBlock: true } },
-          comps.p({ node: {}, children: 'stream' }),
-        ),
-      );
-      const para = screen.getByTestId('markdown-paragraph');
-      const animated = para.querySelector('span[style*="animation"]');
-      expect(animated).toBeTruthy();
-      expect(animated).toHaveTextContent('stream');
-    });
-
-    it('does not wrap streaming paragraph when streamingParagraphAnimation is false', () => {
-      const comps = buildComponents({
-        streaming: true,
-        streamingParagraphAnimation: false,
-      });
-      render(
-        React.createElement(
-          StreamingAnimationContext.Provider,
-          { value: { animateBlock: true } },
-          comps.p({ node: {}, children: 'plain' }),
-        ),
-      );
+      render(comps.p({ node: {}, children: 'stream' }));
       const para = screen.getByTestId('markdown-paragraph');
       expect(para.querySelector('span[style*="animation"]')).toBeNull();
-    });
-
-    it('does not wrap when animateBlock context is false', () => {
-      const comps = buildComponents({ streaming: true });
-      render(
-        React.createElement(
-          StreamingAnimationContext.Provider,
-          { value: { animateBlock: false } },
-          comps.p({ node: {}, children: 'x' }),
-        ),
-      );
-      const para = screen.getByTestId('markdown-paragraph');
-      expect(para.querySelector('span[style*="animation"]')).toBeNull();
+      expect(para).toHaveTextContent('stream');
     });
 
     it('applies eleRender when provided', () => {

@@ -19,11 +19,13 @@ const PROGRESSIVE_THRESHOLD = 12;
 /**
  * @param totalBlocks 总块数
  * @param streaming 是否处于流式模式
+ * @param generation 内容生成代 —— 当文档被整体替换为等长内容时用于检测
  * @returns visibleCount —— 当前应渲染的块数（≤ totalBlocks）
  */
 export function useProgressiveBlocks(
   totalBlocks: number,
   streaming: boolean,
+  generation?: number,
 ): number {
   const [visibleCount, setVisibleCount] = useState(() => {
     if (streaming || totalBlocks <= PROGRESSIVE_THRESHOLD) {
@@ -34,24 +36,27 @@ export function useProgressiveBlocks(
 
   const prevTotalRef = useRef(totalBlocks);
   const prevStreamingRef = useRef(streaming);
+  const prevGenerationRef = useRef(generation);
 
-  // 当 totalBlocks 或 streaming 变化时，重新决定初始值
+  // 当 totalBlocks、streaming 或 generation 变化时，重新决定初始值
   useEffect(() => {
     const totalChanged = totalBlocks !== prevTotalRef.current;
     const streamingChanged = streaming !== prevStreamingRef.current;
+    const generationChanged = generation !== prevGenerationRef.current;
     prevTotalRef.current = totalBlocks;
     prevStreamingRef.current = streaming;
+    prevGenerationRef.current = generation;
 
     if (streaming || totalBlocks <= PROGRESSIVE_THRESHOLD) {
       setVisibleCount(totalBlocks);
       return;
     }
 
-    // 非流式 + 大文档：totalBlocks 增加时（比如 content prop 整体替换）重置
-    if (totalChanged || streamingChanged) {
+    // 非流式 + 大文档：totalBlocks 增加、streaming 变化、或 generation 变化时重置
+    if (totalChanged || streamingChanged || generationChanged) {
       setVisibleCount(Math.min(INITIAL_BATCH, totalBlocks));
     }
-  }, [totalBlocks, streaming]);
+  }, [totalBlocks, streaming, generation]);
 
   // 分帧追加
   useEffect(() => {

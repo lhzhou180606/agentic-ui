@@ -358,9 +358,6 @@ const RerenderBubbleDemo = () => {
           ]}
           markdownRenderConfig={{
             renderMode: 'markdown',
-            queueOptions: { animate: false },
-            // 与旧版一致：未传时曾无末段段落淡入；若需关闭请显式 false
-            streamingParagraphAnimation: false,
           }}
           shouldShowCopy={false}
         />
@@ -378,9 +375,7 @@ const RerenderBubbleDemo = () => {
           非空（此处用零宽占位），否则气泡会显示「思考中」加载态。
         </p>
         <p style={{ margin: 0 }}>
-          当前演示通过{' '}
-          <code>markdownRenderConfig.streamingParagraphAnimation: false</code>{' '}
-          关闭末段段落淡入；若需默认淡入，去掉该字段或设为 <code>true</code>。
+          流式内容随 <code>originData.content</code> 更新即时渲染，无打字机或段落淡入动画。
         </p>
       </div>
     </div>

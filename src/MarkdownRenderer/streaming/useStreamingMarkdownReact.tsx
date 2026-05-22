@@ -14,7 +14,6 @@ import {
 } from '../markdownReactShared';
 
 import { MarkdownBlockPiece } from './MarkdownBlockPiece';
-import { ProgressiveFadeIn } from './ProgressiveFadeIn';
 import { useProgressiveBlocks } from './useProgressiveBlocks';
 import { shouldResetRevisionProgress } from './revisionPolicy';
 import { useShallowMemo } from './useShallowMemo';
@@ -59,7 +58,6 @@ export const useStreamingMarkdownReact = (
         options?.streaming,
         options?.linkConfig,
         stableFncProps,
-        options?.streamingParagraphAnimation,
         options?.eleRender,
       ),
     [
@@ -68,7 +66,6 @@ export const useStreamingMarkdownReact = (
       options?.streaming,
       options?.linkConfig,
       stableFncProps,
-      options?.streamingParagraphAnimation,
       options?.eleRender,
     ],
   );
@@ -110,24 +107,14 @@ export const useStreamingMarkdownReact = (
   const visibleCount = useProgressiveBlocks(
     blocks.length,
     !!options?.streaming,
+    generation,
   );
 
-  // 追踪已渲染过的块下标上限，用于判断哪些块是"本轮新增"需要淡入动画
-  const committedCountRef = useRef(0);
-  // generation 变化时重置
-  const prevGenRef = useRef(generation);
-  if (prevGenRef.current !== generation) {
-    prevGenRef.current = generation;
-    committedCountRef.current = 0;
-  }
-
   // 第三步：生成 React 元素
-  const result = useMemo(() => {
+  return useMemo(() => {
     if (blocks.length === 0) return null;
 
     const renderCount = Math.min(visibleCount, blocks.length);
-    const isProgressive = !options?.streaming && blocks.length > renderCount;
-    const fadeStart = committedCountRef.current;
     const elements = [];
 
     for (let index = 0; index < renderCount; index++) {
@@ -136,33 +123,21 @@ export const useStreamingMarkdownReact = (
       // key 必须与 variant 解耦——末块由 tail 晋升 sealed 时不能卸载重挂，
       // 否则 chart / agentar-card 等重组件会重复初始化。
       const key = `b-${generation}-${index}`;
-      const piece = jsx(
-        MarkdownBlockPiece,
-        {
-          variant: isLast ? 'tail' : 'sealed',
-          blockSource,
-          processor,
-          components,
-          streaming: !!options?.streaming,
-        },
-        key,
+      elements.push(
+        jsx(
+          MarkdownBlockPiece,
+          {
+            variant: isLast ? 'tail' : 'sealed',
+            blockSource,
+            processor,
+            components,
+            streaming: !!options?.streaming,
+          },
+          key,
+        ),
       );
-
-      // 分帧渐进中新增的块：套模糊淡入动画，避免突然出现导致闪动
-      if (isProgressive && index >= fadeStart && fadeStart > 0) {
-        elements.push(
-          jsx(ProgressiveFadeIn, { children: piece }, `fade-${key}`),
-        );
-      } else {
-        elements.push(piece);
-      }
     }
 
     return jsxs(Fragment, { children: elements });
   }, [blocks, generation, visibleCount, processor, components, options?.streaming]);
-
-  // 更新已提交计数，放在 useMemo 之后确保与渲染同步
-  committedCountRef.current = Math.min(visibleCount, blocks.length);
-
-  return result;
 };

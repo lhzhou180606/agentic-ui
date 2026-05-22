@@ -4,10 +4,7 @@ import React from 'react';
 import { BaseEditor, Editor, Selection } from 'slate';
 import { HistoryEditor } from 'slate-history';
 import { ReactEditor, RenderElementProps } from 'slate-react';
-import type {
-  CharacterQueueOptions,
-  RenderMode,
-} from '../MarkdownRenderer/types';
+import type { RenderMode } from '../MarkdownRenderer/types';
 import { TagPopupProps } from './editor/elements/TagPopup';
 import { EditorStore } from './editor/store';
 import { InsertAutocompleteProps } from './editor/tools/InsertAutocomplete';
@@ -249,10 +246,6 @@ export type MarkdownEditorProps = {
     onClick?: (url?: string) => boolean | void;
   };
 
-  /** 字符队列配置（仅 renderMode: 'markdown'），默认关闭逐字 RAF */
-  queueOptions?: CharacterQueueOptions;
-  /** 末段淡入动画（仅 renderMode: 'markdown'），默认开启；传 false 关闭 */
-  streamingParagraphAnimation?: boolean;
   /** MElement 刷新依赖 */
   deps?: string[];
 

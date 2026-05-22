@@ -7,7 +7,6 @@
  */
 export { useStyle } from '../MarkdownEditor/style';
 
-import { TEXT_SWAP_BLUR_PX } from '../Components/TextSwap/constants';
 import { genStyleHooks } from '../Hooks/useStyle';
 
 const useGenVarStyle = genStyleHooks('MarkdownRendererVars', (token) => ({
@@ -18,17 +17,6 @@ const useGenVarStyle = genStyleHooks('MarkdownRendererVars', (token) => ({
     '--padding-2x': '8px',
     '--padding-4x': '16px',
     '--padding-5x': '20px',
-  },
-
-  '@keyframes agenticMdBlurFadeIn': {
-    from: {
-      opacity: 0,
-      filter: `blur(${TEXT_SWAP_BLUR_PX}px)`,
-    },
-    to: {
-      opacity: 1,
-      filter: 'blur(0)',
-    },
   },
 }));
 

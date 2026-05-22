@@ -49,7 +49,6 @@ export const markdownToReactSync = (
       false,
       undefined,
       undefined,
-      false,
     );
 
     return toJsxRuntime(hast as any, {
