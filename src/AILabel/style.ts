@@ -118,6 +118,6 @@ const useGenStyle = genStyleHooks<'AILabel'>('AILabel', genStyle, () => ({
  *   未传时回退到 {@link prefixCls}。
  */
 export function useStyle(customPrefixCls?: string) {
-  const [hashId] = useGenStyle(customPrefixCls ?? prefixCls);
+  const [, hashId] = useGenStyle(customPrefixCls ?? prefixCls);
   return { hashId };
 }

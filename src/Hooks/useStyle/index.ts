@@ -136,8 +136,10 @@ const styleUtils = genStyleUtils<
  * 注册组件样式（含 antCls / iconCls / 计算工具），返回 `useStyle(prefixCls)`。
  *
  * 与 antd `genStyleHooks` 行为一致：
- *   - 顶层调用一次，签名 `(prefixCls, rootCls?) => [hashId, cssVarCls]`
+ *   - 顶层调用一次，签名 `(prefixCls, rootCls?) => [_, hashId, cssVarCls]`
  *   - styleFn 接收的 token 含 `componentCls`、`prefixCls`、`antCls` 等
+ *   - 元组第 0 位为 identity 占位（保持上游类型兼容），调用方使用
+ *     `const [, hashId] = useStyle(...)` 跳过它。
  *
  * @example
  * ```ts
@@ -150,45 +152,16 @@ const styleUtils = genStyleUtils<
  * export const useStyle = genStyleHooks('Bubble', genStyle);
  * ```
  */
-export const genStyleHooks: typeof styleUtils.genStyleHooks = ((
-  component: Parameters<typeof styleUtils.genStyleHooks>[0],
-  styleFn: Parameters<typeof styleUtils.genStyleHooks>[1],
-  getDefaultToken?: Parameters<typeof styleUtils.genStyleHooks>[2],
-  options?: Parameters<typeof styleUtils.genStyleHooks>[3],
-) => {
-  const inner = styleUtils.genStyleHooks(
-    component,
-    styleFn,
-    getDefaultToken,
-    options,
-  );
-  return (prefixCls: string, rootCls?: string) => {
-    const [, hashId, cssVarCls] = inner(prefixCls, rootCls);
-    return [hashId, cssVarCls] as const;
-  };
-}) as typeof styleUtils.genStyleHooks;
+export const genStyleHooks: typeof styleUtils.genStyleHooks =
+  styleUtils.genStyleHooks;
 
 /**
- * 同 antd `genComponentStyleHook`：与 `genStyleHooks` 类似，但不接管 CSS Var 注册，
- * 返回 `[hashId]`。在子样式 / 不需要 CSS Var 的场景使用。
+ * 同 antd `genComponentStyleHook`：与 `genStyleHooks` 类似，但不接管 CSS Var 注册。
+ * 元组第 0 位为 identity 占位（保持上游类型兼容），调用方使用
+ * `const [, hashId] = useStyle(...)` 跳过它。
  */
-export const genComponentStyleHook: typeof styleUtils.genComponentStyleHook = ((
-  component: Parameters<typeof styleUtils.genComponentStyleHook>[0],
-  styleFn: Parameters<typeof styleUtils.genComponentStyleHook>[1],
-  getDefaultToken?: Parameters<typeof styleUtils.genComponentStyleHook>[2],
-  options?: Parameters<typeof styleUtils.genComponentStyleHook>[3],
-) => {
-  const inner = styleUtils.genComponentStyleHook(
-    component,
-    styleFn,
-    getDefaultToken,
-    options,
-  );
-  return (prefixCls: string, rootCls?: string) => {
-    const [, hashId] = inner(prefixCls, rootCls);
-    return [hashId] as const;
-  };
-}) as typeof styleUtils.genComponentStyleHook;
+export const genComponentStyleHook: typeof styleUtils.genComponentStyleHook =
+  styleUtils.genComponentStyleHook;
 
 /**
  * 同 antd `genSubStyleComponent`：返回一个 SubStyle 组件，用于在父组件内挂载子样式。

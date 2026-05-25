@@ -304,6 +304,6 @@ const genStyle: GenStyleFn<'AgentRunBar'> = (token) => {
 const useGenStyle = genStyleHooks('AgentRunBar', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [hashId] = useGenStyle(prefixCls ?? 'agent-run-bar');
+  const [, hashId] = useGenStyle(prefixCls ?? 'agent-run-bar');
   return { hashId };
 }

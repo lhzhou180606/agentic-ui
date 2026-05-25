@@ -32,7 +32,7 @@ describe('genStyleHooks 基础设施', () => {
       wrapper: ({ children }) => <ConfigProvider>{children}</ConfigProvider>,
     });
 
-    const [hashId, cssVarCls] = result.current;
+    const [, hashId, cssVarCls] = result.current;
     expect(hashId).toBe('');
     // 未启用 cssVar 时返回 undefined，启用时为字符串；此处只校验类型兼容
     expect(['string', 'undefined']).toContain(typeof cssVarCls);
@@ -57,7 +57,7 @@ describe('genStyleHooks 基础设施', () => {
     expect(typeof captured?.calc).toBe('function');
   });
 
-  it('genComponentStyleHook 返回 [hashId]', () => {
+  it('genComponentStyleHook 返回 [_, hashId]', () => {
     const useStyle = genComponentStyleHook('TestSubComp' as any, (token) => ({
       [token.componentCls]: { color: token.colorText },
     }));
@@ -66,7 +66,7 @@ describe('genStyleHooks 基础设施', () => {
       wrapper: ({ children }) => <ConfigProvider>{children}</ConfigProvider>,
     });
 
-    expect(result.current[0]).toBe('');
+    expect(result.current[1]).toBe('');
   });
 
   it('genSubStyleComponent 返回 SubStyle React 组件', () => {
