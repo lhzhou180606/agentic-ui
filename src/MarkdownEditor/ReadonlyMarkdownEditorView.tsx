@@ -37,9 +37,9 @@ const ReadonlyMarkdownEditorView: React.FC<MarkdownEditorProps> = (props) => {
 
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls('agentic-md-editor');
-  const { wrapSSR, hashId } = useStyle(baseClassName);
+  const { hashId } = useStyle(baseClassName);
 
-  return wrapSSR(
+  return (
     <I18nBoundary>
       <PluginContext.Provider value={props.plugins || []}>
         <div
@@ -85,7 +85,7 @@ const ReadonlyMarkdownEditorView: React.FC<MarkdownEditorProps> = (props) => {
           {children}
         </div>
       </PluginContext.Provider>
-    </I18nBoundary>,
+    </I18nBoundary>
   );
 };
 

@@ -698,6 +698,6 @@ const useGenStyle = genStyleHooks('MarkdownEditor', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'MarkdownEditor');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'MarkdownEditor');
+  return { hashId };
 }

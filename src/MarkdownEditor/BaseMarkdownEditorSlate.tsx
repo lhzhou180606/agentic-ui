@@ -238,7 +238,7 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
 
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls(`agentic-md-editor`);
-  const { wrapSSR, hashId } = useStyle(baseClassName);
+  const { hashId } = useStyle(baseClassName);
 
   const [showCommentList, setShowComment] = useState<CommentDataType[]>([]);
 
@@ -289,7 +289,7 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
 
   const isStreaming = props.streaming ?? props.typewriter ?? false;
 
-  return wrapSSR(
+  return (
     <I18nBoundary>
       <PluginContext.Provider value={props.plugins || []}>
         <EditorStoreContext.Provider
@@ -437,7 +437,7 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
           </div>
         </EditorStoreContext.Provider>
       </PluginContext.Provider>
-    </I18nBoundary>,
+    </I18nBoundary>
   );
 };
 

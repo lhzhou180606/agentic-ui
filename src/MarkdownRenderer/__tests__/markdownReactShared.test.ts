@@ -91,6 +91,22 @@ describe('splitMarkdownBlocks', () => {
     expect(result[0]).toBe('````\n```\ninner\n```\n````');
     expect(result[1]).toBe('after');
   });
+
+  it('splits two adjacent tables separated by a blank line', () => {
+    const md =
+      '| a | b |\n| - | - |\n| 1 | 2 |\n\n| c | d |\n| - | - |\n| 3 | 4 |';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe('| a | b |\n| - | - |\n| 1 | 2 |');
+    expect(result[1]).toBe('| c | d |\n| - | - |\n| 3 | 4 |');
+  });
+
+  it('keeps chart comment glued to following table', () => {
+    const md =
+      '<!-- [{"chartType":"line"}] -->\n\n| month | value |\n|-------|-------|\n| Jan | 100 |';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(1);
+  });
 });
 
 describe('createHastProcessor', () => {

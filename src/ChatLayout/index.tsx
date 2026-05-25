@@ -99,7 +99,7 @@ const ChatLayoutComponent = forwardRef<ChatLayoutRef, ChatLayoutProps>(
   ) => {
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const prefixCls = getPrefixCls('chat-layout');
-    const { wrapSSR, hashId } = useStyle(prefixCls);
+    const { hashId } = useStyle(prefixCls);
     const { containerRef, scrollToBottom, isAtBottom } = useAutoScroll({
       SCROLL_TOLERANCE: 30,
       scrollBehavior,
@@ -151,7 +151,7 @@ const ChatLayoutComponent = forwardRef<ChatLayoutRef, ChatLayoutProps>(
       hashId,
     );
 
-    return wrapSSR(
+    return (
       <div
         className={rootClassName}
         data-testid={prefixCls}
@@ -188,7 +188,7 @@ const ChatLayoutComponent = forwardRef<ChatLayoutRef, ChatLayoutProps>(
             {footer}
           </div>
         )}
-      </div>,
+      </div>
     );
   },
 );

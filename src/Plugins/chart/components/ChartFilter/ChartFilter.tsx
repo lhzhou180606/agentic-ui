@@ -48,7 +48,7 @@ const ChartFilterComponent: React.FC<ChartFilterProps> = ({
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const i18n = useContext(I18nContext);
   const prefixCls = getPrefixCls('chart-filter');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   const handleRegionChange = (region: string) => {
     if (onSelectionChange) {
@@ -87,7 +87,7 @@ const ChartFilterComponent: React.FC<ChartFilterProps> = ({
     ...(Array.isArray(styles) ? Object.assign({}, ...styles) : styles || {}),
   };
 
-  return wrapSSR(
+  return (
     <div className={mergedClassName} style={mergedStyle}>
       {/* 地区筛选器，统一逻辑，只有可选时才显示 */}
       {customOptions && customOptions.length > 1 && (
@@ -148,7 +148,7 @@ const ChartFilterComponent: React.FC<ChartFilterProps> = ({
           onChange={(value) => handleFilterChange(value as string)}
         />
       )}
-    </div>,
+    </div>
   );
 };
 

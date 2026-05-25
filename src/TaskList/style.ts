@@ -249,6 +249,6 @@ const genStyle: GenStyleFn<'TaskList'> = (token) => {
 const useGenStyle = genStyleHooks('TaskList', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'task-list');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'task-list');
+  return { hashId };
 }

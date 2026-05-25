@@ -759,8 +759,6 @@ const LIST_ITEM_PATTERN = /^(\s*)([-+*]|\d+[.)]) /;
 const BLOCKQUOTE_PATTERN = /^\s*>/;
 const HTML_COMMENT_PATTERN = /^\s*<!--/;
 const FOOTNOTE_DEF_PATTERN = /^\s*\[\^/;
-/** GFM 表格行：以 `|` 开头并以 `|` 结尾，至少一段内容（含分隔行 `| --- |`） */
-const TABLE_LINE_PATTERN = /^\s*\|.*\|\s*$/;
 
 /** 按单空行拆块，保留围栏代码块、列表、blockquote、HTML 注释+表格、脚注定义、GFM 表格的连续性 */
 const splitMarkdownBlocks = (content: string): string[] => {
@@ -770,7 +768,6 @@ const splitMarkdownBlocks = (content: string): string[] => {
   let fenceState = { ...INITIAL_FENCE_STATE };
   let inList = false;
   let inBlockquote = false;
-  let inTable = false;
   let pendingBlankLines = 0;
 
   const lastNonEmptyLine = (): string => {
@@ -802,15 +799,15 @@ const splitMarkdownBlocks = (content: string): string[] => {
     if (pendingBlankLines > 0) {
       const nextIsListItem = LIST_ITEM_PATTERN.test(line);
       const nextIsBlockquote = BLOCKQUOTE_PATTERN.test(line);
-      const nextIsTableLine = TABLE_LINE_PATTERN.test(line);
       const nextIsContinuation =
         (inList && (nextIsListItem || /^\s+\S/.test(line))) ||
-        (inBlockquote && nextIsBlockquote) ||
-        (inTable && nextIsTableLine);
+        (inBlockquote && nextIsBlockquote);
 
       const prevIsHtmlComment = HTML_COMMENT_PATTERN.test(lastNonEmptyLine());
       const nextIsFootnoteDef = FOOTNOTE_DEF_PATTERN.test(line);
 
+      // GFM 中空行终止表格，所以两张相邻表格必须切成两块——若仍合并，
+      // 后表格每次增长都会拖累前表格的 memo 命中
       if (
         current.length > 0 &&
         !nextIsContinuation &&
@@ -821,7 +818,6 @@ const splitMarkdownBlocks = (content: string): string[] => {
         current = [];
         inList = false;
         inBlockquote = false;
-        inTable = false;
       } else {
         for (let i = 0; i < pendingBlankLines; i++) current.push('');
       }
@@ -830,8 +826,6 @@ const splitMarkdownBlocks = (content: string): string[] => {
 
     inList = LIST_ITEM_PATTERN.test(line) || (inList && /^\s+\S/.test(line));
     inBlockquote = BLOCKQUOTE_PATTERN.test(line);
-    // 表格无缩进续行：仅按行首 | 判断，避免缩进行误触发 inTable
-    inTable = TABLE_LINE_PATTERN.test(line);
 
     current.push(line);
   }

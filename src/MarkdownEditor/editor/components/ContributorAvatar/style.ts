@@ -31,8 +31,8 @@ const genStyle: GenStyleFn<'ContributorAvatar'> = (token) => {
 const useGenStyle = genStyleHooks('ContributorAvatar', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(
+  const [, hashId] = useGenStyle(
     prefixCls ?? 'editor-content-contributorAvatar',
   );
-  return { wrapSSR, hashId };
+  return { hashId };
 }

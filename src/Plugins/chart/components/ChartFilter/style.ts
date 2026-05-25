@@ -164,6 +164,6 @@ const useGenStyle = genStyleHooks('ChartFilter', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'ChartFilter');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'ChartFilter');
+  return { hashId };
 }

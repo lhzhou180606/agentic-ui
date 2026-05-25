@@ -227,7 +227,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     return !childrenIsEmpty ? 'focus' : '';
   }, [readonly, !childrenIsEmpty]);
 
-  const { wrapSSR, hashId } = useStyle(`${props.prefixCls}-content`, {
+  const { hashId } = useStyle(`${props.prefixCls}-content`, {
     placeholderContent: props?.textAreaProps?.placeholder || props?.placeholder,
   });
 
@@ -1237,7 +1237,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     return [EditorUtils.p];
   }, [props.initSchemaValue]);
 
-  return wrapSSR(
+  return (
     <>
       <Slate
         editor={markdownEditorRef.current}
@@ -1303,6 +1303,6 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
           onKeyDown={handleKeyDown}
         />
       </Slate>
-    </>,
+    </>
   );
 });

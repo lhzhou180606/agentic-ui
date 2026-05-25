@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 import {
   JINJA_DOLLAR_PLACEHOLDER,
@@ -21,6 +21,16 @@ import { useShallowMemo } from './useShallowMemo';
 /** 空块数组常量，避免每次返回新引用 */
 const EMPTY_BLOCKS: string[] = [];
 
+interface RevisionState {
+  prevRevision: string | undefined;
+  generation: number;
+}
+
+const INITIAL_REVISION_STATE: RevisionState = {
+  prevRevision: undefined,
+  generation: 0,
+};
+
 /**
  * 流式优先的 Markdown → React：每块独立 MarkdownBlockPiece，末块 tail、其余 sealed。
  * 块 key 仅用修订代 + 下标，使「末块晋升为 sealed」时外层组件类型不变，避免子树卸载重挂。
@@ -36,9 +46,6 @@ export const useStreamingMarkdownReact = (
     options?.contentRevisionSource !== undefined
       ? options.contentRevisionSource
       : content;
-
-  const prevRevisionRef = useRef<string | undefined>(undefined);
-  const revisionGenerationRef = useRef(0);
 
   const processor = useMemo(
     () => createHastProcessor(options?.remarkPlugins, options?.htmlConfig),
@@ -70,38 +77,55 @@ export const useStreamingMarkdownReact = (
     ],
   );
 
-  // 第一步：拆分 blocks + 更新修订代（纯计算，无副作用）
-  const { blocks, generation } = useMemo(() => {
-    if (!content) {
-      prevRevisionRef.current = '';
-      return { blocks: EMPTY_BLOCKS, generation: revisionGenerationRef.current };
-    }
+  // 修订代用 useState 承载：渲染阶段对比 props 派生 next state，并通过
+  // setState-in-render 让 React 在 commit 时持久化。避免在 useMemo 里写 ref
+  // 触发 StrictMode 双调用与 Concurrent 渲染下的脏读。
+  const [revisionState, setRevisionState] = useState<RevisionState>(
+    INITIAL_REVISION_STATE,
+  );
 
-    const prevRev = prevRevisionRef.current;
+  let nextPrevRevision = revisionState.prevRevision;
+  let nextGeneration = revisionState.generation;
+
+  if (!content) {
+    nextPrevRevision = '';
+  } else {
     if (
-      prevRev !== undefined &&
-      shouldResetRevisionProgress(prevRev, revisionSource)
+      revisionState.prevRevision !== undefined &&
+      shouldResetRevisionProgress(revisionState.prevRevision, revisionSource)
     ) {
-      revisionGenerationRef.current += 1;
+      nextGeneration = revisionState.generation + 1;
     }
-    prevRevisionRef.current = revisionSource;
+    nextPrevRevision = revisionSource;
+  }
 
+  if (
+    nextPrevRevision !== revisionState.prevRevision ||
+    nextGeneration !== revisionState.generation
+  ) {
+    setRevisionState({
+      prevRevision: nextPrevRevision,
+      generation: nextGeneration,
+    });
+  }
+
+  const generation = nextGeneration;
+
+  const blocks = useMemo(() => {
+    if (!content) return EMPTY_BLOCKS;
     try {
       const preprocessed = preprocessNormalizeLeafToContainerDirective(
         content.replace(new RegExp(JINJA_DOLLAR_PLACEHOLDER, 'g'), '$'),
       );
       const splitBlocks = splitMarkdownBlocks(preprocessed);
-      return {
-        blocks: splitBlocks.length > 0 ? splitBlocks : EMPTY_BLOCKS,
-        generation: revisionGenerationRef.current,
-      };
+      return splitBlocks.length > 0 ? splitBlocks : EMPTY_BLOCKS;
     } catch (error) {
       debugInfo('[MarkdownRenderer] splitMarkdownBlocks failed', {
         error: (error as Error)?.message || String(error),
       });
-      return { blocks: EMPTY_BLOCKS, generation: revisionGenerationRef.current };
+      return EMPTY_BLOCKS;
     }
-  }, [content, revisionSource]);
+  }, [content]);
 
   // 第二步：分帧渐进——非流式大文档首批只渲染部分块，后续空闲帧追加
   const visibleCount = useProgressiveBlocks(

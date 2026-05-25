@@ -123,7 +123,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('radar-chart');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
   const { axisTextColor, gridColor, isLight } = useChartTheme(resolvedTheme);
@@ -202,7 +202,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
 
   // 如果没有有效数据，返回空状态
   if (safeData.length === 0 || xValues.length === 0 || datasetTypes.length === 0) {
-    return wrapSSR(
+    return (
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
         theme={resolvedTheme}
@@ -238,7 +238,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
         >
           暂无有效数据
         </div>
-      </ChartContainer>,
+      </ChartContainer>
     );
   }
 
@@ -567,7 +567,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
 
   // 最终渲染，包含错误边界
   try {
-    return wrapSSR(
+    return (
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
         theme={resolvedTheme}
@@ -635,11 +635,11 @@ const RadarChart: React.FC<RadarChartProps> = ({
         <div className={classNames(`${prefixCls}-chart-wrapper`, hashId)}>
           <Radar ref={chartRef} data={processedData} options={options} />
         </div>
-      </ChartContainer>,
+      </ChartContainer>
     );
   } catch (error) {
     console.error('RadarChart 渲染错误:', error);
-    return wrapSSR(
+    return (
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
         theme={resolvedTheme}
@@ -675,7 +675,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
         >
           图表渲染失败，请检查数据格式
         </div>
-      </ChartContainer>,
+      </ChartContainer>
     );
   }
 };

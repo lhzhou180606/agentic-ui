@@ -17,8 +17,8 @@ const genStyle: GenStyleFn<'FntTag'> = (token) => {
 const useGenStyle = genStyleHooks('FntTag', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(
+  const [, hashId] = useGenStyle(
     prefixCls ?? 'editor-content-TextStyleTag',
   );
-  return { wrapSSR, hashId };
+  return { hashId };
 }

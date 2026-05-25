@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * 非流式大文档分帧渐进渲染：首批只渲染前 N 个块，后续在空闲帧逐步追加。
@@ -16,6 +16,21 @@ const BATCH_SIZE = 6;
 /** 块数低于此值不启用分帧 */
 const PROGRESSIVE_THRESHOLD = 12;
 
+interface ProgressiveState {
+  visibleCount: number;
+  lastTotal: number;
+  lastStreaming: boolean;
+  lastGeneration: number | undefined;
+}
+
+const computeResetVisibleCount = (
+  totalBlocks: number,
+  streaming: boolean,
+): number => {
+  if (streaming || totalBlocks <= PROGRESSIVE_THRESHOLD) return totalBlocks;
+  return Math.min(INITIAL_BATCH, totalBlocks);
+};
+
 /**
  * @param totalBlocks 总块数
  * @param streaming 是否处于流式模式
@@ -27,44 +42,35 @@ export function useProgressiveBlocks(
   streaming: boolean,
   generation?: number,
 ): number {
-  const [visibleCount, setVisibleCount] = useState(() => {
-    if (streaming || totalBlocks <= PROGRESSIVE_THRESHOLD) {
-      return totalBlocks;
-    }
-    return Math.min(INITIAL_BATCH, totalBlocks);
-  });
+  const [state, setState] = useState<ProgressiveState>(() => ({
+    visibleCount: computeResetVisibleCount(totalBlocks, streaming),
+    lastTotal: totalBlocks,
+    lastStreaming: streaming,
+    lastGeneration: generation,
+  }));
 
-  const prevTotalRef = useRef(totalBlocks);
-  const prevStreamingRef = useRef(streaming);
-  const prevGenerationRef = useRef(generation);
+  // 渲染期同步派生 visibleCount：用 setState-in-render 让 React 同帧重渲，
+  // 否则等长替换会先按旧 visibleCount 全量渲染再坍缩到 INITIAL_BATCH，肉眼可见闪烁
+  let visibleCount = state.visibleCount;
+  const totalChanged = totalBlocks !== state.lastTotal;
+  const streamingChanged = streaming !== state.lastStreaming;
+  const generationChanged = generation !== state.lastGeneration;
 
-  // 当 totalBlocks、streaming 或 generation 变化时，重新决定初始值
+  if (totalChanged || streamingChanged || generationChanged) {
+    visibleCount = computeResetVisibleCount(totalBlocks, streaming);
+    setState({
+      visibleCount,
+      lastTotal: totalBlocks,
+      lastStreaming: streaming,
+      lastGeneration: generation,
+    });
+  }
+
   useEffect(() => {
-    const totalChanged = totalBlocks !== prevTotalRef.current;
-    const streamingChanged = streaming !== prevStreamingRef.current;
-    const generationChanged = generation !== prevGenerationRef.current;
-    prevTotalRef.current = totalBlocks;
-    prevStreamingRef.current = streaming;
-    prevGenerationRef.current = generation;
+    if (streaming || state.visibleCount >= totalBlocks) return;
 
-    if (streaming || totalBlocks <= PROGRESSIVE_THRESHOLD) {
-      setVisibleCount(totalBlocks);
-      return;
-    }
-
-    // 非流式 + 大文档：totalBlocks 增加、streaming 变化、或 generation 变化时重置
-    if (totalChanged || streamingChanged || generationChanged) {
-      setVisibleCount(Math.min(INITIAL_BATCH, totalBlocks));
-    }
-  }, [totalBlocks, streaming, generation]);
-
-  // 分帧追加
-  useEffect(() => {
-    if (streaming || visibleCount >= totalBlocks) return;
-
-    // 标签页不可见时直接全量，避免 rIC/RAF 被冻结导致内容缺失
     if (typeof document !== 'undefined' && document.hidden) {
-      setVisibleCount(totalBlocks);
+      setState((prev) => ({ ...prev, visibleCount: totalBlocks }));
       return;
     }
 
@@ -72,36 +78,26 @@ export function useProgressiveBlocks(
 
     const scheduleNext = () => {
       if (cancelled) return;
-
-      // 优先用 requestIdleCallback，降级用 requestAnimationFrame
+      const bump = () => {
+        if (cancelled) return;
+        setState((prev) => ({
+          ...prev,
+          visibleCount: Math.min(prev.visibleCount + BATCH_SIZE, totalBlocks),
+        }));
+      };
       if (typeof requestIdleCallback === 'function') {
-        requestIdleCallback(
-          () => {
-            if (cancelled) return;
-            setVisibleCount((prev) => {
-              const next = Math.min(prev + BATCH_SIZE, totalBlocks);
-              return next;
-            });
-          },
-          { timeout: 80 },
-        );
+        requestIdleCallback(bump, { timeout: 80 });
       } else {
-        requestAnimationFrame(() => {
-          if (cancelled) return;
-          setVisibleCount((prev) =>
-            Math.min(prev + BATCH_SIZE, totalBlocks),
-          );
-        });
+        requestAnimationFrame(bump);
       }
     };
 
     scheduleNext();
 
-    // 标签页可见性变化时：切到后台直接全量
     const handleVisibility = () => {
       if (document.hidden) {
         cancelled = true;
-        setVisibleCount(totalBlocks);
+        setState((prev) => ({ ...prev, visibleCount: totalBlocks }));
       }
     };
 
@@ -115,7 +111,7 @@ export function useProgressiveBlocks(
         document.removeEventListener('visibilitychange', handleVisibility);
       }
     };
-  }, [visibleCount, totalBlocks, streaming]);
+  }, [state.visibleCount, totalBlocks, streaming]);
 
   return visibleCount;
 }
