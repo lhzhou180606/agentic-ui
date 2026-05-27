@@ -754,7 +754,17 @@ const textHtml = (t: Text) => {
   if (t.strikethrough) str = `<del>${str}</del>`;
   if (t?.url) str = `<a href="${t?.url}">${str}</a>`;
   if (t?.identifier || t?.fnc) str = `[^${str}]`;
-  if ((t as CustomLeaf).mark) str = `<mark>${str}</mark>`;
+  if ((t as CustomLeaf).mark) {
+    const attrs: string[] = [];
+    if ((t as CustomLeaf).markColor)
+      attrs.push(`color="${(t as CustomLeaf).markColor}"`);
+    if ((t as CustomLeaf).markBg)
+      attrs.push(`bg="${(t as CustomLeaf).markBg}"`);
+    if ((t as CustomLeaf).markLabel)
+      attrs.push(`label="${(t as CustomLeaf).markLabel}"`);
+    const attrStr = attrs.length ? ` ${attrs.join(' ')}` : '';
+    str = `<mark${attrStr}>${str}</mark>`;
+  }
   return str;
 };
 
