@@ -396,8 +396,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
     const { ...restStyle } = customStyle || {};
     const [docMeta, setDocMeta] = React.useState<Partial<DocMeta> | null>(null);
 
-    // 为组件实例生成唯一ID，避免多个实例间的key冲突
-    const instanceId = 'ThoughtChainList';
+    const instanceId = React.useId();
 
     useEffect(() => {
       if (bubble?.isFinished && finishAutoCollapse !== false) {

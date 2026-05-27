@@ -397,7 +397,6 @@ export const BubbleMessageDisplay: React.FC<
     }
 
     if (
-      content === '...' ||
       props.placement !== 'left' ||
       props?.originData?.extra?.tags?.includes?.('REJECT_TO_ANSWER') ||
       props.originData?.role === 'bot'

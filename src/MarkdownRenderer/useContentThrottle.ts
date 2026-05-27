@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ContentThrottle } from './ContentThrottle';
 import type { ContentThrottleOptions } from './types';
 
@@ -11,10 +11,12 @@ export function useContentThrottle(
   options?: ContentThrottleOptions,
   isFinished?: boolean,
 ): string {
-  const [displayed, setDisplayed] = useState(content);
+  const [displayed, setDisplayed] = useState(() =>
+    enabled && !isFinished ? '' : content,
+  );
   const engineRef = useRef<ContentThrottle | null>(null);
-  // 父组件常以新对象字面量传入 options。用稳定签名比对，避免 effect 每渲染都重跑。
-  const optionsSig = useMemo(() => JSON.stringify(options ?? {}), [options]);
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
 
   useEffect(() => {
     if (!enabled) {
@@ -25,16 +27,13 @@ export function useContentThrottle(
     }
 
     if (!engineRef.current) {
-      engineRef.current = new ContentThrottle(setDisplayed, options);
+      engineRef.current = new ContentThrottle(setDisplayed, optionsRef.current);
+    } else {
+      engineRef.current.setOptions(optionsRef.current);
     }
     engineRef.current.push(content);
     if (isFinished) engineRef.current.complete();
   }, [content, enabled, isFinished]);
-
-  useEffect(() => {
-    if (!enabled || !engineRef.current) return;
-    engineRef.current.setOptions(options);
-  }, [optionsSig, enabled]);
 
   useEffect(
     () => () => {

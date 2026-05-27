@@ -138,13 +138,6 @@ const ChartFilterComponent: React.FC<ChartFilterProps> = ({
           options={filterOptions || []}
           value={selectedFilter}
           size="small"
-          className={[
-            `${prefixCls}-segmented-filter`,
-            'custom-segmented',
-            hashId,
-          ]
-            .filter(Boolean)
-            .join(' ')}
           onChange={(value) => handleFilterChange(value as string)}
         />
       )}
