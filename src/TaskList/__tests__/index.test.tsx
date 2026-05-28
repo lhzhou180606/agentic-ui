@@ -1116,7 +1116,7 @@ describe('TaskList', () => {
       ).not.toBeInTheDocument();
     });
 
-    it('展开后取消状态只显示最后一条任务', async () => {
+    it('展开后存在 error 项时仍展示全部任务（工具失败不等同于整任务取消）', async () => {
       const errorItems = [
         {
           key: '1',
@@ -1134,7 +1134,7 @@ describe('TaskList', () => {
 
       render(<TaskList items={errorItems} variant="simple" open={true} />);
 
-      expect(screen.queryByText('Task 1')).not.toBeInTheDocument();
+      expect(screen.getByText('Task 1')).toBeInTheDocument();
       expect(screen.getByText('Error Task')).toBeInTheDocument();
     });
 

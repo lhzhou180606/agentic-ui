@@ -52,7 +52,7 @@ group:
 `variant="simple"` 将列表收成摘要条 + 可展开详情：
 
 - **收起（默认 `open=false`）**：详情区只展示**最后一项**任务（产品预期）；要看全部步骤请点击摘要条展开，或传入 `open={true}` / 使用 `variant="default"`。
-- **展开**：展示全部 `items`（若存在 `error` 项则仅展示最后一项，与取消态一致）。
+- **展开**：展示全部 `items`（含 `error` 项；单步工具失败时仍可查看完整步骤）。
 - **摘要文案优先级**（由高到低）：
   1. 全部 item 为 `success` → 「任务完成」（或 `taskCompleteText`）；**不因** `loading={true}` 滞留为进行中。
   2. 存在 `status: 'loading'` 或 `pending` 的 item → 「正在进行${title}任务」。

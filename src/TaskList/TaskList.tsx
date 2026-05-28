@@ -122,7 +122,6 @@ export const TaskList = memo(
       summaryStatus,
       summaryText,
       summarySwapKey,
-      isCancelled,
       lastItem,
       completedCount,
       totalCount,
@@ -174,7 +173,6 @@ export const TaskList = memo(
         summaryStatus: status,
         summaryText: text,
         summarySwapKey: swapKey,
-        isCancelled: hasError,
         lastItem: items[items.length - 1] as TaskItem | undefined,
         completedCount,
         totalCount: items.length,
@@ -216,9 +214,7 @@ export const TaskList = memo(
       : locale?.['taskList.expand'] || '展开';
 
     const visibleItems = simpleExpanded
-      ? isCancelled
-        ? items.slice(-1)
-        : items
+      ? items
       : lastItem
         ? [lastItem]
         : [];

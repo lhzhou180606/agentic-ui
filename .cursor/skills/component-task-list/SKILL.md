@@ -33,6 +33,6 @@ description: Develop TaskList for step or task status display in @ant-design/age
 
 - 样式使用 token 与 `useStyle(prefixCls)`，BEM 类名。
 - 新增状态或变体时在 types 中补充，保持向后兼容。
-- 勿改 simple 收起时 `visibleItems = [lastItem]` 逻辑。
+- 勿改 simple 收起时 `visibleItems = [lastItem]` 逻辑；展开时展示全部 `items`（含 `error` 项，不因工具失败只保留最后一项）。
 
 修改任务列表时，参考 `src/TaskList/`、`docs/components/task-list.md` 与 `AGENTS.md`。
