@@ -4,9 +4,7 @@ import React, {
   forwardRef,
   memo,
   useContext,
-  useEffect,
   useImperativeHandle,
-  useRef,
 } from 'react';
 import { LayoutHeader } from '../Components/LayoutHeader';
 import useAutoScroll from '../Hooks/useAutoScroll';
@@ -106,8 +104,10 @@ const ChatLayoutComponent = forwardRef<ChatLayoutRef, ChatLayoutProps>(
       onScrollStateChange,
     });
 
-    const footerRef = useRef<HTMLDivElement>(null);
-    const { height: actualFooterHeight } = useElementSize(footerRef);
+    const { ref: footerRef, height: measuredFooterHeight } =
+      useElementSize<HTMLDivElement>();
+    const footerSpacerHeight =
+      measuredFooterHeight > 0 ? measuredFooterHeight : footerHeight;
 
     useImperativeHandle(
       ref,
@@ -121,13 +121,6 @@ const ChatLayoutComponent = forwardRef<ChatLayoutRef, ChatLayoutProps>(
       }),
       [scrollToBottom, isAtBottom],
     );
-
-    // footer 实际高度变化时（spacer 随之调整），立即贴底，避免被遮挡
-    useEffect(() => {
-      if (actualFooterHeight > 0) {
-        scrollToBottom('auto');
-      }
-    }, [actualFooterHeight, scrollToBottom]);
 
     const rootClassName = clsx(prefixCls, className, classNames?.root, hashId);
     const contentClassName = clsx(
@@ -170,7 +163,7 @@ const ChatLayoutComponent = forwardRef<ChatLayoutRef, ChatLayoutProps>(
             {children}
             {footer && (
               <div
-                style={{ height: actualFooterHeight, width: '100%' }}
+                style={{ height: footerSpacerHeight, width: '100%' }}
                 aria-hidden="true"
               />
             )}
