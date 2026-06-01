@@ -1,6 +1,17 @@
 import { Editor, Node, Operation, Path, Range, Transforms } from 'slate';
 import { clearCardAreaText, hasRange, isCardEmpty } from './utils';
 
+/** 删 card 后若文档为空，补一个空段落，避免后续 selection 拿到无效 path */
+const ensureNonEmptyEditor = (editor: Editor) => {
+  if (!editor.children || editor.children.length === 0) {
+    Transforms.insertNodes(
+      editor,
+      { type: 'paragraph', children: [{ text: '' }] } as any,
+      { at: [0], select: true },
+    );
+  }
+};
+
 /**
  * 处理卡片相关节点的操作
  *
@@ -24,23 +35,54 @@ const handleCardOperation = (
   if (operation.type === 'remove_node') {
     const { node } = operation;
 
-    // 删除card时，直接删除整个卡片
+    // 删除card时，直接删除整个卡片，并保证文档非空
     if (node.type === 'card') {
-      // 直接执行原始操作，避免递归
+      apply(operation);
+      ensureNonEmptyEditor(editor);
+      return true;
+    }
+
+    // 删除 card-after：定位到父 card，直接 emit 一个 card 的 remove_node，
+    // 绕过 Transforms.removeNodes(parent) 的二次链路，避免嵌套触发
+    if (node.type === 'card-after') {
+      try {
+        const cardPath = Path.parent(operation.path);
+        const cardNode = Node.get(editor, cardPath);
+        if (cardNode && (cardNode as any).type === 'card') {
+          apply({
+            type: 'remove_node',
+            path: cardPath,
+            node: cardNode as any,
+          });
+          ensureNonEmptyEditor(editor);
+          return true;
+        }
+      } catch (error) {
+        // 不在 card 内（schema 异常）→ 让原 apply 兜底
+      }
       apply(operation);
       return true;
     }
 
-    // 删除card-after时，删除整个卡片
-    if (node.type === 'card-after') {
-      Transforms.removeNodes(editor, {
-        at: Path.parent(operation.path),
-      });
-      return true;
-    }
-
-    // 删除card-before时，阻止操作
+    // 删除 card-before：和 card-after 同等处理，整张卡片一起删，
+    // 避免留下 [content, card-after] 这种残缺结构
     if (node.type === 'card-before') {
+      try {
+        const cardPath = Path.parent(operation.path);
+        const cardNode = Node.get(editor, cardPath);
+        if (cardNode && (cardNode as any).type === 'card') {
+          apply({
+            type: 'remove_node',
+            path: cardPath,
+            node: cardNode as any,
+          });
+          ensureNonEmptyEditor(editor);
+          return true;
+        }
+      } catch (error) {
+        // 不在 card 内 → 让原 apply 兜底
+      }
+      apply(operation);
       return true;
     }
 
@@ -57,6 +99,7 @@ const handleCardOperation = (
           Transforms.removeNodes(editor, {
             at: parentPath,
           });
+          ensureNonEmptyEditor(editor);
           return true;
         }
       } catch (error) {
@@ -304,15 +347,45 @@ export const withCardPlugin = (editor: Editor) => {
       hasRange(editor, selection) &&
       Range.isCollapsed(selection)
     ) {
-      const node = Node.get(editor, Path.parent(selection.anchor.path));
-      if (node.type === 'card-before') {
-        return;
-      }
-      if (node.type === 'card-after') {
-        Transforms.removeNodes(editor, {
-          at: Path.parent(selection.anchor.path),
-        });
-        return;
+      try {
+        const node = Node.get(editor, Path.parent(selection.anchor.path));
+        // 在 card-before 内 Backspace 静默忽略（前面没有任何可删内容）
+        if ((node as any)?.type === 'card-before') {
+          return;
+        }
+        // 在 card-after 内 Backspace 改为两阶段：
+        //   第一次：把光标挪到 card 内容尾部，给用户一个"将要删除什么"的反馈机会
+        //   第二次：用户在 content 内继续 Backspace，按正常文字/void 删除路径走
+        // content 全删空后会触发自动空卡片清理，整张 card 才消失
+        if ((node as any)?.type === 'card-after') {
+          try {
+            const cardAfterPath = Path.parent(selection.anchor.path);
+            const cardPath = Path.parent(cardAfterPath);
+            const cardNode = Node.get(editor, cardPath);
+            if (
+              (cardNode as any)?.type === 'card' &&
+              Array.isArray((cardNode as any)?.children) &&
+              (cardNode as any).children.length >= 2
+            ) {
+              // content 节点 = card-after 之前的兄弟
+              const contentIndex = cardAfterPath[cardAfterPath.length - 1] - 1;
+              if (contentIndex >= 0) {
+                const contentPath = [...cardPath, contentIndex];
+                if (Editor.hasPath(editor, contentPath)) {
+                  Transforms.select(editor, Editor.end(editor, contentPath));
+                  return;
+                }
+              }
+              // 没有 content 节点，直接删整张卡片
+              Transforms.removeNodes(editor, { at: cardPath });
+              return;
+            }
+          } catch {
+            // 不在标准 card 结构内 → 走默认 deleteBackward
+          }
+        }
+      } catch {
+        // selection 不可达 → 直接走默认 deleteBackward
       }
     }
     deleteBackward(unit);
