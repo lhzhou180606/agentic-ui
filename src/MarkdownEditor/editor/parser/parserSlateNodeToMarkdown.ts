@@ -13,6 +13,17 @@ import { JINJA_DOLLAR_PLACEHOLDER } from './constants';
 const inlineNode = new Set(['break']);
 
 /**
+ * 转义 HTML 属性值，避免用户输入里的 `"`、`<`、`&` 破坏标签结构。
+ * 仅在需要把任意字符串拼到 `attr="..."` 里时使用。
+ */
+const escapeHtmlAttr = (value: string): string =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+/**
  * 尝试使用插件转换节点
  */
 const tryPluginConversion = (
@@ -757,11 +768,11 @@ const textHtml = (t: Text) => {
   if ((t as CustomLeaf).mark) {
     const attrs: string[] = [];
     if ((t as CustomLeaf).markColor)
-      attrs.push(`color="${(t as CustomLeaf).markColor}"`);
+      attrs.push(`color="${escapeHtmlAttr((t as CustomLeaf).markColor!)}"`);
     if ((t as CustomLeaf).markBg)
-      attrs.push(`bg="${(t as CustomLeaf).markBg}"`);
+      attrs.push(`bg="${escapeHtmlAttr((t as CustomLeaf).markBg!)}"`);
     if ((t as CustomLeaf).markLabel)
-      attrs.push(`label="${(t as CustomLeaf).markLabel}"`);
+      attrs.push(`label="${escapeHtmlAttr((t as CustomLeaf).markLabel!)}"`);
     const attrStr = attrs.length ? ` ${attrs.join(' ')}` : '';
     str = `<mark${attrStr}>${str}</mark>`;
   }

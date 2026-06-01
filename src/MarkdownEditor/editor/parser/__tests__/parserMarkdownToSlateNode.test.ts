@@ -208,6 +208,26 @@ describe('parserMarkdownToSlateNode', () => {
       });
     });
 
+    it('should decode HTML entities in mark color/bg/label (block-only)', () => {
+      const markdown =
+        '<mark color="red&quot;x" bg="a&amp;b" label="Note: &quot;重要&quot; &lt;hl&gt;">v</mark>';
+      const result = parserMarkdownToSlateNode(markdown);
+      const leaf = (result.schema[0] as any).children[0];
+      expect(leaf.markColor).toBe('red"x');
+      expect(leaf.markBg).toBe('a&b');
+      expect(leaf.markLabel).toBe('Note: "重要" <hl>');
+    });
+
+    it('should decode HTML entities in mark color/bg/label (inline)', () => {
+      const markdown =
+        'pre <mark color="red&quot;x" label="&amp;Note">v</mark> post';
+      const result = parserMarkdownToSlateNode(markdown);
+      const para: any = result.schema[0];
+      const marked = para.children.find((c: any) => c?.mark);
+      expect(marked.markColor).toBe('red"x');
+      expect(marked.markLabel).toBe('&Note');
+    });
+
     it('should handle paragraph with inline code', () => {
       const markdown = 'Some `inline code` here';
       const result = parserMarkdownToSlateNode(markdown);

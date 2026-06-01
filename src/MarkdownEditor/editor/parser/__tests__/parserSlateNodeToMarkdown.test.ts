@@ -1440,6 +1440,27 @@ describe('parserSlateNodeToMarkdown - coverage', () => {
     expect(result).toBe('<mark>/alipay </mark>');
   });
 
+  it('should escape special characters in mark color/bg/label attrs', () => {
+    const node = {
+      type: 'paragraph',
+      children: [
+        {
+          text: 'note',
+          mark: true,
+          markColor: 'red"x',
+          markBg: 'a&b',
+          markLabel: 'Note: "重要" <hl>',
+        } as any,
+      ],
+    };
+    const result = parserSlateNodeToMarkdown([node]);
+    expect(result).toContain('color="red&quot;x"');
+    expect(result).toContain('bg="a&amp;b"');
+    expect(result).toContain('label="Note: &quot;重要&quot; &lt;hl&gt;"');
+    // 原始未转义字符不应直接出现在 attr 内
+    expect(result).not.toMatch(/color="red"x"/);
+  });
+
   it('should handle mixed format text with no space then next word (isMix space)', () => {
     const node = {
       type: 'paragraph',

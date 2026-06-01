@@ -70,6 +70,18 @@ export function normalizeThinkTagAliases(markdown: string): string {
 }
 
 /**
+ * 反向解码 HTML 属性常见实体，与 parserSlateNodeToMarkdown 的 escapeHtmlAttr 配对，
+ * 保证 mark 颜色/背景/label 的往返一致。
+ */
+const decodeHtmlAttr = (value: string): string =>
+  value
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
+
+/**
  * 解码 URI 组件，处理错误情况
  */
 export const decodeURIComponentUrl = (url: string) => {
@@ -477,9 +489,9 @@ const handleBlockHtml = (
     const bgMatch = attrStr.match(/\bbg\s*=\s*["']([^"']*)["']/i);
     const labelMatch = attrStr.match(/\blabel\s*=\s*["']([^"']*)["']/i);
     const markProps: Record<string, any> = { mark: true };
-    if (colorMatch?.[1]) markProps.markColor = colorMatch[1];
-    if (bgMatch?.[1]) markProps.markBg = bgMatch[1];
-    if (labelMatch?.[1]) markProps.markLabel = labelMatch[1];
+    if (colorMatch?.[1]) markProps.markColor = decodeHtmlAttr(colorMatch[1]);
+    if (bgMatch?.[1]) markProps.markBg = decodeHtmlAttr(bgMatch[1]);
+    if (labelMatch?.[1]) markProps.markLabel = decodeHtmlAttr(labelMatch[1]);
 
     const applyMarkRecursive = (node: any): any => {
       if (node && typeof node.text === 'string') {
@@ -715,9 +727,9 @@ const processMarkTag = (str: string, tag: string, htmlTag: any[]): any[] => {
   const bgMatch = str.match(/\bbg\s*=\s*["']([^"']*)["']/i);
   const labelMatch = str.match(/\blabel\s*=\s*["']([^"']*)["']/i);
   const entry: Record<string, any> = { tag };
-  if (colorMatch?.[1]) entry.markColor = colorMatch[1];
-  if (bgMatch?.[1]) entry.markBg = bgMatch[1];
-  if (labelMatch?.[1]) entry.markLabel = labelMatch[1];
+  if (colorMatch?.[1]) entry.markColor = decodeHtmlAttr(colorMatch[1]);
+  if (bgMatch?.[1]) entry.markBg = decodeHtmlAttr(bgMatch[1]);
+  if (labelMatch?.[1]) entry.markLabel = decodeHtmlAttr(labelMatch[1]);
   return [...htmlTag, entry];
 };
 
