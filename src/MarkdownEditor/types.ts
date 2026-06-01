@@ -201,6 +201,17 @@ export type MarkdownEditorProps = {
     allowedTypes?: string[];
     /** @default false */
     plainTextOnly?: boolean;
+    /**
+     * 粘 text/plain 时是否启发式识别 markdown 并解析。
+     * 默认 true（保留旧行为）；关掉后含 `**bold**` `[x](y)` 等的纯文本会原样插入。
+     */
+    parseMarkdownInPlainText?: boolean;
+    /**
+     * text/html 单次粘贴体积上限（字节）。超过时降级为 text/plain，避免主线程被巨型
+     * Word/Excel 文档卡死。默认 1MB；设为 0 关闭限制。
+     * @default 1_048_576
+     */
+    htmlMaxBytes?: number;
   };
 
   jinja?: JinjaConfig;

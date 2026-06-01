@@ -559,33 +559,25 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
           }
 
           try {
-            const tempDiv = document.createElement('div');
-            const domRange = ReactEditor.toDOMRange(editor, sel);
-            const selectedHtml = domRange.cloneContents();
-            tempDiv.appendChild(selectedHtml);
-            event.clipboardData.setData('text/html', tempDiv.innerHTML);
-            tempDiv?.remove();
-
-            // 设置Slate编辑器特定的片段数据，用于保留格式信息
-            event.clipboardData.setData(
-              'application/x-slate-md-fragment',
-              JSON.stringify(editor?.getFragment() || []),
-            );
-            event.clipboardData.setData(
-              'text/plain',
-              parserSlateNodeToMarkdown(editor?.getFragment()),
-            );
-            event.clipboardData.setData(
-              'text/markdown',
-              parserSlateNodeToMarkdown(editor?.getFragment()),
-            );
-
-            // 4. 设置剪贴板的片段数据
+            // ReactEditor.setFragmentData 内部会写 application/x-slate-fragment、
+            // text/html、text/plain（slate-dom）。我们让它先写默认值再追加自定义键，
+            // 避免重复 cloneContents / 多次 markdown 序列化。
             ReactEditor.setFragmentData(
               markdownEditorRef.current,
               event.clipboardData,
               operationType,
             );
+
+            const fragment = editor?.getFragment() || [];
+            const markdown = parserSlateNodeToMarkdown(fragment);
+
+            // 自定义 key 不会被 Slate 默认实现覆盖
+            event.clipboardData.setData(
+              'application/x-slate-md-fragment',
+              JSON.stringify(fragment),
+            );
+            // text/markdown 是非标准 MIME，但同源粘回时会优先使用，且保留 markdown 原文
+            event.clipboardData.setData('text/markdown', markdown);
 
             // 5. 如果是剪切操作，删除选中内容
             if (operationType === 'cut') {
@@ -674,11 +666,34 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   ) => {
     event.stopPropagation();
     event.preventDefault();
-    // 检查粘贴配置
+
     const pasteConfig = props.pasteConfig;
     if (pasteConfig?.enabled === false) {
-      return; // 如果禁用粘贴功能，直接返回
+      return;
     }
+
+    // 入口同步缓存全部需要的 clipboard 字段。React 合成事件 + await 之后在
+    // Safari 下 clipboardData 可能被清空，必须先读后 await。
+    const clipboardData = event.clipboardData;
+    const types = Array.from(clipboardData?.types || ['text/plain']);
+    const cachedHtml = types.includes('text/html')
+      ? clipboardData?.getData('text/html') || ''
+      : '';
+    const cachedRtf = types.includes('text/rtf')
+      ? clipboardData?.getData('text/rtf') || ''
+      : '';
+    const cachedSlateMd = types.includes('application/x-slate-md-fragment')
+      ? clipboardData?.getData('application/x-slate-md-fragment') || ''
+      : '';
+    const cachedMarkdown = types.includes('text/markdown')
+      ? clipboardData?.getData('text/markdown') || ''
+      : '';
+    const cachedPlain = types.includes('text/plain')
+      ? clipboardData?.getData('text/plain') || ''
+      : '';
+    const cachedFiles = clipboardData?.files
+      ? Array.from(clipboardData.files)
+      : [];
 
     const currentTextSelection = markdownEditorRef.current.selection;
     if (
@@ -707,7 +722,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
         handleTagNodePaste(
           markdownEditorRef.current,
           currentTextSelection,
-          event.clipboardData,
+          clipboardData,
           curNode,
         )
       ) {
@@ -720,20 +735,21 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       return;
     }
 
-    const types = event.clipboardData?.types || ['text/plain'];
-
-    // 获取允许的类型
     const allowedTypes = pasteConfig?.allowedTypes || defaultAllowedTypes;
 
-    // 1. 首先尝试处理 slate-md-fragment
+    // 1. slate-md-fragment（同源复制粘贴）
     if (
-      types.includes('application/x-slate-md-fragment') &&
+      cachedSlateMd &&
       allowedTypes.includes('application/x-slate-md-fragment')
     ) {
+      const synthetic = {
+        getData: (k: string) =>
+          k === 'application/x-slate-md-fragment' ? cachedSlateMd : '',
+      } as unknown as DataTransfer;
       if (
         handleSlateMarkdownFragment(
           markdownEditorRef.current,
-          event.clipboardData,
+          synthetic,
           currentTextSelection,
         )
       ) {
@@ -741,29 +757,38 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       }
     }
 
-    // 2. 然后尝试处理 HTML
-    if (types.includes('text/html') && allowedTypes.includes('text/html')) {
-      event.stopPropagation();
-      event.preventDefault();
-      const result = await handleHtmlPaste(
+    // 2. text/html —— 大文档守门，超阈值降级到 text/plain
+    const htmlMaxBytes = pasteConfig?.htmlMaxBytes ?? 1_048_576;
+    const htmlOversize = htmlMaxBytes > 0 && cachedHtml.length > htmlMaxBytes;
+    if (
+      cachedHtml &&
+      !htmlOversize &&
+      allowedTypes.includes('text/html')
+    ) {
+      const syntheticForHtml = {
+        getData: (k: string) => {
+          if (k === 'text/html') return cachedHtml;
+          if (k === 'text/rtf') return cachedRtf;
+          return '';
+        },
+      } as unknown as DataTransfer;
+      const ok = await handleHtmlPaste(
         markdownEditorRef.current,
-        event.clipboardData,
+        syntheticForHtml,
         props,
       );
-
-      if (result) {
-        return;
-      }
+      if (ok) return;
     }
 
-    // 3. 处理文件
-    if (types.includes('Files') && allowedTypes.includes('Files')) {
-      event.stopPropagation();
-      event.preventDefault();
+    // 3. Files
+    if (cachedFiles.length && allowedTypes.includes('Files')) {
+      const syntheticForFiles = {
+        files: cachedFiles as unknown as FileList,
+      } as unknown as DataTransfer;
       if (
         await handleFilesPaste(
           markdownEditorRef.current,
-          event.clipboardData,
+          syntheticForFiles,
           props,
         )
       ) {
@@ -771,33 +796,34 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       }
     }
 
-    if (
-      types.includes('text/markdown') &&
-      allowedTypes.includes('text/markdown')
-    ) {
-      event.stopPropagation();
-      event.preventDefault();
-      const text =
-        event.clipboardData?.getData?.('text/markdown')?.trim() || '';
+    // 4. text/markdown
+    if (cachedMarkdown && allowedTypes.includes('text/markdown')) {
+      const text = cachedMarkdown.trim();
       if (text) {
-        Transforms.insertFragment(
-          markdownEditorRef.current,
-          parserMdToSchema(text, plugins).schema,
-        );
+        const selection = markdownEditorRef.current.selection;
+        // 与 text/plain 保持一致：在代码块/表格单元格内不解析为 markdown 节点
+        if (shouldInsertTextDirectly(markdownEditorRef.current, selection)) {
+          Transforms.insertText(markdownEditorRef.current, text);
+        } else {
+          Transforms.insertFragment(
+            markdownEditorRef.current,
+            parserMdToSchema(text, plugins).schema,
+          );
+        }
       }
-
       return;
     }
-    // 4. 处理纯文本
-    if (types.includes('text/plain') && allowedTypes.includes('text/plain')) {
-      event.stopPropagation();
-      event.preventDefault();
-      const text = event.clipboardData?.getData?.('text/plain')?.trim() || '';
+
+    // 5. text/plain（含从 oversize HTML 降级过来的情形）
+    if (
+      (cachedPlain || htmlOversize) &&
+      allowedTypes.includes('text/plain')
+    ) {
+      const text = (cachedPlain || '').trim();
       if (!text) return;
 
       const selection = markdownEditorRef.current.selection;
 
-      // plainTextOnly 时仅插入纯文本，不做 HTML/Markdown/链接解析
       if (pasteConfig?.plainTextOnly) {
         if (selection) {
           Transforms.insertText(markdownEditorRef.current, text, {
@@ -811,28 +837,22 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
         return;
       }
 
-      // 如果是表格或者代码块，直接插入文本
       if (shouldInsertTextDirectly(markdownEditorRef.current, selection)) {
         Transforms.insertText(markdownEditorRef.current, text);
         return;
       }
 
       try {
-        // 处理特殊文本格式（media:// 和 attach:// 链接）
         if (
           handleSpecialTextPaste(markdownEditorRef.current, text, selection)
         ) {
           return;
         }
-
-        // 处理 HTTP 链接
         if (
           handleHttpLinkPaste(markdownEditorRef.current, text, selection, store)
         ) {
           return;
         }
-
-        // 处理普通文本
         if (
           await handlePlainTextPaste(
             markdownEditorRef.current,
@@ -840,6 +860,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
             selection,
             plugins,
             allowedTypes,
+            { parseMarkdownInPlainText: pasteConfig?.parseMarkdownInPlainText },
           )
         ) {
           return;
@@ -849,9 +870,9 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       }
     }
 
-    // 5. 如果前面的处理都失败了，才使用默认的插入行为
+    // 6. 全部失败 → 走 Slate 默认插入逻辑
     if (hasEditableTarget(markdownEditorRef.current, event.target)) {
-      ReactEditor.insertData(markdownEditorRef.current, event.clipboardData);
+      ReactEditor.insertData(markdownEditorRef.current, clipboardData);
     }
   };
 
@@ -1279,10 +1300,9 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
             handleSelectionChange.run(e);
           }}
           onCut={(event: React.ClipboardEvent<HTMLDivElement>) => {
-            const handled = handleClipboardCopy(event, 'cut');
-            if (!handled) {
-              event.preventDefault();
-            }
+            // 内部成功时已 preventDefault；失败时让浏览器原生 cut 兜底，
+            // 避免在 handler 早返时把剪贴板写空。
+            handleClipboardCopy(event, 'cut');
           }}
           onFocus={(e) => {
             props.onFocus?.(
@@ -1302,10 +1322,8 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
             onPaste(event);
           }}
           onCopy={(event: React.ClipboardEvent<HTMLDivElement>) => {
-            const handled = handleClipboardCopy(event, 'copy');
-            if (!handled) {
-              event.preventDefault();
-            }
+            // 同 onCut：handler 失败时让原生 copy 兜底
+            handleClipboardCopy(event, 'copy');
           }}
           renderElement={elementRenderElement}
           renderLeaf={renderMarkdownLeaf}
