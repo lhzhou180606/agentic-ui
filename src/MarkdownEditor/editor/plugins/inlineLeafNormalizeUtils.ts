@@ -1,4 +1,4 @@
-﻿import type { CustomLeaf } from '../../el';
+import type { CustomLeaf } from '../../el';
 
 export const MARK_DECORATION_KEYS = [
   'mark',

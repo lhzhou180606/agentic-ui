@@ -1,4 +1,4 @@
-﻿import { Editor, Element, Node, Path, Transforms } from 'slate';
+import { Editor, Element, Node, Path, Transforms } from 'slate';
 
 import { ListsEditor } from './ListsEditor';
 import {

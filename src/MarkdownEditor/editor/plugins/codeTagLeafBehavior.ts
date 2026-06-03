@@ -110,6 +110,122 @@ export const handleMarkRemoveTextOperation = (
   return true;
 };
 
+export const shouldExitMarkOnInsertBreak = (
+  leaf: CustomLeaf & { text: string },
+  offset: number,
+): boolean => {
+  const text = leaf.text ?? '';
+  if (text.length === 0) {
+    return true;
+  }
+  if (offset !== text.length) {
+    return false;
+  }
+  return text === '\n' || text.endsWith('\n');
+};
+
+/** 第二次 Enter：从 mark 叶节点移到后续普通文本 */
+export const moveSelectionOutOfMarkLeaf = (editor: Editor): boolean => {
+  const { selection } = editor;
+  if (!selection || !Range.isCollapsed(selection)) {
+    return false;
+  }
+
+  try {
+    const node = Node.get(editor, selection.anchor.path);
+    if (!Text.isText(node) || !(node as CustomLeaf).mark) {
+      return false;
+    }
+
+    const path = selection.anchor.path;
+
+    Editor.withoutNormalizing(editor, () => {
+      if (node.text.length === 0) {
+        Transforms.unsetNodes(editor, [...MARK_LEAF_KEYS], {
+          at: path,
+          match: Text.isText,
+        });
+      }
+
+      const nextPath = Path.next(path);
+      if (Editor.hasPath(editor, nextPath)) {
+        Transforms.select(editor, Editor.start(editor, nextPath));
+      } else {
+        Transforms.insertNodes(
+          editor,
+          { text: '' },
+          { at: nextPath, select: true },
+        );
+      }
+    });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export const handleMarkInsertBreak = (
+  editor: Editor,
+  insertBreak: () => void,
+): boolean => {
+  const { selection } = editor;
+  if (!selection || !Range.isCollapsed(selection)) {
+    return false;
+  }
+
+  let node: Node;
+  try {
+    node = Node.get(editor, selection.anchor.path);
+  } catch {
+    return false;
+  }
+
+  if (!Text.isText(node) || !(node as CustomLeaf).mark) {
+    return false;
+  }
+
+  const leaf = node as CustomLeaf & { text: string };
+  if (!shouldExitMarkOnInsertBreak(leaf, selection.anchor.offset)) {
+    return false;
+  }
+
+  const path = selection.anchor.path;
+  const text = leaf.text ?? '';
+
+  if (
+    text.length > 0 &&
+    text.endsWith('\n') &&
+    selection.anchor.offset === text.length
+  ) {
+    Editor.withoutNormalizing(editor, () => {
+      const breakOffset = text.length - 1;
+      if (breakOffset > 0) {
+        Transforms.splitNodes(editor, {
+          at: { path, offset: breakOffset },
+          match: Text.isText,
+        });
+        const tailPath = Path.next(path);
+        Transforms.unsetNodes(editor, [...MARK_LEAF_KEYS], {
+          at: tailPath,
+          match: Text.isText,
+        });
+        Transforms.select(editor, Editor.start(editor, tailPath));
+      } else {
+        Transforms.unsetNodes(editor, [...MARK_LEAF_KEYS], {
+          at: path,
+          match: Text.isText,
+        });
+      }
+    });
+    insertBreak();
+    return true;
+  }
+
+  moveSelectionOutOfMarkLeaf(editor);
+  insertBreak();
+  return true;
+};
+
 export const moveSelectionOutOfCodeTagLeaf = (editor: Editor): boolean => {
   const { selection } = editor;
   if (!selection || !Range.isCollapsed(selection)) {
@@ -160,6 +276,40 @@ export const tryInsertTextOutsideTagOnDoubleSpace = (
 
   const lastChar = node.text.charAt(node.text.length - 1);
   if (lastChar !== ' ') {
+    return false;
+  }
+
+  Transforms.insertNodes(editor, [{ text: ' ' }]);
+  return true;
+};
+
+/** mark 叶末尾已有空格时，再按空格在 mark 外插入（与 tag 双空格一致） */
+export const tryInsertTextOutsideMarkOnDoubleSpace = (
+  editor: Editor,
+  text: string,
+): boolean => {
+  const { selection } = editor;
+  if (!selection || !Range.isCollapsed(selection)) {
+    return false;
+  }
+
+  let node: Node;
+  try {
+    node = Node.get(editor, selection.anchor.path);
+  } catch {
+    return false;
+  }
+
+  const leaf = node as CustomLeaf & { text: string };
+  if (!Text.isText(node) || !leaf.mark || leaf.tag || leaf.code) {
+    return false;
+  }
+
+  if (text !== ' ' || selection.anchor.offset !== leaf.text.length) {
+    return false;
+  }
+
+  if (leaf.text.charAt(leaf.text.length - 1) !== ' ') {
     return false;
   }
 

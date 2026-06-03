@@ -1,4 +1,4 @@
-﻿import type { KeyboardEvent } from 'react';
+import type { KeyboardEvent } from 'react';
 import { Editor, Element, Range } from 'slate';
 
 import { ListsEditor } from './ListsEditor';

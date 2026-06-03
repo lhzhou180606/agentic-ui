@@ -1,4 +1,4 @@
-﻿/* eslint-disable no-param-reassign */
+/* eslint-disable no-param-reassign */
 import {
   Editor,
   Element,

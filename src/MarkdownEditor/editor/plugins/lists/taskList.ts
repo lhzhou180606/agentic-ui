@@ -1,4 +1,4 @@
-﻿import { Editor, Element, Node, Transforms } from 'slate';
+import { Editor, Element, Node, Transforms } from 'slate';
 import type { BulletedListNode } from '../../../el';
 import { ListType } from './types';
 

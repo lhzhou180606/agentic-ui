@@ -1,4 +1,4 @@
-﻿import type { Editor, Node, NodeEntry } from 'slate';
+import type { Editor, Node, NodeEntry } from 'slate';
 import { Element, Node as SlateNode } from 'slate';
 
 import type { ListsSchema } from '../types';

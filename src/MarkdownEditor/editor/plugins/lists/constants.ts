@@ -1,4 +1,4 @@
-﻿// List items have either 1 or 2 children, always in the following order:
+// List items have either 1 or 2 children, always in the following order:
 // 0 - list item text (paragraph in Agentic schema)
 // 1 - nested list (optional)
 export const TEXT_PATH_INDEX = 0;

@@ -1,4 +1,4 @@
-﻿import { Editor, Element, Transforms, type NodeEntry } from 'slate';
+import { Editor, Element, Transforms, type NodeEntry } from 'slate';
 
 import { agenticListsSchema, getListType } from './schema';
 import { normalizeNode as listsNormalizeNode } from './normalizeNode';

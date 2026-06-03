@@ -1,4 +1,4 @@
-﻿import { Editor, NodeEntry, Text, Transforms } from 'slate';
+import { Editor, NodeEntry, Text, Transforms } from 'slate';
 
 import {
   hasOrphanMarkDecoration,

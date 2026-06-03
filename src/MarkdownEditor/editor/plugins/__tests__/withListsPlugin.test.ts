@@ -1,4 +1,4 @@
-﻿import { createEditor, Transforms } from 'slate';
+import { createEditor, Transforms } from 'slate';
 import { vi } from 'vitest';
 import { withListsPlugin } from '../withListsPlugin';
 

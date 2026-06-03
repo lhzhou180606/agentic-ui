@@ -1,4 +1,4 @@
-﻿import { createEditor, Editor } from 'slate';
+import { createEditor, Editor } from 'slate';
 import { describe, expect, it } from 'vitest';
 
 import { withFootnoteReferenceNormalize } from '../withFootnoteReferenceNormalize';

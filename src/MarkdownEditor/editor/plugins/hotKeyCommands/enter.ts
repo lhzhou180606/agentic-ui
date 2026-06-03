@@ -1,4 +1,4 @@
-﻿/* eslint-disable no-case-declarations */
+/* eslint-disable no-case-declarations */
 import React from 'react';
 import {
   BaseSelection,

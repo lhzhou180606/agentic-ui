@@ -1,4 +1,4 @@
-name: Run Vitest and upload coverage to Codecov
+﻿name: Run Vitest and upload coverage to Codecov
 
 on:
   push:
@@ -20,9 +20,13 @@ jobs:
 
       - name: Set up Node
         uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
-      - name: Install dependencies
-        run: npm i pnpm -g && pnpm install
+      - name: Enable Corepack and install dependencies
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
 
       - name: Run tests
         run: npm run test:coverage:full

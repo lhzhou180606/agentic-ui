@@ -1,4 +1,4 @@
-﻿import type { Editor } from 'slate';
+import type { Editor } from 'slate';
 import type { Element, Location, NodeEntry } from 'slate';
 import { Path, Point, Range, Span } from 'slate';
 

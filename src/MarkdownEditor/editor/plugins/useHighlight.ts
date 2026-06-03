@@ -1,4 +1,4 @@
-﻿import { Editor, Element, Node, NodeEntry, Path, Range } from 'slate';
+import { Editor, Element, Node, NodeEntry, Path, Range } from 'slate';
 import { EditorStore } from '../store';
 import { EditorUtils } from '../utils/editorUtils';
 import { FOOTNOTE_REF_REG } from '../utils/footnoteDisplay';

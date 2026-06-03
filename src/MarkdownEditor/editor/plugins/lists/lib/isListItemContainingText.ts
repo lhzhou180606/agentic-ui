@@ -1,4 +1,4 @@
-﻿import type { Editor } from 'slate';
+import type { Editor } from 'slate';
 import type { Node } from 'slate';
 import { Element } from 'slate';
 

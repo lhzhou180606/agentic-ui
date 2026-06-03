@@ -1,4 +1,4 @@
-﻿export { isDeleteBackwardAllowed } from './isDeleteBackwardAllowed';
+export { isDeleteBackwardAllowed } from './isDeleteBackwardAllowed';
 export { getCursorPosition } from './getCursorPosition';
 export { getCursorPositionInNode } from './getCursorPositionInNode';
 export { getListItems } from './getListItems';

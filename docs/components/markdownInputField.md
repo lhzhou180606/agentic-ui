@@ -1,4 +1,4 @@
----
+﻿---
 title: MarkdownInputField 输入框
 nav:
   order: 1
@@ -19,6 +19,8 @@ group:
 - 🔘 支持自定义操作按钮
 - 🍵 支持插槽输入
 - 🎯 支持技能模式
+
+<code src="../demos/markdownInputField/basic.tsx" background="var(--main-bg-color)" iframe=640></code>
 
 ```tsx
 import { message } from 'antd';

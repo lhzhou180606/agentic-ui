@@ -1,4 +1,4 @@
-﻿import type { Editor } from 'slate';
+import type { Editor } from 'slate';
 import { isHotkey } from 'is-hotkey';
 import type { KeyboardEvent } from 'react';
 

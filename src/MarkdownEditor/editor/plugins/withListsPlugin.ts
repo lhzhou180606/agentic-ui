@@ -1,4 +1,4 @@
-﻿import type { Editor } from 'slate';
+import type { Editor } from 'slate';
 
 export { getListType, isListType } from './lists';
 import { withAgenticLists } from './lists';

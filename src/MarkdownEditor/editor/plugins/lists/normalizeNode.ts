@@ -1,4 +1,4 @@
-﻿import type { Editor } from 'slate';
+import type { Editor } from 'slate';
 import type { NodeEntry } from 'slate';
 
 import { ListsEditor } from './ListsEditor';

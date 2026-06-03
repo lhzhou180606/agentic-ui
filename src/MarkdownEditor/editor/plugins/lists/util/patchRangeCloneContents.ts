@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Prezly slate-lists: patch Range.cloneContents for list copy/paste DOM structure.
  * @see https://github.com/prezly/slate/blob/main/packages/slate-lists/src/util/patchRangeCloneContents.ts
  */

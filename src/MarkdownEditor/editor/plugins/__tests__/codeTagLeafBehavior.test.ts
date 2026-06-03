@@ -1,10 +1,13 @@
 ﻿import { createEditor, Transforms } from 'slate';
 import { describe, expect, it, vi } from 'vitest';
 import {
+  handleMarkInsertBreak,
   handleMarkRemoveTextOperation,
   handleTagRemoveTextOperation,
   moveSelectionOutOfCodeTagLeaf,
+  shouldExitMarkOnInsertBreak,
   tryInsertTextOutsideTagOnDoubleSpace,
+  tryInsertTextOutsideMarkOnDoubleSpace,
 } from '../codeTagLeafBehavior';
 
 const tagNode = (text: string) => ({ text, tag: true, code: true });
@@ -73,6 +76,46 @@ describe('codeTagLeafBehavior', () => {
     unsetSpy.mockRestore();
   });
 
+  it('shouldExitMarkOnInsertBreak：正文末尾第一次 Enter 不退出，空 mark 叶第二次退出', () => {
+    expect(
+      shouldExitMarkOnInsertBreak(
+        { text: '@助理', mark: true } as never,
+        '@助理'.length,
+      ),
+    ).toBe(false);
+    expect(
+      shouldExitMarkOnInsertBreak({ text: '', mark: true } as never, 0),
+    ).toBe(true);
+  });
+
+  it('handleMarkInsertBreak 在空 mark 叶上第二次 Enter 移出并换行', () => {
+    const base = createEditor();
+    const originalInsertBreak = vi.fn();
+    base.insertBreak = originalInsertBreak;
+    const editor = base;
+    editor.children = [
+      {
+        type: 'paragraph',
+        children: [
+          { text: '@助理', mark: true, markLabel: '@' },
+          { text: '', mark: true, markLabel: '@' },
+        ],
+      },
+    ];
+    editor.selection = {
+      anchor: { path: [0, 1], offset: 0 },
+      focus: { path: [0, 1], offset: 0 },
+    };
+
+    const unsetSpy = vi.spyOn(Transforms, 'unsetNodes');
+    const handled = handleMarkInsertBreak(editor, originalInsertBreak);
+
+    expect(handled).toBe(true);
+    expect(unsetSpy).toHaveBeenCalled();
+    expect(originalInsertBreak).toHaveBeenCalledTimes(1);
+    unsetSpy.mockRestore();
+  });
+
   it('moveSelectionOutOfCodeTagLeaf 在 code 叶子上移出选区', () => {
     const editor = createEditor();
     editor.children = [
@@ -102,6 +145,25 @@ describe('codeTagLeafBehavior', () => {
 
     const insertSpy = vi.spyOn(Transforms, 'insertNodes');
     expect(tryInsertTextOutsideTagOnDoubleSpace(editor, ' ')).toBe(true);
+    expect(insertSpy).toHaveBeenCalledWith(editor, [{ text: ' ' }]);
+    insertSpy.mockRestore();
+  });
+
+  it('tryInsertTextOutsideMarkOnDoubleSpace 第二个空格插入到 mark 外', () => {
+    const editor = createEditor();
+    editor.children = [
+      {
+        type: 'paragraph',
+        children: [{ text: '@助理 ', mark: true, markLabel: '@' }],
+      },
+    ];
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 4 },
+      focus: { path: [0, 0], offset: 4 },
+    };
+
+    const insertSpy = vi.spyOn(Transforms, 'insertNodes');
+    expect(tryInsertTextOutsideMarkOnDoubleSpace(editor, ' ')).toBe(true);
     expect(insertSpy).toHaveBeenCalledWith(editor, [{ text: ' ' }]);
     insertSpy.mockRestore();
   });

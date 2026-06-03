@@ -1,4 +1,4 @@
-﻿import { Element, type Element as SlateElement, type Node } from 'slate';
+import { Element, type Element as SlateElement, type Node } from 'slate';
 import type { BulletedListNode, NumberedListNode } from '../../../el';
 import { ListType, type ListsSchema } from './types';
 

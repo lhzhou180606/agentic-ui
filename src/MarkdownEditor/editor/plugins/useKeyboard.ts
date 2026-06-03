@@ -1,4 +1,4 @@
-﻿import isHotkey from 'is-hotkey';
+import isHotkey from 'is-hotkey';
 import React, { useMemo, useRef } from 'react';
 import {
   BaseEditor,

@@ -1,4 +1,4 @@
-﻿export * from './utils';
+export * from './utils';
 export * from './withCardPlugin';
 export * from './withCodeBlockPlugin';
 export * from './withCodeTagPlugin';

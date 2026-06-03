@@ -1,4 +1,4 @@
-﻿import { ConfigProvider } from 'antd';
+import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { CSSProperties, useContext } from 'react';
 import { Editor, Path, Transforms } from 'slate';

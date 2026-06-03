@@ -1,4 +1,4 @@
-﻿export { agenticListsSchema, getListType, isListType } from './schema';
+export { agenticListsSchema, getListType, isListType } from './schema';
 export { withAgenticLists } from './withAgenticLists';
 export { onKeyDown as listsOnKeyDown } from './onKeyDown';
 export {

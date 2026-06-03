@@ -1,4 +1,4 @@
-name: E2E Tests
+﻿name: E2E Tests
 
 on:
   push:
@@ -21,11 +21,10 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Install dependencies
-        run: pnpm install
+      - name: Enable Corepack and install dependencies
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
 
       - name: Install Playwright Browsers
         run: pnpm run playwright:install

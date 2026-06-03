@@ -1,4 +1,4 @@
-﻿import { Editor, Element, NodeEntry, Transforms } from 'slate';
+import { Editor, Element, NodeEntry, Transforms } from 'slate';
 
 import { legacyFootnoteReferenceElementToTextLeaf } from '../parser/parse/parseFootnote';
 
