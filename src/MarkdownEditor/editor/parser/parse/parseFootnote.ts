@@ -1,4 +1,4 @@
-﻿import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../Utils/debugUtils';
 import type { CustomLeaf } from '../../../el';
 import { extractFootnoteRefIdentifier } from '../../utils/footnoteDisplay';
 

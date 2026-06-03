@@ -1,4 +1,4 @@
-﻿import type { RootContent } from 'mdast';
+import type { RootContent } from 'mdast';
 import { CustomLeaf } from '../../../el';
 import { handleFootnoteReference } from './parseFootnote';
 import { handleInlineCode } from './parseElements';

@@ -1,4 +1,4 @@
-﻿import { BaseElement, Path, Transforms } from 'slate';
+import { BaseElement, Path, Transforms } from 'slate';
 import { ReactEditor, useSlate } from 'slate-react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { selChange$ } from '../editor/plugins/useOnchange';

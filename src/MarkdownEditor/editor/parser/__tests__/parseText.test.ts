@@ -1,4 +1,4 @@
-﻿/**
+/**
  * parseText 及相关函数单元测试
  * 覆盖 parseText.ts 中 setFinishedProp、parseText、applyHtmlTagsToElement、handleTextAndInlineElementsPure
  */

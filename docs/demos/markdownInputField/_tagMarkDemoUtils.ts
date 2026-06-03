@@ -1,4 +1,4 @@
-﻿export const TAG_MARK_MENTION_ITEMS = [
+export const TAG_MARK_MENTION_ITEMS = [
   { label: '客服助理', description: '解答产品问题' },
   { label: '代码助手', description: '编写与审查代码' },
 ] as const;

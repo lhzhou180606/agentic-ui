@@ -1,4 +1,4 @@
-﻿import { Element, Node, Text, type BaseEditor } from 'slate';
+import { Element, Node, Text, type BaseEditor } from 'slate';
 
 const PLAIN_TEXT_BLOCK_TYPES = new Set(['paragraph', 'head']);
 

@@ -1,4 +1,4 @@
-﻿import { Keyframes } from '@ant-design/cssinjs';
+import { Keyframes } from '@ant-design/cssinjs';
 import {
   INPUT_FIELD_EDITOR_CONTENT_PADDING_MOBILE_CSS_VAR,
   MOBILE_INPUT_FIELD_EDITOR_CONTENT_PADDING_DEFAULT,

@@ -1,4 +1,4 @@
-﻿import type { FileNode, FileTreeNode } from '../types';
+import type { FileNode, FileTreeNode } from '../types';
 import { ensureNodeWithId } from './handlers';
 import { fileIdOrTreeKeyToRelativePath } from './workspaceFileId';
 

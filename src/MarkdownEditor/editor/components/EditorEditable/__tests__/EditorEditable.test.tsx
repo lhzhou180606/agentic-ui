@@ -1,4 +1,4 @@
-﻿import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React, { createRef } from 'react';
 import { createEditor } from 'slate';

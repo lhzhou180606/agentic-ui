@@ -79,6 +79,8 @@
     "preview": "pnpm dumi preview",
     "report:demo": "node scripts/generateDemoReport.js",
     "start": "pnpm run dev",
+    "strip:bom": "node scripts/strip-utf8-bom.mjs",
+    "strip:bom:check": "node scripts/strip-utf8-bom.mjs --check",
     "test": "vitest --run",
     "test:coverage": "vitest --run --coverage",
     "test:coverage:full": "vitest --run --coverage --mode full",

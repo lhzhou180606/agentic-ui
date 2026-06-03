@@ -1,4 +1,4 @@
-﻿import { ChevronUp } from '@sofa-design/icons';
+import { ChevronUp } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import { useMergedState } from 'rc-util';

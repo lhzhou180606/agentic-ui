@@ -1,4 +1,4 @@
-﻿import { Modal } from 'antd';
+import { Modal } from 'antd';
 import React from 'react';
 import { Node } from 'slate';
 

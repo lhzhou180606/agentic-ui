@@ -1,4 +1,4 @@
-﻿import '@testing-library/jest-dom';
+import '@testing-library/jest-dom';
 import { fireEvent, render } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';

@@ -1,4 +1,4 @@
-﻿import { MOBILE_BREAKPOINT } from '../../Constants/mobile';
+import { MOBILE_BREAKPOINT } from '../../Constants/mobile';
 import {
   ChatTokenType,
   GenerateStyle,

@@ -1,4 +1,4 @@
-﻿import { createEditor, Transforms } from 'slate';
+import { createEditor, Transforms } from 'slate';
 import { describe, expect, it, vi } from 'vitest';
 import {
   handleMarkInsertBreak,

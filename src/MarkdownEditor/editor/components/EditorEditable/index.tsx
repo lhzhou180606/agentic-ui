@@ -1,4 +1,4 @@
-﻿import type { ComponentProps } from 'react';
+import type { ComponentProps } from 'react';
 import React, { useContext } from 'react';
 import { Editable, useSlate } from 'slate-react';
 import { I18nContext } from '../../../../I18n';

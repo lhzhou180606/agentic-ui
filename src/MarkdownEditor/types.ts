@@ -1,4 +1,4 @@
-﻿import type { Ace } from 'ace-builds';
+import type { Ace } from 'ace-builds';
 import { AnchorProps, ImageProps } from 'antd';
 import React from 'react';
 import { BaseEditor, Editor, Selection } from 'slate';

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @fileoverview 代码渲染器组件
  * 封装代码编辑器的所有渲染逻辑
  */
@@ -282,7 +282,12 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
                 {viewMode === 'preview' &&
                   props.element.language &&
                   props.element.language === 'markdown' && (
-                    <MarkdownEditor initValue={codePlainText} />
+                    <MarkdownEditor
+                      initValue={codePlainText}
+                      readonly
+                      toolBar={{ enable: false }}
+                      floatBar={{ enable: false }}
+                    />
                   )}
                 <div
                   style={{

@@ -1,4 +1,4 @@
-﻿# Agentic UI
+# Agentic UI
 
 <div align="center">
 

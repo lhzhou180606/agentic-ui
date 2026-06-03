@@ -1,4 +1,4 @@
-﻿import { ConfigProvider } from 'antd';
+import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { CSSProperties, useContext, useMemo, useState } from 'react';
 import { RenderLeafProps } from 'slate-react';

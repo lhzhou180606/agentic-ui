@@ -1,4 +1,4 @@
-﻿import { Typography } from 'antd';
+import { Typography } from 'antd';
 import React, { useCallback } from 'react';
 import { TagMarkInputDemo } from './_TagMarkInputDemo';
 import { TAG_MARK_DEMO_INITIAL, inputMinStyle, pageStyle } from './_constants';

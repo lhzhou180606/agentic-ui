@@ -1,4 +1,4 @@
-﻿/** 与 useHighlight 脚注引用匹配一致（全局匹配） */
+/** 与 useHighlight 脚注引用匹配一致（全局匹配） */
 export const FOOTNOTE_REF_REG = /\[\^[^\]]+\]/g;
 
 /** 从 `[^id]` 片段提取 identifier */

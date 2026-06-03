@@ -1,4 +1,4 @@
-﻿# AGENTS.md
+# AGENTS.md
 
 > Agentic UI 项目开发指南 - 为 AI 编程助手提供项目上下文和开发规范
 
@@ -900,6 +900,15 @@ corepack enable
 corepack prepare pnpm@9.15.9 --activate
 pnpm -v   # 应为 9.15.9
 pnpm install
+```
+
+#### JSON 报 `Unexpected token ﻿`（UTF-8 BOM）
+
+部分编辑器会以「UTF-8 with BOM」保存文件。清理：
+
+```bash
+pnpm run strip:bom          # 写回移除 BOM
+pnpm run strip:bom:check    # 仅检查（有 BOM 时 exit 1）
 ```
 
 #### 样式不生效

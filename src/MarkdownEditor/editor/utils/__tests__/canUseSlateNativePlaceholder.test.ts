@@ -1,4 +1,4 @@
-﻿import { createEditor } from 'slate';
+import { createEditor } from 'slate';
 import { withReact } from 'slate-react';
 import { describe, expect, it } from 'vitest';
 import { canUseSlateNativePlaceholder } from '../canUseSlateNativePlaceholder';

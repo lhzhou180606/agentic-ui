@@ -1,4 +1,4 @@
-﻿import { Editor, Operation } from 'slate';
+import { Editor, Operation } from 'slate';
 import {
   handleMarkInsertBreak,
   handleMarkRemoveTextOperation,

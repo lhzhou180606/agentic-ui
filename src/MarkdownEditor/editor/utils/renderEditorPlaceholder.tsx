@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import type { RenderPlaceholderProps } from 'slate-react';
 
 /** Slate 原生 placeholder 渲染，对齐编辑器设计 token */

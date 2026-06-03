@@ -1,4 +1,4 @@
-﻿/**
+/**
  * TableContext / TablePropsProvider 测试：覆盖 setDeleteIconPosition 回调
  */
 import '@testing-library/jest-dom';

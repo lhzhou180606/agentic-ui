@@ -1,4 +1,4 @@
-﻿import { endsInsideUnclosedFence } from './fenceTracker';
+import { endsInsideUnclosedFence } from './fenceTracker';
 
 const LAST_BLOCK_THROTTLE_CHARS = 20;
 const BLOCK_BOUNDARY_TRIGGERS = /[\n`|#>*\-!~]/;
