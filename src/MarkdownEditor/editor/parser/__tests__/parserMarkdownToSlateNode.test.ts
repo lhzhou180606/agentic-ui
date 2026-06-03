@@ -473,7 +473,7 @@ describe('parserMarkdownToSlateNode', () => {
         render: false,
         isConfig: false,
         value: 'console.log("hello");',
-        children: [{ text: 'console.log("hello");' }],
+        children: [{ text: '' }],
       });
       // 验证 otherProps 存在（不再包含 data-block 等冗余属性）
       expect(codeNode).toHaveProperty('otherProps');
@@ -491,7 +491,7 @@ describe('parserMarkdownToSlateNode', () => {
         render: false,
         isConfig: false,
         value: 'some code',
-        children: [{ text: 'some code' }],
+        children: [{ text: '' }],
       });
       // 验证 otherProps 存在（不再包含 data-block 等冗余属性）
       expect(codeNode).toHaveProperty('otherProps');
@@ -510,9 +510,7 @@ describe('parserMarkdownToSlateNode', () => {
         render: false,
         isConfig: false,
         value: 'def hello():\n    print("Hello World")\n    return True',
-        children: [
-          { text: 'def hello():\n    print("Hello World")\n    return True' },
-        ],
+        children: [{ text: '' }],
       });
       // 验证 otherProps 存在（不再包含 data-block 等冗余属性）
       expect(codeNode).toHaveProperty('otherProps');
@@ -1269,7 +1267,7 @@ function hello() {
         type: 'code',
         language: 'think',
         value: '深度思考内容',
-        children: [{ text: '深度思考内容' }],
+        children: [{ text: '' }],
       });
     });
 

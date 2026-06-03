@@ -1558,6 +1558,16 @@ describe('Editor branches - onSlateChange', () => {
     expect(mockOnChange).not.toHaveBeenCalled();
   });
 
+  it('first content-changing call still triggers onChange (e.g. void code block)', () => {
+    const { editor } = setupStore({ readonly: false });
+    renderEditor({});
+
+    editor.operations = [{ type: 'set_node' }];
+    slateOnChange!([{ type: 'code', value: 'x', children: [{ text: '' }] }]);
+
+    expect(mockOnChange).toHaveBeenCalled();
+  });
+
   it('after timer, subsequent calls trigger onChange and detect content changes', () => {
     const { editor } = setupStore({ readonly: false });
     renderEditor({});

@@ -2,6 +2,7 @@ import { createEditor, Transforms } from 'slate';
 import { describe, expect, it, vi } from 'vitest';
 import {
   handleCodeBlockAceKeyDown,
+  handleCodeBlockTextInputKeyDown,
   insertParagraphAfterCodeBlock,
   isCodeBlockAceInputTarget,
   removeEmptyCodeBlock,
@@ -97,5 +98,34 @@ describe('codeBlockBehavior', () => {
     document.body.appendChild(root);
     expect(isCodeBlockAceInputTarget(textarea)).toBe(true);
     root.remove();
+  });
+
+  it('handleCodeBlockTextInputKeyDown Mod+A 全选 textarea 正文', () => {
+    const editor = createEditor();
+    editor.children = [
+      { type: 'code', value: 'abc', language: 'md', children: [{ text: '' }] },
+    ];
+    const textarea = document.createElement('textarea');
+    textarea.value = 'hello code';
+    const event = new KeyboardEvent('keydown', {
+      key: 'a',
+      ctrlKey: true,
+      bubbles: true,
+    });
+    const preventSpy = vi.spyOn(event, 'preventDefault');
+    const stopSpy = vi.spyOn(event, 'stopPropagation');
+
+    const result = handleCodeBlockTextInputKeyDown(
+      editor,
+      [0],
+      event,
+      textarea,
+    );
+
+    expect(result).toBe('handled');
+    expect(preventSpy).toHaveBeenCalled();
+    expect(stopSpy).toHaveBeenCalled();
+    expect(textarea.selectionStart).toBe(0);
+    expect(textarea.selectionEnd).toBe('hello code'.length);
   });
 });

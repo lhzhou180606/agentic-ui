@@ -164,6 +164,30 @@ describe('useKeyboardHandler', () => {
     selectSpy.mockRestore();
   });
 
+  it('代码块 textarea 聚焦时 Ctrl+A 不抢 Slate 全选', () => {
+    const params = createDefaultParams();
+    const selectSpy = vi.spyOn(Transforms, 'select');
+    const { result } = renderHook(() => useKeyboardHandler(params));
+    const wrap = document.createElement('div');
+    wrap.setAttribute('data-be', 'code');
+    const textarea = document.createElement('textarea');
+    wrap.appendChild(textarea);
+    const e = {
+      key: 'a',
+      ctrlKey: true,
+      metaKey: false,
+      shiftKey: false,
+      target: textarea,
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      nativeEvent: { isComposing: false },
+    } as any;
+    result.current.handleKeyDown(e);
+    expect(e.preventDefault).not.toHaveBeenCalled();
+    expect(selectSpy).not.toHaveBeenCalled();
+    selectSpy.mockRestore();
+  });
+
   it('triggerSendKey 默认（Enter）时纯 Enter 应触发 sendMessage', () => {
     const params = createDefaultParams();
     params.props.onSend = vi.fn();

@@ -16,9 +16,21 @@ export const hasOrphanMarkDecoration = (leaf: CustomLeaf): boolean =>
 
 export type CodeTagTextLeaf = CustomLeaf & { text: string };
 
-export const hasOrphanTagDecoration = (leaf: CustomLeaf): leaf is CodeTagTextLeaf =>
-  !!(leaf.tag && leaf.code) &&
-  isOrphanInlineDecorationText((leaf as CodeTagTextLeaf).text ?? '');
+/**
+ * 占位 Tag（`${placeholder:…}`）解析后 `text` 常为单空格，不能按 trim 判 orphan。
+ */
+export const hasOrphanTagDecoration = (
+  leaf: CustomLeaf,
+): leaf is CodeTagTextLeaf => {
+  if (!(leaf.tag && leaf.code)) {
+    return false;
+  }
+  const text = (leaf as CodeTagTextLeaf).text ?? '';
+  if (leaf.placeholder) {
+    return text.length === 0;
+  }
+  return isOrphanInlineDecorationText(text);
+};
 
 const PLAIN_TEXT_AFTER_TAG = ' ';
 

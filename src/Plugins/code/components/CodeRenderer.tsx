@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @fileoverview 代码渲染器组件
  * 封装代码编辑器的所有渲染逻辑
  */
@@ -20,6 +20,7 @@ import {
   openHtmlLocalPreview,
   openMarkdownLocalPreview,
 } from '../utils/localPreview';
+import { resolveInitialCodeBlockViewMode } from '../utils/resolveInitialCodeBlockViewMode';
 import {
   AceEditor,
   AceEditorContainer,
@@ -122,13 +123,13 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
   // 如果禁用了 HTML 预览或包含 JavaScript，强制使用代码模式
   const shouldDisablePreview = disableHtmlPreview || hasJavaScript;
 
-  const [viewMode, setViewMode] = useState<'preview' | 'code'>(() => {
-    // 如果禁用了 HTML 预览或包含 JavaScript，强制使用代码模式
-    if (shouldDisablePreview && language === 'html') {
-      return 'code';
-    }
-    return language === 'html' || language === 'markdown' ? 'preview' : 'code';
-  });
+  const [viewMode, setViewMode] = useState<'preview' | 'code'>(() =>
+    resolveInitialCodeBlockViewMode({
+      readonly,
+      language,
+      shouldDisableHtmlPreview: shouldDisablePreview,
+    }),
+  );
 
   // 使用Ace编辑器Hook
   const { dom, setLanguage, focusEditor } = AceEditor({

@@ -87,6 +87,46 @@ export const handleCodeBlockAceKeyDown = (
   return 'ignored';
 };
 
+/** 代码块 textarea 内 Mod+A 全选正文 */
+export const selectAllInCodeBlockTextarea = (
+  textarea: HTMLTextAreaElement,
+): void => {
+  textarea.setSelectionRange(0, textarea.value.length);
+};
+
+/**
+ * SimpleCodeBlockEditor / Ace 共用：优先处理块内快捷键，避免外层 Slate 抢走 Mod+A 等。
+ */
+export const handleCodeBlockTextInputKeyDown = (
+  editor: Editor,
+  path: Path,
+  event: KeyboardEvent,
+  textarea: HTMLTextAreaElement,
+): CodeBlockAceKeyDownResult => {
+  const aceResult = handleCodeBlockAceKeyDown(
+    editor,
+    path,
+    event,
+    textarea.value,
+  );
+  if (aceResult === 'handled') {
+    return 'handled';
+  }
+
+  const isSelectAll =
+    (event.key === 'a' || event.key === 'A') &&
+    (event.metaKey || event.ctrlKey) &&
+    !event.shiftKey;
+  if (isSelectAll) {
+    event.preventDefault();
+    event.stopPropagation();
+    selectAllInCodeBlockTextarea(textarea);
+    return 'handled';
+  }
+
+  return 'ignored';
+};
+
 /** 焦点在 Ace 输入区时，外层 Slate onKeyDown 应让路。 */
 export const isCodeBlockAceInputTarget = (target: EventTarget | null): boolean => {
   if (!(target instanceof HTMLElement)) {

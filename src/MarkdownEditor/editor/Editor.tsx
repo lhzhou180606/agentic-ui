@@ -457,22 +457,27 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   const baseClassName = `${props.prefixCls}-content`;
 
   const onSlateChange = useRefFunction((v: any[]) => {
-    // 忽略初始化时的第一次变化
+    const operations = [...(markdownEditorRef.current.operations ?? [])];
+    const hasContentChanges = operations.some(
+      (op) => op.type !== 'set_selection',
+    );
+
+    // 忽略初始化时「仅选区 / 无实质操作」的第一次回调；若用户首次交互就是改内容（如 void 代码块 textarea），必须上报
     if (first.current) {
-      setTimeout(() => {
-        first.current = false;
-      }, 100);
-      return;
+      if (!hasContentChanges) {
+        setTimeout(() => {
+          first.current = false;
+        }, 100);
+        return;
+      }
+      first.current = false;
     }
 
     // 更新当前值引用
     value.current = v;
     // 触发onChange回调
-    onChange(v, markdownEditorRef.current.operations);
+    onChange(v, operations);
     // 检查是否存在非选区变化操作，如有则标记内容已变更
-    const hasContentChanges = markdownEditorRef.current.operations?.some(
-      (op) => op.type !== 'set_selection',
-    );
     if (hasContentChanges && !changedMark.current) {
       changedMark.current = true;
     }

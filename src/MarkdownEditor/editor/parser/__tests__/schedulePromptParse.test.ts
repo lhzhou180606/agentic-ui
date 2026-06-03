@@ -1,4 +1,6 @@
-﻿import { describe, expect, it } from 'vitest';
+import { createEditor, Editor, type Descendant } from 'slate';
+import { describe, expect, it } from 'vitest';
+import { withOrphanInlineLeafNormalize } from '../../plugins/withOrphanInlineLeafNormalize';
 import { parserMarkdownToSlateNode } from '../parserMarkdownToSlateNode';
 import { parserMdToSchema } from '../parserMdToSchema';
 import { parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
@@ -40,5 +42,23 @@ describe('schedule prompt with placeholders and code fence', () => {
     }
     expect(md).toContain('```markdown');
     expect(md).toContain('任务内容');
+  });
+
+  it('placeholder tags survive orphan inline leaf normalize after parse', () => {
+    const { schema } = parserMdToSchema(
+      '描述 `${placeholder:任务名称}` 结束',
+    );
+    const editor = withOrphanInlineLeafNormalize(createEditor());
+    editor.children = schema as Descendant[];
+    Editor.normalize(editor, { force: true });
+
+    const paragraph = editor.children[0] as {
+      children: Array<{ tag?: boolean; placeholder?: string; text: string }>;
+    };
+    const tagLeaf = paragraph.children.find((c) => c.tag && c.placeholder);
+    expect(tagLeaf).toMatchObject({
+      tag: true,
+      placeholder: '任务名称',
+    });
   });
 });
