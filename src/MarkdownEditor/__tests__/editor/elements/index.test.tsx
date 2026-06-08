@@ -116,6 +116,10 @@ vi.mock('../../../editor/elements/Head', () => ({
   Head: elementStubs.box('head'),
 }));
 
+vi.mock('../../../editor/elements/Code', () => ({
+  Code: elementStubs.box('code'),
+}));
+
 // Mock Ant Design components
 vi.mock('antd', async (importOriginal) => {
   const actual = await importOriginal<typeof import('antd')>();

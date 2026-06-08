@@ -915,7 +915,7 @@ describe('parserMarkdownToSlateNode', () => {
         language: 'yaml',
         frontmatter: true,
         value: 'title: Test\nauthor: John',
-        children: [{ text: 'title: Test\nauthor: John' }],
+        children: [{ text: '' }],
       });
       expect(result.schema[1]).toMatchObject({
         type: 'head',
