@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
+﻿/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable react/no-children-prop */
 import classNames from 'clsx';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -65,6 +65,8 @@ import {
   isPath,
 } from './utils/editorUtils';
 import {
+  commitImeCompositionTextIfMissing,
+  getEditorTextSnapshot,
   markImeEnterCommitGuard,
   scheduleClearInputComposition,
 } from './utils/isImeComposing';
@@ -189,6 +191,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   const [suppressPlaceholderForIme, setSuppressPlaceholderForIme] =
     useState(false);
   const [hasEmptyRootParagraph, setHasEmptyRootParagraph] = useState(false);
+  const lastCompositionDataRef = useRef('');
 
   const plugins = useContext(PluginContext);
 
@@ -954,6 +957,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
    * 处理输入法开始事件
    */
   const onCompositionStart = () => {
+    lastCompositionDataRef.current = '';
     activateInputComposition();
   };
 
@@ -961,7 +965,11 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
    * 部分 Android WebView（如微信）可能跳过 compositionstart 直接触发
    * compositionupdate；微信下每次 update 都刷新组合态，避免 inputComposition 卡住。
    */
-  const onCompositionUpdate = () => {
+  const onCompositionUpdate = (event: React.CompositionEvent) => {
+    if (event.data) {
+      lastCompositionDataRef.current = event.data;
+    }
+
     if (isWeChat()) {
       activateInputComposition();
       return;
@@ -977,8 +985,18 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   /**
    * 处理输入法结束事件
    */
-  const onCompositionEnd = useRefFunction(() => {
+  const onCompositionEnd = useRefFunction((event?: React.CompositionEvent) => {
     markImeEnterCommitGuard();
+
+    const composedText = event?.data || lastCompositionDataRef.current;
+    lastCompositionDataRef.current = '';
+    if (composedText) {
+      commitImeCompositionTextIfMissing(
+        markdownEditorRef.current,
+        composedText,
+        getEditorTextSnapshot,
+      );
+    }
 
     cancelClearInputCompositionRef.current?.();
     cancelClearInputCompositionRef.current = scheduleClearInputComposition(

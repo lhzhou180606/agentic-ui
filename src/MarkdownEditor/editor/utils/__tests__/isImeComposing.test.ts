@@ -1,11 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
+import { createEditor, Editor, Transforms } from 'slate';
 import {
+  commitImeCompositionTextIfMissing,
   IME_PROCESSING_KEY_CODE,
   isImeComposing,
   markImeEnterCommitGuard,
   resetImeEnterCommitGuardForTests,
   scheduleClearInputComposition,
 } from '../isImeComposing';
+
+const getSnapshot = (editor: Editor) =>
+  Editor.string(editor, editor.selection?.focus.path ?? [0, 0]);
 
 describe('isImeComposing', () => {
   beforeEach(() => {
@@ -50,6 +55,29 @@ describe('isImeComposing', () => {
         false,
       ),
     ).toBe(true);
+  });
+});
+
+describe('commitImeCompositionTextIfMissing', () => {
+  it('Slate 已写入时不重复插入', async () => {
+    const editor = createEditor();
+    editor.children = [{ type: 'paragraph', children: [{ text: '，' }] }];
+    Transforms.select(editor, { path: [0, 0], offset: 1 });
+
+    commitImeCompositionTextIfMissing(editor, '，', getSnapshot);
+    await Promise.resolve();
+    expect(getSnapshot(editor)).toBe('，');
+  });
+
+  it('compositionend 未落盘时在 microtask 补写', async () => {
+    const editor = createEditor();
+    editor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
+    Transforms.select(editor, { path: [0, 0], offset: 0 });
+
+    commitImeCompositionTextIfMissing(editor, '，', getSnapshot);
+    expect(getSnapshot(editor)).toBe('');
+    await Promise.resolve();
+    expect(getSnapshot(editor)).toBe('，');
   });
 });
 

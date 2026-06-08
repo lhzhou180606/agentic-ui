@@ -1,3 +1,20 @@
+import { Editor, Range } from 'slate';
+
+/** 读取编辑器首段纯文本，供 IME commit 回退比对 */
+export function getEditorTextSnapshot(
+  editor: { children: unknown[] } | null | undefined,
+): string {
+  if (!editor?.children?.length) return '';
+  try {
+    const paragraph = editor.children[0] as {
+      children?: Array<{ text?: string }>;
+    };
+    return paragraph.children?.map((c) => c.text ?? '').join('') ?? '';
+  } catch {
+    return '';
+  }
+}
+
 /** Chrome / Edge：IME 组合期间 keydown 的 keyCode 常为 229 */
 export const IME_PROCESSING_KEY_CODE = 229;
 
@@ -67,4 +84,36 @@ export function scheduleClearInputComposition(clear: () => void): () => void {
   return () => {
     cancelled = true;
   };
+}
+
+/**
+ * Windows Chrome + 中文 IME 全角标点：slate-react 在 compositionend 依赖
+ * event.data 写入 Slate；若与 React 渲染竞态导致内容未落盘，在 microtask 中补写。
+ * 已写入则跳过，避免重复字符。
+ */
+export function commitImeCompositionTextIfMissing(
+  editor: Editor | null | undefined,
+  composedText: string,
+  getTextSnapshot: (editor: Editor) => string,
+): void {
+  if (!editor?.selection || !composedText || !Range.isCollapsed(editor.selection)) {
+    return;
+  }
+
+  const textBefore = getTextSnapshot(editor);
+
+  queueMicrotask(() => {
+    if (!editor.selection || !Range.isCollapsed(editor.selection)) {
+      return;
+    }
+
+    const textAfter = getTextSnapshot(editor);
+    if (textAfter.endsWith(composedText) && textAfter.length >= textBefore.length) {
+      return;
+    }
+
+    if (textAfter.length === textBefore.length) {
+      Editor.insertText(editor, composedText);
+    }
+  });
 }
