@@ -273,7 +273,7 @@ export function AceEditor({
         lang = modeMap.get(lang)!;
       }
       const aceLangs = await getAceLangs();
-      if (aceLangs.has(lang)) {
+      if (aceLangs.has(lang) && codeEditor.session) {
         codeEditor.session.setMode(`ace/mode/${lang}`);
       }
     }, 16);
