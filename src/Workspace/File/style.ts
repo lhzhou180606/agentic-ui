@@ -563,7 +563,7 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
         cursor: 'unset',
         '&:hover': {
           background: 'var(--color-gray-bg-card-white)',
-          border: '1px solid var(--color-gray-border-light)',
+          border: 'var(--color-gray-border-light)',
           boxShadow: 'var(--shadow-control-base)',
         },
       },
