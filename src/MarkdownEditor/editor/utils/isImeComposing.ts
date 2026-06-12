@@ -18,10 +18,8 @@ export function getEditorTextSnapshot(
 /** Chrome / Edge：IME 组合期间 keydown 的 keyCode 常为 229 */
 export const IME_PROCESSING_KEY_CODE = 229;
 
-/** compositionend 后短暂窗口内，紧随的 Enter 仍视为 IME 确认选字 */
-const IME_ENTER_COMMIT_GUARD_MS = 200;
-
-let imeEnterCommitGuardUntil = 0;
+/** compositionend 后下一记 Enter 仍视为 IME 确认选字（无固定毫秒窗口） */
+let imeEnterCommitGuardPending = false;
 
 export interface ImeKeyboardEventLike {
   key?: string;
@@ -29,16 +27,20 @@ export interface ImeKeyboardEventLike {
   nativeEvent: { isComposing?: boolean };
 }
 
-/**
  * compositionend 后标记：下一记 Enter 多为确认选字，勿触发发送或 / 快捷面板。
- */
+ * 仅消费一次；未命中时应在双 rAF 后调用 clearImeEnterCommitGuard 清除。
 export function markImeEnterCommitGuard(): void {
-  imeEnterCommitGuardUntil = Date.now() + IME_ENTER_COMMIT_GUARD_MS;
+  imeEnterCommitGuardPending = true;
 }
 
-/** 测试用：重置 Enter 守卫时间戳 */
+/** compositionend 双 rAF 后清除未消费的 Enter 守卫 */
+export function clearImeEnterCommitGuard(): void {
+  imeEnterCommitGuardPending = false;
+}
+
+/** 测试用：重置 Enter 守卫 */
 export function resetImeEnterCommitGuardForTests(): void {
-  imeEnterCommitGuardUntil = 0;
+  imeEnterCommitGuardPending = false;
 }
 
 /**
@@ -55,7 +57,8 @@ export function isImeComposing(
   if (inputComposition) return true;
   if (event.nativeEvent?.isComposing) return true;
   if (event.keyCode === IME_PROCESSING_KEY_CODE) return true;
-  if (event.key === 'Enter' && Date.now() < imeEnterCommitGuardUntil) {
+  if (event.key === 'Enter' && imeEnterCommitGuardPending) {
+    imeEnterCommitGuardPending = false;
     return true;
   }
   return false;
