@@ -30,6 +30,7 @@ vi.mock('slate', () => ({
   Editor: {
     fragment: vi.fn(() => []),
     hasPath: vi.fn(() => true),
+    insertText: vi.fn(),
     node: vi.fn(() => [{ type: 'paragraph', children: [{ text: '' }] }, [0]]),
     nodes: vi.fn(function* () {}),
     start: vi.fn(() => ({ path: [0, 0], offset: 0 })),
@@ -94,7 +95,6 @@ vi.mock('../components/EditorEditable', () => ({
   },
 }));
 
-
 vi.mock('../../../Hooks/useRefFunction', () => ({
   useRefFunction: (fn: (...args: any[]) => any) => fn,
 }));
@@ -139,6 +139,7 @@ vi.mock('../plugins/parseMarkdownToNodesAndInsert', () => ({
 
 vi.mock('../utils', () => ({
   MARKDOWN_EDITOR_EVENTS: { SELECTIONCHANGE: 'md-selectionchange' },
+  copy: vi.fn((value: unknown) => JSON.parse(JSON.stringify(value))),
   parserSlateNodeToMarkdown: vi.fn(() => 'mock-md'),
 }));
 
@@ -1587,7 +1588,7 @@ describe('Editor branches - onSlateChange', () => {
     expect(mockOnChange).toHaveBeenCalled();
   });
 
-  it('set_selection only operations do not mark content changed', () => {
+  it('set_selection only operations remain ignored before first content change', () => {
     const { editor } = setupStore({ readonly: false });
     renderEditor({});
 
@@ -1597,7 +1598,7 @@ describe('Editor branches - onSlateChange', () => {
     editor.operations = [{ type: 'set_selection' }];
     slateOnChange!([{ type: 'paragraph', children: [{ text: '' }] }]);
 
-    expect(mockOnChange).toHaveBeenCalled();
+    expect(mockOnChange).not.toHaveBeenCalled();
   });
 });
 
@@ -1801,6 +1802,25 @@ describe('Editor branches - onCompositionStart/End', () => {
       });
     });
     expect(mockStoreConfig.store.inputComposition).toBe(false);
+  });
+
+  it('compositionEnd 在 Slate 未落盘时补写 IME 文本', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Range.isCollapsed).mockReturnValue(true);
+
+    renderEditor({});
+
+    editableProps.onCompositionEnd({ data: '，' });
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(Editor.insertText).toHaveBeenCalledWith(editor, '，');
   });
 
   it('compositionEnd with tag-popup-input removes data-composition', () => {
@@ -2048,7 +2068,7 @@ describe('Editor branches - readonlyCls and childrenIsEmpty', () => {
     expect(editableProps.className).toContain('readonly');
   });
 
-  it('non-readonly with non-empty content applies focus class', () => {
+  it('non-readonly with non-empty content does not apply empty paragraph focus class', () => {
     const { editor } = setupStore({ readonly: false });
     editor.children = [{ type: 'paragraph', children: [{ text: 'content' }] }];
 
@@ -2056,8 +2076,8 @@ describe('Editor branches - readonlyCls and childrenIsEmpty', () => {
       initSchemaValue: [{ type: 'paragraph', children: [{ text: 'content' }] }],
     });
 
-    // Should include 'focus' class when content is not empty
-    expect(editableProps.className).toContain('focus');
+    expect(editableProps.className).toContain('ant-md-content-edit');
+    expect(editableProps.className).not.toContain('ant-md-content-focus');
   });
 
   it('non-readonly with only non-empty paragraphs has empty readonlyCls', () => {
